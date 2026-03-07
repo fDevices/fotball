@@ -208,6 +208,12 @@
   .lag-list-del:hover { color: var(--danger); }
   .lag-list-empty { padding: 16px; font-size: 14px; color: var(--muted); text-align: center; font-style: italic; }
 
+  .lag-star { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--muted); padding: 0 6px 0 0; line-height: 1; transition: color 0.15s, transform 0.15s; flex-shrink: 0; }
+  .lag-star:hover { color: var(--gold); transform: scale(1.2); }
+  .lag-star.active { color: var(--gold); }
+  .lag-list-name.favoritt { font-weight: 500; }
+  .lag-fav-badge { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); background: rgba(240,192,80,0.15); border: 1px solid rgba(240,192,80,0.3); border-radius: 10px; padding: 1px 6px; margin-left: 4px; vertical-align: middle; }
+
   /* Add lag row */
   .add-lag-row { display: flex; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); background: rgba(168,224,99,0.03); }
   .add-lag-input { flex: 1; background: rgba(168,224,99,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 14px; padding: 9px 12px; outline: none; }
@@ -428,8 +434,54 @@
   // ════════════════════════════════ PROFIL ════════════════════════════════
 
   function hentProfil() {
-    try { return JSON.parse(localStorage.getItem(PROFIL_KEY)) || { navn: '', klubb: '', posisjon: '', lag: [] }; }
-    catch(e) { return { navn: '', klubb: '', posisjon: '', lag: [] }; }
+    try { return JSON.parse(localStorage.getItem(PROFIL_KEY)) || { navn: '', klubb: '', posisjon: '', lag: [], favorittLag: '' }; }
+    catch(e) { return { navn: '', klubb: '', posisjon: '', lag: [], favorittLag: '' }; }
+  }
+
+  async function hentProfilFraSupabase() {
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/profiler?id=eq.default&select=*', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+      var data = await res.json();
+      if (data && data[0]) {
+        var p = {
+          navn: data[0].navn || '',
+          klubb: data[0].klubb || '',
+          posisjon: data[0].posisjon || '',
+          lag: data[0].lag || [],
+          favorittLag: data[0].favoritt_lag || '',
+          avatar: data[0].avatar_url || ''
+        };
+        localStorage.setItem(PROFIL_KEY, JSON.stringify(p));
+        return p;
+      }
+    } catch(e) {}
+    return hentProfil();
+  }
+
+  async function lagreProfilTilSupabase(profil) {
+    try {
+      await fetch(SUPABASE_URL + '/rest/v1/profiler', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'resolution=merge-duplicates'
+        },
+        body: JSON.stringify({
+          id: 'default',
+          navn: profil.navn,
+          klubb: profil.klubb,
+          posisjon: profil.posisjon,
+          lag: profil.lag,
+          favoritt_lag: profil.favorittLag || '',
+          avatar_url: profil.avatar || '',
+          oppdatert: new Date().toISOString()
+        })
+      });
+    } catch(e) { console.log('Supabase profil feil:', e); }
   }
 
   function lastOppBilde(input) {
@@ -464,18 +516,20 @@
     }
   }
 
-  function lagreProfil() {
+  async function lagreProfil() {
     const profil = {
       navn: document.getElementById('profil-navn').value.trim(),
       klubb: document.getElementById('profil-klubb').value.trim(),
       posisjon: document.getElementById('profil-posisjon').value.trim(),
-      lag: hentProfil().lag
+      lag: hentProfil().lag,
+      favorittLag: hentProfil().favorittLag || '',
+      avatar: hentProfil().avatar || ''
     };
     localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    await lagreProfilTilSupabase(profil);
     oppdaterAvatar();
     renderProfilLagListe();
     renderLoggSub();
-    // Flash saved indicator
     const el = document.getElementById('profil-saved');
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 2000);
@@ -505,9 +559,21 @@
   function slettLag(navn) {
     const profil = hentProfil();
     profil.lag = profil.lag.filter(l => l !== navn);
+    if (profil.favorittLag === navn) profil.favorittLag = '';
     localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    lagreProfilTilSupabase(profil);
     renderProfilLagListe();
     renderLagDropdown();
+  }
+
+  function setFavorittLag(navn) {
+    var profil = hentProfil();
+    profil.favorittLag = (profil.favorittLag === navn) ? '' : navn;
+    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    lagreProfilTilSupabase(profil);
+    renderProfilLagListe();
+    renderLagDropdown();
+    if (profil.favorittLag) velgLag(profil.favorittLag);
   }
 
   function renderProfilLagListe() {
@@ -517,17 +583,18 @@
       list.innerHTML = '<div class="lag-list-empty">Ingen lag lagt til ennå</div>';
       return;
     }
-    list.innerHTML = profil.lag.map(navn => `
-      <div class="lag-list-item">
-        <div class="lag-list-dot"></div>
-        <span class="lag-list-name">${navn}</span>
-        <button class="lag-list-del" onclick="slettLag('${navn.replace(/'/g,"\\'")}')">×</button>
-      </div>
-    `).join('');
+    const favoritt = profil.favorittLag || '';
+    list.innerHTML = profil.lag.map(function(navn) {
+      var erFav = navn === favoritt;
+      return '<div class="lag-list-item">' +
+        '<button class="lag-star ' + (erFav ? 'active' : '') + '" onclick="setFavorittLag(\'' + navn.replace(/'/g, "\\'") + '\')">' + (erFav ? '&#9733;' : '&#9734;') + '</button>' +
+        '<span class="lag-list-name' + (erFav ? ' favoritt' : '') + '">' + navn + (erFav ? ' <span class=\"lag-fav-badge\">standard</span>' : '') + '</span>' +
+        '<button class="lag-list-del" onclick="slettLag(\'' + navn.replace(/'/g, "\\'") + '\')">×</button>' +
+      '</div>';
+    }).join('');
   }
 
-  function lastInnProfil() {
-    const profil = hentProfil();
+  function lastInnProfilData(profil) {
     document.getElementById('profil-navn').value = profil.navn || '';
     document.getElementById('profil-klubb').value = profil.klubb || '';
     document.getElementById('profil-posisjon').value = profil.posisjon || '';
@@ -535,6 +602,10 @@
     document.getElementById('avatar-club').textContent = profil.klubb || '–';
     visAvatarBilde(profil.avatar || '');
     renderProfilLagListe();
+  }
+
+  function lastInnProfil() {
+    lastInnProfilData(hentProfil());
   }
 
   function renderLoggSub() {
@@ -604,6 +675,7 @@
     if (!profil.lag.includes(navn)) {
       profil.lag.push(navn);
       localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+      lagreProfilTilSupabase(profil);
       renderProfilLagListe();
     }
     input.value = '';
@@ -949,9 +1021,13 @@
   window.addEventListener('load', () => {
     document.getElementById('dato').value = new Date().toISOString().split('T')[0];
     oppdaterResultat();
-    lastInnProfil();
-    renderLagDropdown();
-    renderLoggSub();
+    // Load profil - try Supabase first, fall back to localStorage
+    hentProfilFraSupabase().then(function(p) {
+      lastInnProfilData(p);
+      renderLagDropdown();
+      renderLoggSub();
+      if (p.favorittLag && p.lag.includes(p.favorittLag)) velgLag(p.favorittLag);
+    });
   });
 </script>
 
