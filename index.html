@@ -28,11 +28,6 @@
   input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 14px 16px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
   input::placeholder { color: var(--muted); }
   input:focus { border-color: var(--lime); background: rgba(168,224,99,0.05); }
-  .result-picker { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-  .result-btn { padding: 14px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
-  .result-btn.active-win  { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
-  .result-btn.active-draw { background: rgba(240,192,80,0.15); border-color: var(--gold); color: var(--gold); }
-  .result-btn.active-loss { background: rgba(224,85,85,0.15); border-color: var(--danger); color: var(--danger); }
   .number-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .number-control { display: flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .num-btn { width: 48px; height: 52px; background: none; border: none; color: var(--lime); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
@@ -59,6 +54,10 @@
   .toggle-btn { padding: 14px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
   .toggle-btn.active { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
   .score-team-label.highlight { color: var(--lime); font-weight: 800; }
+  .resultat-auto { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 700; text-align: center; color: var(--muted); transition: all 0.2s; letter-spacing: 0.05em; }
+  .resultat-auto.seier    { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
+  .resultat-auto.uavgjort { background: rgba(240,192,80,0.15); border-color: var(--gold); color: var(--gold); }
+  .resultat-auto.tap      { background: rgba(224,85,85,0.15); border-color: var(--danger); color: var(--danger); }
 </style>
 </head>
 <body>
@@ -115,11 +114,7 @@
     </div>
     <div class="form-section">
       <label class="form-label">Resultat</label>
-      <div class="result-picker">
-        <button class="result-btn" onclick="setResultat('Seier')" id="btn-seier">🏆 Seier</button>
-        <button class="result-btn" onclick="setResultat('Uavgjort')" id="btn-uavgjort">🤝 Uavgjort</button>
-        <button class="result-btn" onclick="setResultat('Tap')" id="btn-tap">💪 Tap</button>
-      </div>
+      <div id="resultat-display" class="resultat-auto">–</div>
     </div>
     <div class="divider"></div>
     <div class="form-section">
@@ -150,10 +145,11 @@
   const SUPABASE_URL = 'https://gjxsebeajcrmseraypyw.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_gkIN7XSAzQVKS9lpqj6LYQ_vV8G3VRe';
 
-  let mal = 0, assist = 0, hjemme = 0, borte = 0, resultat = '', kamptype = 'hjemme';
+  let mal = 0, assist = 0, hjemme = 0, borte = 0, kamptype = 'hjemme';
 
   window.addEventListener('load', () => {
     document.getElementById('dato').value = new Date().toISOString().split('T')[0];
+    oppdaterResultat();
   });
 
   function setKamptype(type) {
@@ -162,39 +158,41 @@
     document.getElementById('btn-borte-toggle').classList.toggle('active', type === 'borte');
     document.getElementById('label-hjemme').classList.toggle('highlight', type === 'hjemme');
     document.getElementById('label-borte').classList.toggle('highlight', type === 'borte');
+    oppdaterResultat();
+  }
+
+  function oppdaterResultat() {
+    const el = document.getElementById('resultat-display');
+    let r;
+    if (kamptype === 'hjemme') {
+      r = hjemme > borte ? 'seier' : hjemme < borte ? 'tap' : 'uavgjort';
+    } else {
+      r = borte > hjemme ? 'seier' : borte < hjemme ? 'tap' : 'uavgjort';
+    }
+    const labels = { seier: '🏆 Seier', uavgjort: '🤝 Uavgjort', tap: '💪 Tap' };
+    el.textContent = labels[r];
+    el.className = 'resultat-auto ' + r;
   }
 
   function adjust(type, delta) {
     if (type === 'mal') {
       mal = Math.max(0, mal + delta);
       document.getElementById('mal-display').textContent = mal;
-      if (kamptype === 'hjemme' && hjemme < mal) {
-        hjemme = mal;
-        document.getElementById('hjemme-display').textContent = hjemme;
-      } else if (kamptype === 'borte' && borte < mal) {
-        borte = mal;
-        document.getElementById('borte-display').textContent = borte;
-      }
+      if (kamptype === 'hjemme' && hjemme < mal) { hjemme = mal; document.getElementById('hjemme-display').textContent = hjemme; }
+      else if (kamptype === 'borte' && borte < mal) { borte = mal; document.getElementById('borte-display').textContent = borte; }
+      oppdaterResultat();
     }
     if (type === 'assist') { assist = Math.max(0, assist+delta); document.getElementById('assist-display').textContent = assist; }
     if (type === 'hjemme') {
-      const min = (kamptype === 'hjemme') ? mal : 0;
-      hjemme = Math.max(min, hjemme + delta);
+      hjemme = Math.max(kamptype === 'hjemme' ? mal : 0, hjemme + delta);
       document.getElementById('hjemme-display').textContent = hjemme;
+      oppdaterResultat();
     }
     if (type === 'borte') {
-      const min = (kamptype === 'borte') ? mal : 0;
-      borte = Math.max(min, borte + delta);
+      borte = Math.max(kamptype === 'borte' ? mal : 0, borte + delta);
       document.getElementById('borte-display').textContent = borte;
+      oppdaterResultat();
     }
-  }
-
-  function setResultat(r) {
-    resultat = r;
-    document.querySelectorAll('.result-btn').forEach(b => b.className = 'result-btn');
-    if (r === 'Seier')    document.getElementById('btn-seier').classList.add('active-win');
-    if (r === 'Uavgjort') document.getElementById('btn-uavgjort').classList.add('active-draw');
-    if (r === 'Tap')      document.getElementById('btn-tap').classList.add('active-loss');
   }
 
   async function lagreKamp() {
@@ -202,8 +200,8 @@
     const motstander = document.getElementById('motstander').value.trim();
     const egetLag    = document.getElementById('eget-lag').value.trim();
     const turnering  = document.getElementById('turnering').value.trim();
-    if (!dato || !motstander || !egetLag || !resultat) {
-      showToast('Fyll inn dato, motstander, lag og resultat', 'error');
+    if (!dato || !motstander || !egetLag) {
+      showToast('Fyll inn dato, motstander og lag', 'error');
       return;
     }
     const btn = document.getElementById('submit-btn');
@@ -212,7 +210,7 @@
       const res = await fetch(SUPABASE_URL + '/rest/v1/kamper', {
         method: 'POST',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ dato, motstanderlag: motstander, eget_lag: egetLag, turnering, hjemme, borte, mal, assist, resultat, kamptype })
+        body: JSON.stringify({ dato, motstanderlag: motstander, eget_lag: egetLag, turnering, hjemme, borte, mal, assist, kamptype })
       });
       if (res.ok) { showToast('⚽ Kamp lagret!', 'success'); resetForm(); }
       else { const err = await res.json(); showToast('Feil: ' + (err.message || 'ukjent'), 'error'); }
@@ -222,10 +220,10 @@
 
   function resetForm() {
     ['motstander','eget-lag','turnering'].forEach(id => document.getElementById(id).value = '');
-    mal = 0; assist = 0; hjemme = 0; borte = 0; resultat = '';
+    mal = 0; assist = 0; hjemme = 0; borte = 0;
     ['mal','assist','hjemme','borte'].forEach(t => document.getElementById(t+'-display').textContent = '0');
-    document.querySelectorAll('.result-btn').forEach(b => b.className = 'result-btn');
     setKamptype('hjemme');
+    oppdaterResultat();
     document.getElementById('dato').value = new Date().toISOString().split('T')[0];
   }
 
