@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fotball">
+<title>Fotball Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --grass: #1a3a1f;
+    --grass-mid: #1e4525;
+    --grass-light: #2d5e35;
+    --lime: #a8e063;
+    --lime-bright: #c5f270;
+    --white: #f5f5f0;
+    --muted: #8a9a80;
+    --card: #162b1a;
+    --border: rgba(168,224,99,0.15);
+    --danger: #e05555;
+    --gold: #f0c050;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--grass);
+    color: var(--white);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Grass texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(0,0,0,0.03) 40px,
+      rgba(0,0,0,0.03) 80px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(0,0,0,0.03) 40px,
+      rgba(0,0,0,0.03) 80px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 0 40px;
+  }
+
+  /* Header */
+  .header {
+    padding: 56px 24px 24px;
+    position: relative;
+  }
+
+  .header-badge {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--lime);
+    background: rgba(168,224,99,0.1);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+
+  h1 span { color: var(--lime); }
+
+  .header-sub {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  /* Setup screen */
+  #setup-screen {
+    display: none;
+    padding: 0 24px;
+    animation: slideUp 0.4s ease;
+  }
+
+  .setup-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .setup-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 4px;
+  }
+
+  .setup-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .step {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(168,224,99,0.15);
+    border: 1px solid var(--lime);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--lime);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 13px;
+    color: var(--white);
+    line-height: 1.5;
+  }
+
+  .step-text a {
+    color: var(--lime);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(168,224,99,0.3);
+  }
+
+  .step-text code {
+    background: rgba(168,224,99,0.1);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Form */
+  #main-screen { display: none; padding: 0 24px; animation: slideUp 0.4s ease; }
+
+  .form-section {
+    margin-bottom: 8px;
+  }
+
+  .form-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    font-size: 16px;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input::placeholder { color: var(--muted); }
+
+  input:focus, select:focus {
+    border-color: var(--lime);
+    background: rgba(168,224,99,0.05);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a9a80' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+    cursor: pointer;
+  }
+
+  select option { background: #1a3a1f; color: white; }
+
+  /* Result picker */
+  .result-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .result-btn {
+    padding: 14px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .result-btn.active-win { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
+  .result-btn.active-draw { background: rgba(240,192,80,0.15); border-color: var(--gold); color: var(--gold); }
+  .result-btn.active-loss { background: rgba(224,85,85,0.15); border-color: var(--danger); color: var(--danger); }
+
+  /* Number row */
+  .number-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .number-control {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .num-btn {
+    width: 48px;
+    height: 52px;
+    background: none;
+    border: none;
+    color: var(--lime);
+    font-size: 22px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .num-btn:active { background: rgba(168,224,99,0.1); }
+
+  .num-display {
+    flex: 1;
+    text-align: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    pointer-events: none;
+  }
+
+  .num-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    text-align: center;
+    padding-bottom: 6px;
+  }
+
+  /* Submit button */
+  .submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--lime);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grass);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:active { transform: scale(0.98); background: var(--lime-bright); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Settings link */
+  .settings-link {
+    text-align: center;
+    padding: 16px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 100;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--lime); color: var(--lime); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Score display */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .score-row .number-control { flex: 1; }
+
+  .score-separator {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--muted);
+    flex-shrink: 0;
+    line-height: 1;
+    padding-top: 4px;
+  }
+
+  .score-team-labels {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .score-team-label {
+    flex: 1;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .score-team-label.sep-spacer { width: 20px; flex-shrink: 0; flex-grow: 0; }
+
+  /* Config inputs */
+  .config-input-wrap { margin-bottom: 12px; }
+
+  .save-config-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--lime);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--grass);
+    cursor: pointer;
+    margin-top: 8px;
+  }
+
+  .notion-icon {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="header-badge">⚽ Sesong 2025</div>
+    <h1>Kamp<span>logger</span></h1>
+    <p class="header-sub" id="header-sub">Logg kamper direkte til Notion</p>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div id="setup-screen">
+    <div class="setup-card">
+      <span class="notion-icon">◾</span>
+      <div class="setup-title">Koble til Notion</div>
+      <p class="setup-desc">Følg disse stegene én gang, så er du klar til å logge kamper.</p>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          Gå til <a href="https://www.notion.so/my-integrations" target="_blank">notion.so/my-integrations</a> og lag en ny integrasjon. Gi den et navn (f.eks. "Fotball"). Kopier <strong>Internal Integration Token</strong>.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          Opprett en ny Notion-database med disse kolonnene:<br><br>
+          <code>Kamp</code> (Title) · <code>Dato</code> (Date) · <code>Motstanderlag</code> (Text) · <code>Eget lag</code> (Text) · <code>Turnering</code> (Text) · <code>Hjemme</code> (Number) · <code>Borte</code> (Number) · <code>Mål</code> (Number) · <code>Assist</code> (Number) · <code>Resultat</code> (Select: Seier / Uavgjort / Tap)
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          Åpne databasen → klikk ••• øverst til høyre → <strong>Add connections</strong> → legg til integrasjonen din.
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          Kopier database-ID fra URL-en: <code>notion.so/[din-id]?v=...</code> – IDen er den lange strengen mellom <code>/</code> og <code>?</code>.
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-card">
+      <div class="setup-title">Skriv inn nøkler</div>
+
+      <div class="config-input-wrap">
+        <label class="form-label">Notion API Token</label>
+        <input type="password" id="config-token" placeholder="secret_xxxxxxxx..." autocomplete="off">
+      </div>
+
+      <div class="config-input-wrap">
+        <label class="form-label">Database ID</label>
+        <input type="text" id="config-db" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+      </div>
+
+      <button class="save-config-btn" onclick="saveConfig()">Lagre og start →</button>
+    </div>
+  </div>
+
+  <!-- MAIN SCREEN -->
+  <div id="main-screen">
+
+    <div style="padding: 0 24px;">
+
+      <div class="form-section">
+        <label class="form-label">Dato</label>
+        <input type="date" id="dato">
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Motstanderlag</label>
+        <input type="text" id="motstander" placeholder="F.eks. Brann IL" autocomplete="off">
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Eget lag / tropp</label>
+        <input type="text" id="eget-lag" placeholder="F.eks. Stabæk G12" autocomplete="off">
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Turnering / serie</label>
+        <input type="text" id="turnering" placeholder="F.eks. Kretscup, seriespill..." autocomplete="off">
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-section">
+        <div class="score-team-labels">
+          <span class="score-team-label">Hjemmelag</span>
+          <span class="score-team-label sep-spacer"> </span>
+          <span class="score-team-label">Bortelag</span>
+        </div>
+        <div class="score-row">
+          <div class="number-control">
+            <button class="num-btn" onclick="adjust('hjemme', -1)">−</button>
+            <span class="num-display" id="hjemme-display">0</span>
+            <button class="num-btn" onclick="adjust('hjemme', 1)">+</button>
+          </div>
+          <span class="score-separator">–</span>
+          <div class="number-control">
+            <button class="num-btn" onclick="adjust('borte', -1)">−</button>
+            <span class="num-display" id="borte-display">0</span>
+            <button class="num-btn" onclick="adjust('borte', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <label class="form-label">Resultat</label>
+        <div class="result-picker">
+          <button class="result-btn" onclick="setResultat('Seier')" id="btn-seier">🏆 Seier</button>
+          <button class="result-btn" onclick="setResultat('Uavgjort')" id="btn-uavgjort">🤝 Uavgjort</button>
+          <button class="result-btn" onclick="setResultat('Tap')" id="btn-tap">💪 Tap</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="form-section">
+        <div class="number-row">
+          <div>
+            <span class="num-label">Mål</span>
+            <div class="number-control">
+              <button class="num-btn" onclick="adjust('mal', -1)">−</button>
+              <span class="num-display" id="mal-display">0</span>
+              <button class="num-btn" onclick="adjust('mal', 1)">+</button>
+            </div>
+          </div>
+          <div>
+            <span class="num-label">Assist</span>
+            <div class="number-control">
+              <button class="num-btn" onclick="adjust('assist', -1)">−</button>
+              <span class="num-display" id="assist-display">0</span>
+              <button class="num-btn" onclick="adjust('assist', 1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="lagreKamp()">
+        Lagre kamp til Notion
+      </button>
+
+      <div class="settings-link" onclick="showSetup()">⚙ Endre API-innstillinger</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // State
+  let mal = 0, assist = 0, hjemme = 0, borte = 0, resultat = '';
+
+  // Config – hardkodet direkte
+  let notionToken = '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';
+  let notionDb    = '31cac9be292e812b8d08cde9ba6012f5';
+
+  // Init – gå direkte til skjema, ingen setup nødvendig
+  window.addEventListener('load', () => {
+    showMain();
+  });
+
+  function showMain() {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+    document.getElementById('header-sub').textContent = 'Klar til å logge kamp 🟢';
+    // Set today's date
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dato').value = today;
+  }
+
+  function showSetup() {
+    document.getElementById('setup-screen').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+    document.getElementById('config-token').value = notionToken;
+    document.getElementById('config-db').value = notionDb || '31cac9be292e812b8d08cde9ba6012f5';
+  }
+
+  function saveConfig() {
+    const token = document.getElementById('config-token').value.trim();
+    const db = document.getElementById('config-db').value.trim();
+
+    if (!token || !db) {
+      showToast('Fyll inn begge feltene', 'error');
+      return;
+    }
+
+    notionToken = token;
+    notionDb = db;
+
+    showToast('Lagret! ✓', 'success');
+    setTimeout(() => showMain(), 800);
+  }
+
+  function adjust(type, delta) {
+    if (type === 'mal') {
+      mal = Math.max(0, mal + delta);
+      document.getElementById('mal-display').textContent = mal;
+    } else if (type === 'assist') {
+      assist = Math.max(0, assist + delta);
+      document.getElementById('assist-display').textContent = assist;
+    } else if (type === 'hjemme') {
+      hjemme = Math.max(0, hjemme + delta);
+      document.getElementById('hjemme-display').textContent = hjemme;
+    } else if (type === 'borte') {
+      borte = Math.max(0, borte + delta);
+      document.getElementById('borte-display').textContent = borte;
+    }
+  }
+
+  function setResultat(r) {
+    resultat = r;
+    document.querySelectorAll('.result-btn').forEach(b => b.className = 'result-btn');
+    if (r === 'Seier') document.getElementById('btn-seier').classList.add('active-win');
+    if (r === 'Uavgjort') document.getElementById('btn-uavgjort').classList.add('active-draw');
+    if (r === 'Tap') document.getElementById('btn-tap').classList.add('active-loss');
+  }
+
+  async function lagreKamp() {
+    const dato = document.getElementById('dato').value;
+    const motstander = document.getElementById('motstander').value.trim();
+    const egetLag = document.getElementById('eget-lag').value.trim();
+    const turnering = document.getElementById('turnering').value.trim();
+
+    if (!dato || !motstander || !egetLag || !resultat) {
+      showToast('Fyll inn dato, motstander, lag og resultat', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Lagrer...';
+
+    const title = `${egetLag} vs ${motstander} (${hjemme}–${borte})`;
+
+    const body = {
+      parent: { database_id: notionDb },
+      properties: {
+        "Kamp": { title: [{ text: { content: title } }] },
+        "Dato": { date: { start: dato } },
+        "Motstanderlag": { rich_text: [{ text: { content: motstander } }] },
+        "Eget lag": { rich_text: [{ text: { content: egetLag } }] },
+        "Turnering": { rich_text: [{ text: { content: turnering } }] },
+        "Hjemme": { number: hjemme },
+        "Borte": { number: borte },
+        "Mål": { number: mal },
+        "Assist": { number: assist },
+        "Resultat": { select: { name: resultat } }
+      }
+    };
+
+    try {
+      const res = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': '2022-06-28'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        showToast('⚽ Kamp lagret i Notion!', 'success');
+        resetForm();
+      } else {
+        const err = await res.json();
+        console.error(err);
+        showToast('Feil: ' + (err.message || 'Sjekk API-nøkkel'), 'error');
+      }
+    } catch (e) {
+      showToast('Nettverksfeil – prøv igjen', 'error');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Lagre kamp til Notion';
+  }
+
+  function resetForm() {
+    document.getElementById('motstander').value = '';
+    document.getElementById('eget-lag').value = '';
+    document.getElementById('turnering').value = '';
+    mal = 0; assist = 0; hjemme = 0; borte = 0; resultat = '';
+    document.getElementById('mal-display').textContent = '0';
+    document.getElementById('assist-display').textContent = '0';
+    document.getElementById('hjemme-display').textContent = '0';
+    document.getElementById('borte-display').textContent = '0';
+    document.querySelectorAll('.result-btn').forEach(b => b.className = 'result-btn');
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dato').value = today;
+  }
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + type;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>
