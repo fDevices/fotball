@@ -5,69 +5,240 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Fotball">
-<title>Fotball Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-title" content="Athlytics">
+<title>Athlytics Sport</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --grass: #1a3a1f; --grass-mid: #1e4525; --lime: #a8e063; --lime-bright: #c5f270;
-    --white: #f5f5f0; --muted: #8a9a80; --card: #162b1a; --border: rgba(168,224,99,0.15);
+    --grass: #1a3a1f; --grass-mid: #1e4525;
+    --lime: #a8e063; --lime-bright: #c5f270;
+    --white: #f5f5f0; --muted: #8a9a80;
+    --card: #162b1a; --border: rgba(168,224,99,0.15);
     --danger: #e05555; --gold: #f0c050;
+    --tab-h: 64px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: 'Barlow', sans-serif; background: var(--grass); color: var(--white); min-height: 100vh; min-height: -webkit-fill-available; padding-bottom: env(safe-area-inset-bottom); }
-  body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.03) 40px,rgba(0,0,0,0.03) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.03) 40px,rgba(0,0,0,0.03) 80px); pointer-events: none; z-index: 0; }
-  .app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 40px; }
-  .header { padding: 56px 24px 24px; }
-  .header-badge { display: inline-block; font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); background: rgba(168,224,99,0.1); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
-  h1 { font-family: 'Barlow Condensed',sans-serif; font-size: 42px; font-weight: 800; line-height: 1; text-transform: uppercase; }
+  html, body { height: 100%; }
+  body { font-family: 'Barlow', sans-serif; background: var(--grass); color: var(--white); min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px); pointer-events: none; z-index: 0; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 calc(var(--tab-h) + 20px + env(safe-area-inset-bottom)); min-height: 100vh; pointer-events: none; }
+  .screen.active { pointer-events: all; }
+  .screen.active { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── HEADER ── */
+  .header { padding: 52px 24px 20px; }
+  .header-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); background: rgba(168,224,99,0.1); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+  h1 { font-family: 'Barlow Condensed',sans-serif; font-size: 42px; font-weight: 900; line-height: 1; text-transform: uppercase; }
   h1 span { color: var(--lime); }
   .header-sub { font-size: 14px; color: var(--muted); margin-top: 6px; font-weight: 300; }
+
+  /* ── SHARED FORM ── */
+  .form-body { padding: 0 24px; }
   .form-section { margin-bottom: 8px; }
   .form-label { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; display: block; }
-  input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 14px 16px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
+  input[type=text], input[type=date] { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 14px 16px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
   input::placeholder { color: var(--muted); }
   input:focus { border-color: var(--lime); background: rgba(168,224,99,0.05); }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* ── TOGGLE ── */
+  .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .toggle-btn { padding: 13px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
+  .toggle-btn.active { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
+
+  /* ── SCORE ── */
+  .score-team-labels { display: flex; gap: 10px; margin-bottom: 4px; }
+  .score-team-label { flex: 1; font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .score-team-label.highlight { color: var(--lime); font-weight: 800; }
+  .sep-spacer { width: 20px; flex-shrink: 0; }
+  .score-row { display: flex; align-items: center; gap: 10px; }
+  .score-row .number-control { flex: 1; }
+  .score-separator { font-family: 'Barlow Condensed',sans-serif; font-size: 28px; font-weight: 800; color: var(--muted); flex-shrink: 0; }
+
+  /* ── NUMBER CONTROLS ── */
   .number-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .number-control { display: flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .num-btn { width: 48px; height: 52px; background: none; border: none; color: var(--lime); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
   .num-btn:active { background: rgba(168,224,99,0.1); }
   .num-display { flex: 1; text-align: center; font-family: 'Barlow Condensed',sans-serif; font-size: 26px; font-weight: 700; color: var(--white); }
   .num-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; text-align: center; padding-bottom: 6px; }
-  .score-row { display: flex; align-items: center; gap: 10px; }
-  .score-row .number-control { flex: 1; }
-  .score-separator { font-family: 'Barlow Condensed',sans-serif; font-size: 28px; font-weight: 800; color: var(--muted); flex-shrink: 0; }
-  .score-team-labels { display: flex; gap: 10px; margin-bottom: 4px; }
-  .score-team-label { flex: 1; font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
-  .sep-spacer { width: 20px; flex-shrink: 0; flex-grow: 0; }
-  .submit-btn { width: 100%; padding: 18px; background: var(--lime); border: none; border-radius: 12px; font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grass); cursor: pointer; transition: all 0.15s; margin-top: 16px; }
-  .submit-btn:active { transform: scale(0.98); background: var(--lime-bright); }
-  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-  .divider { height: 1px; background: var(--border); margin: 20px 0; }
-  .toast { position: fixed; bottom: calc(24px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; z-index: 100; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-  .toast.success { border-color: var(--lime); color: var(--lime); }
-  .toast.error { border-color: var(--danger); color: var(--danger); }
-  #main-screen { padding: 0 24px; animation: slideUp 0.4s ease; }
-  @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-  .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .toggle-btn { padding: 14px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; text-align: center; }
-  .toggle-btn.active { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
-  .score-team-label.highlight { color: var(--lime); font-weight: 800; }
+
+  /* ── RESULTAT ── */
   .resultat-auto { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 700; text-align: center; color: var(--muted); transition: all 0.2s; letter-spacing: 0.05em; }
   .resultat-auto.seier    { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
   .resultat-auto.uavgjort { background: rgba(240,192,80,0.15); border-color: var(--gold); color: var(--gold); }
   .resultat-auto.tap      { background: rgba(224,85,85,0.15); border-color: var(--danger); color: var(--danger); }
+
+  /* ── LAG DROPDOWN ── */
+  .lag-selector-wrap { position: relative; }
+  .lag-selected { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 14px 44px 14px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s; user-select: none; }
+  .lag-selected.open { border-color: var(--lime); background: rgba(168,224,99,0.05); }
+  .lag-selected-text { color: var(--white); flex: 1; }
+  .lag-selected-text.placeholder { color: var(--muted); }
+  .lag-chevron { color: var(--muted); font-size: 12px; transition: transform 0.2s; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); }
+  .lag-chevron.open { transform: translateY(-50%) rotate(180deg); color: var(--lime); }
+  .lag-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1a3a22; border: 1px solid var(--lime); border-radius: 10px; z-index: 50; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); display: none; }
+  .lag-dropdown.open { display: block; animation: dropDown 0.15s ease; }
+  @keyframes dropDown { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .lag-option { padding: 13px 16px; font-size: 15px; color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .lag-option:last-child { border-bottom: none; }
+  .lag-option:hover, .lag-option.selected { background: rgba(168,224,99,0.1); }
+  .lag-option.selected { color: var(--lime); }
+  .lag-option-add { color: var(--lime); font-weight: 500; }
+  .lag-option-add span { font-size: 18px; margin-right: 8px; }
+  .lag-new-row { padding: 8px; display: none; border-top: 1px solid var(--border); }
+  .lag-new-row.visible { display: flex; gap: 6px; }
+  .lag-new-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 14px; padding: 10px 12px; outline: none; }
+  .lag-new-input:focus { border-color: var(--lime); }
+  .lag-new-save { background: var(--lime); border: none; border-radius: 8px; color: var(--grass); font-family: 'Barlow Condensed',sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.05em; padding: 10px 14px; cursor: pointer; white-space: nowrap; }
+
+  /* ── SUBMIT ── */
+  .submit-btn { width: 100%; padding: 18px; background: var(--lime); border: none; border-radius: 12px; font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grass); cursor: pointer; transition: all 0.15s; margin-top: 16px; }
+  .submit-btn:active { transform: scale(0.98); background: var(--lime-bright); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: calc(var(--tab-h) + 12px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--lime); color: var(--lime); }
+  .toast.error   { border-color: var(--danger); color: var(--danger); }
+
+  /* ── TAB BAR ── */
+  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-start; padding-top: 8px; }
+  .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; padding: 0 8px; transition: all 0.15s; }
+  .tab-icon { font-size: 22px; line-height: 1; filter: grayscale(1) opacity(0.5); transition: all 0.2s; }
+  .tab-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; }
+  .tab-btn.active .tab-icon { filter: none; transform: scale(1.1); }
+  .tab-btn.active .tab-label { color: var(--lime); }
+
+  /* ── STATS ── */
+  .stats-body { padding: 0 24px; }
+  .season-selector { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .season-selector::-webkit-scrollbar { display: none; }
+  .season-pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .season-pill.active { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+  .stat-num { font-family: 'Barlow Condensed',sans-serif; font-size: 36px; font-weight: 900; line-height: 1; color: var(--white); }
+  .stat-num.lime { color: var(--lime); }
+  .stat-num.gold { color: var(--gold); }
+  .stat-num.danger { color: var(--danger); }
+  .stat-lbl { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .wdl-bar { height: 6px; border-radius: 3px; overflow: hidden; display: flex; margin: 8px 0 4px; gap: 2px; }
+  .wdl-seg { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .wdl-seg.w { background: var(--lime); }
+  .wdl-seg.d { background: var(--gold); }
+  .wdl-seg.l { background: var(--danger); }
+  .wdl-labels { display: flex; justify-content: space-between; }
+  .wdl-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+  .stat-row-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin-bottom: 8px; }
+  .stat-row-title { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .stat-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .stat-row-label { font-size: 14px; color: var(--white); }
+  .stat-row-value { font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 700; color: var(--lime); }
+  .refresh-btn { margin-top: 8px; background: none; border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-size: 16px; padding: 4px 12px; cursor: pointer; transition: all 0.2s; }
+  .refresh-btn:active { color: var(--lime); border-color: var(--lime); }
+  .loading { text-align: center; padding: 40px; color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--lime); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── KAMP LISTE ── */
+  .kamp-liste-header { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 16px 0 8px; }
+  .kamp-item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s, background 0.15s; display: flex; align-items: center; gap: 10px; }
+  .kamp-item:hover { border-color: rgba(168,224,99,0.4); background: rgba(168,224,99,0.04); }
+  .kamp-res { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; font-weight: 700; font-family: 'Barlow Condensed',sans-serif; }
+  .kamp-res.seier    { background: rgba(168,224,99,0.2); color: var(--lime); }
+  .kamp-res.uavgjort { background: rgba(240,192,80,0.2); color: var(--gold); }
+  .kamp-res.tap      { background: rgba(224,85,85,0.2); color: var(--danger); }
+  .kamp-info { flex: 1; min-width: 0; }
+  .kamp-motstander { font-size: 15px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kamp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .kamp-score { font-family: 'Barlow Condensed',sans-serif; font-size: 20px; font-weight: 800; color: var(--white); flex-shrink: 0; }
+  .kamp-edit-icon { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+
+  /* ── EDIT MODAL ── */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal-sheet { position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto; background: #1a3422; border: 1px solid var(--border); border-bottom: none; border-radius: 20px 20px 0 0; z-index: 301; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32,0.72,0,1); padding-bottom: env(safe-area-inset-bottom); max-height: 90vh; overflow-y: auto; }
+  .modal-sheet.open { transform: translateY(0); }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 16px; }
+  .modal-title { font-family: 'Barlow Condensed',sans-serif; font-size: 20px; font-weight: 800; text-transform: uppercase; color: var(--white); padding: 0 20px 12px; }
+  .modal-body { padding: 0 20px; }
+  .modal-field { margin-bottom: 10px; }
+  .modal-label { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; display: block; }
+  .modal-input { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 12px 14px; outline: none; transition: border-color 0.2s; appearance: none; }
+  .modal-input:focus { border-color: var(--lime); }
+  .modal-score-row { display: flex; align-items: center; gap: 10px; }
+  .modal-score-row .number-control { flex: 1; }
+  .modal-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; padding: 16px 20px 20px; }
+  .modal-del-btn { padding: 15px; background: rgba(224,85,85,0.15); border: 1px solid var(--danger); border-radius: 12px; color: var(--danger); font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+  .modal-del-btn:active { background: rgba(224,85,85,0.3); }
+  .modal-save-btn { padding: 15px; background: var(--lime); border: none; border-radius: 12px; color: var(--grass); font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+  .modal-save-btn:active { background: var(--lime-bright); }
+
+  /* ── PROFIL ── */
+  .profil-body { padding: 0 24px; }
+
+  /* Avatar */
+  .profil-avatar { display: flex; flex-direction: column; align-items: center; padding: 8px 0 24px; }
+  .avatar-circle { width: 80px; height: 80px; border-radius: 50%; background: rgba(168,224,99,0.1); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 10px; }
+  .avatar-name { font-family: 'Barlow Condensed',sans-serif; font-size: 22px; font-weight: 800; color: var(--white); letter-spacing: 0.03em; }
+  .avatar-club { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* Section card */
+  .profil-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 10px; }
+  .profil-card-title { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); padding: 12px 16px 8px; }
+  .profil-field { display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); gap: 12px; }
+  .profil-field:last-child { border-bottom: none; }
+  .profil-field-label { font-size: 13px; color: var(--muted); width: 70px; flex-shrink: 0; }
+  .profil-field-input { flex: 1; background: none; border: none; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 15px; outline: none; padding: 0; }
+  .profil-field-input::placeholder { color: rgba(138,154,128,0.5); }
+
+  /* Lag liste */
+  .lag-list { padding: 0; }
+  .lag-list-item { display: flex; align-items: center; padding: 11px 16px; border-bottom: 1px solid var(--border); gap: 10px; }
+  .lag-list-item:last-child { border-bottom: none; }
+  .lag-list-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lime); flex-shrink: 0; opacity: 0.7; }
+  .lag-list-name { flex: 1; font-size: 15px; color: var(--white); }
+  .lag-list-del { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 0 0 0 8px; line-height: 1; transition: color 0.15s; }
+  .lag-list-del:hover { color: var(--danger); }
+  .lag-list-empty { padding: 16px; font-size: 14px; color: var(--muted); text-align: center; font-style: italic; }
+
+  /* Add lag row */
+  .add-lag-row { display: flex; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); background: rgba(168,224,99,0.03); }
+  .add-lag-input { flex: 1; background: rgba(168,224,99,0.05); border: 1px solid var(--border); border-radius: 8px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 14px; padding: 9px 12px; outline: none; }
+  .add-lag-input:focus { border-color: var(--lime); }
+  .add-lag-btn { background: var(--lime); border: none; border-radius: 8px; color: var(--grass); font-family: 'Barlow Condensed',sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.05em; padding: 9px 14px; cursor: pointer; white-space: nowrap; }
+  .add-lag-btn:active { background: var(--lime-bright); }
+
+  /* Save profil btn */
+  .profil-save-btn { width: 100%; padding: 16px; background: var(--lime); border: none; border-radius: 12px; font-family: 'Barlow Condensed',sans-serif; font-size: 17px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grass); cursor: pointer; transition: all 0.15s; margin-top: 4px; }
+  .profil-save-btn:active { transform: scale(0.98); background: var(--lime-bright); }
+
+  /* Avatar upload */
+  .avatar-circle { cursor: pointer; transition: border-color 0.2s, transform 0.15s; overflow: hidden; }
+  .avatar-circle:hover { border-color: var(--lime); transform: scale(1.04); }
+  .avatar-upload-hint { font-size: 11px; color: var(--muted); margin-top: -4px; margin-bottom: 6px; letter-spacing: 0.03em; }
+
+  /* Saved indicator */
+  .profil-saved { text-align: center; font-size: 13px; color: var(--lime); padding: 8px; opacity: 0; transition: opacity 0.3s; }
+  .profil-saved.show { opacity: 1; }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ══════════════════════════════════ LOGG ══════════════════════════════════ -->
+<div class="screen active" id="screen-logg">
   <div class="header">
     <div class="header-badge">⚽ Sesong 2025</div>
     <h1>Kamp<span>logger</span></h1>
-    <p class="header-sub">Klar til å logge kamp 🟢</p>
+    <p class="header-sub" id="logg-sub">Klar til å logge kamp 🟢</p>
   </div>
-  <div id="main-screen">
+  <div class="form-body">
     <div class="form-section">
       <label class="form-label">Dato</label>
       <input type="date" id="dato">
@@ -83,10 +254,25 @@
       <label class="form-label">Motstanderlag</label>
       <input type="text" id="motstander" placeholder="F.eks. Brann IL" autocomplete="off">
     </div>
+
+    <!-- Lag dropdown -->
     <div class="form-section">
       <label class="form-label">Eget lag / tropp</label>
-      <input type="text" id="eget-lag" placeholder="F.eks. Stabæk G12" autocomplete="off">
+      <div class="lag-selector-wrap">
+        <div class="lag-selected" id="lag-selected" onclick="toggleLagDropdown()">
+          <span class="lag-selected-text placeholder" id="lag-selected-text">Velg lag...</span>
+          <span class="lag-chevron" id="lag-chevron">▼</span>
+        </div>
+        <div class="lag-dropdown" id="lag-dropdown">
+          <div id="lag-options-list"></div>
+          <div class="lag-new-row" id="lag-new-row">
+            <input class="lag-new-input" id="lag-new-input" placeholder="Navn på nytt lag..." onkeydown="if(event.key==='Enter')saveNewLagFromDropdown()">
+            <button class="lag-new-save" onclick="saveNewLagFromDropdown()">Legg til</button>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="form-section">
       <label class="form-label">Turnering / serie</label>
       <input type="text" id="turnering" placeholder="F.eks. Kretscup, seriespill..." autocomplete="off">
@@ -140,17 +326,298 @@
     <button class="submit-btn" id="submit-btn" onclick="lagreKamp()">Lagre kamp</button>
   </div>
 </div>
+
+<!-- ══════════════════════════════════ STATS ══════════════════════════════════ -->
+<div class="screen" id="screen-stats">
+  <div class="header">
+    <div class="header-badge">📊 Statistikk</div>
+    <h1>Sesongen<span> 2025</span></h1>
+    <p class="header-sub" id="stats-sub">Laster data...</p>
+    <button class="refresh-btn" onclick="loadStats(true)" title="Oppdater">↻ Oppdater</button>
+  </div>
+  <div class="stats-body">
+    <div class="form-section">
+      <div class="season-selector" id="season-selector"></div>
+    </div>
+    <div class="form-section" style="margin-bottom:12px">
+      <div class="season-selector" id="lag-filter-selector"></div>
+    </div>
+    <div id="stats-content">
+      <div class="loading"><div class="spinner"></div>Henter statistikk...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ PROFIL ══════════════════════════════════ -->
+<div class="screen" id="screen-profil">
+  <div class="header">
+    <div class="header-badge">👤 Profil</div>
+    <h1>Min<span> profil</span></h1>
+    <p class="header-sub">Innstillinger og lag</p>
+  </div>
+  <div class="profil-body">
+
+    <!-- Avatar preview -->
+    <div class="profil-avatar">
+      <div class="avatar-circle" id="avatar-icon" onclick="document.getElementById('avatar-upload').click()" title="Endre bilde">
+        <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
+        <span id="avatar-emoji">⚽</span>
+      </div>
+      <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="lastOppBilde(this)">
+      <div class="avatar-upload-hint" id="avatar-upload-hint">Trykk for å laste opp bilde</div>
+      <div class="avatar-name" id="avatar-name">–</div>
+      <div class="avatar-club" id="avatar-club">–</div>
+    </div>
+
+    <!-- Info fields -->
+    <div class="profil-card">
+      <div class="profil-card-title">Spillerinfo</div>
+      <div class="profil-field">
+        <span class="profil-field-label">Navn</span>
+        <input class="profil-field-input" id="profil-navn" type="text" placeholder="Fullt navn" autocomplete="off" oninput="oppdaterAvatar()">
+      </div>
+      <div class="profil-field">
+        <span class="profil-field-label">Klubb</span>
+        <input class="profil-field-input" id="profil-klubb" type="text" placeholder="F.eks. Stabæk" autocomplete="off" oninput="oppdaterAvatar()">
+      </div>
+      <div class="profil-field">
+        <span class="profil-field-label">Posisjon</span>
+        <input class="profil-field-input" id="profil-posisjon" type="text" placeholder="F.eks. Midtbane" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- Lag liste -->
+    <div class="profil-card">
+      <div class="profil-card-title">Mine lag / tropper</div>
+      <div class="lag-list" id="profil-lag-list"></div>
+      <div class="add-lag-row">
+        <input class="add-lag-input" id="profil-lag-input" placeholder="Legg til lag..." onkeydown="if(event.key==='Enter')addLagFromProfil()">
+        <button class="add-lag-btn" onclick="addLagFromProfil()">+ Legg til</button>
+      </div>
+    </div>
+
+    <button class="profil-save-btn" onclick="lagreProfil()">Lagre profil</button>
+    <div class="profil-saved" id="profil-saved">✓ Lagret</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════ TAB BAR ══════════════════════════════════ -->
+<nav class="tab-bar">
+  <button class="tab-btn active" id="tab-logg" onclick="switchTab('logg')">
+    <span class="tab-icon">⚽</span>
+    <span class="tab-label">Logg</span>
+  </button>
+  <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
+    <span class="tab-icon">📊</span>
+    <span class="tab-label">Statistikk</span>
+  </button>
+  <button class="tab-btn" id="tab-profil" onclick="switchTab('profil')">
+    <span class="tab-icon">👤</span>
+    <span class="tab-label">Profil</span>
+  </button>
+</nav>
+
 <div class="toast" id="toast"></div>
+
 <script>
   const SUPABASE_URL = 'https://gjxsebeajcrmseraypyw.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_gkIN7XSAzQVKS9lpqj6LYQ_vV8G3VRe';
+  const CACHE_KEY    = 'athlytics_kamper';
+  const PROFIL_KEY   = 'athlytics_profil';
+
+  // ════════════════════════════════ PROFIL ════════════════════════════════
+
+  function hentProfil() {
+    try { return JSON.parse(localStorage.getItem(PROFIL_KEY)) || { navn: '', klubb: '', posisjon: '', lag: [] }; }
+    catch(e) { return { navn: '', klubb: '', posisjon: '', lag: [] }; }
+  }
+
+  function lastOppBilde(input) {
+    if (!input.files || !input.files[0]) return;
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target.result;
+      // Save to localStorage
+      const profil = hentProfil();
+      profil.avatar = base64;
+      localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+      // Show image
+      visAvatarBilde(base64);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function visAvatarBilde(src) {
+    const img = document.getElementById('avatar-img');
+    const emoji = document.getElementById('avatar-emoji');
+    const hint = document.getElementById('avatar-upload-hint');
+    if (src) {
+      img.src = src;
+      img.style.display = 'block';
+      emoji.style.display = 'none';
+      hint.textContent = 'Trykk for å bytte bilde';
+    } else {
+      img.style.display = 'none';
+      emoji.style.display = '';
+      hint.textContent = 'Trykk for å laste opp bilde';
+    }
+  }
+
+  function lagreProfil() {
+    const profil = {
+      navn: document.getElementById('profil-navn').value.trim(),
+      klubb: document.getElementById('profil-klubb').value.trim(),
+      posisjon: document.getElementById('profil-posisjon').value.trim(),
+      lag: hentProfil().lag
+    };
+    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    oppdaterAvatar();
+    renderProfilLagListe();
+    renderLoggSub();
+    // Flash saved indicator
+    const el = document.getElementById('profil-saved');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+    showToast('✓ Profil lagret', 'success');
+  }
+
+  function oppdaterAvatar() {
+    const navn = document.getElementById('profil-navn').value.trim();
+    const klubb = document.getElementById('profil-klubb').value.trim();
+    document.getElementById('avatar-name').textContent = navn || '–';
+    document.getElementById('avatar-club').textContent = klubb || '–';
+  }
+
+  function addLagFromProfil() {
+    const input = document.getElementById('profil-lag-input');
+    const navn = input.value.trim();
+    if (!navn) return;
+    const profil = hentProfil();
+    if (profil.lag.includes(navn)) { showToast('Laget finnes allerede', 'error'); return; }
+    profil.lag.push(navn);
+    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    input.value = '';
+    renderProfilLagListe();
+    renderLagDropdown();
+  }
+
+  function slettLag(navn) {
+    const profil = hentProfil();
+    profil.lag = profil.lag.filter(l => l !== navn);
+    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    renderProfilLagListe();
+    renderLagDropdown();
+  }
+
+  function renderProfilLagListe() {
+    const profil = hentProfil();
+    const list = document.getElementById('profil-lag-list');
+    if (!profil.lag.length) {
+      list.innerHTML = '<div class="lag-list-empty">Ingen lag lagt til ennå</div>';
+      return;
+    }
+    list.innerHTML = profil.lag.map(navn => `
+      <div class="lag-list-item">
+        <div class="lag-list-dot"></div>
+        <span class="lag-list-name">${navn}</span>
+        <button class="lag-list-del" onclick="slettLag('${navn.replace(/'/g,"\\'")}')">×</button>
+      </div>
+    `).join('');
+  }
+
+  function lastInnProfil() {
+    const profil = hentProfil();
+    document.getElementById('profil-navn').value = profil.navn || '';
+    document.getElementById('profil-klubb').value = profil.klubb || '';
+    document.getElementById('profil-posisjon').value = profil.posisjon || '';
+    document.getElementById('avatar-name').textContent = profil.navn || '–';
+    document.getElementById('avatar-club').textContent = profil.klubb || '–';
+    visAvatarBilde(profil.avatar || '');
+    renderProfilLagListe();
+  }
+
+  function renderLoggSub() {
+    const profil = hentProfil();
+    const sub = profil.navn ? `Hei, ${profil.navn.split(' ')[0]}! 🟢` : 'Klar til å logge kamp 🟢';
+    document.getElementById('logg-sub').textContent = sub;
+  }
+
+  // ════════════════════════════════ LAG DROPDOWN ════════════════════════════════
+
+  let valgtLag = '';
+  let lagDropdownOpen = false;
+  let visNyttLagInput = false;
+
+  function toggleLagDropdown() {
+    lagDropdownOpen = !lagDropdownOpen;
+    document.getElementById('lag-dropdown').classList.toggle('open', lagDropdownOpen);
+    document.getElementById('lag-selected').classList.toggle('open', lagDropdownOpen);
+    document.getElementById('lag-chevron').classList.toggle('open', lagDropdownOpen);
+    if (lagDropdownOpen) renderLagDropdown();
+  }
+
+  function closeLagDropdown() {
+    lagDropdownOpen = false;
+    visNyttLagInput = false;
+    document.getElementById('lag-dropdown').classList.remove('open');
+    document.getElementById('lag-selected').classList.remove('open');
+    document.getElementById('lag-chevron').classList.remove('open');
+    document.getElementById('lag-new-row').classList.remove('visible');
+  }
+
+  function renderLagDropdown() {
+    const profil = hentProfil();
+    const list = document.getElementById('lag-options-list');
+    let html = '';
+    profil.lag.forEach(navn => {
+      html += `<div class="lag-option ${valgtLag === navn ? 'selected' : ''}" onclick="velgLag('${navn.replace(/'/g,"\\'")}')">
+        ${navn}
+        ${valgtLag === navn ? '<span style="color:var(--lime)">✓</span>' : ''}
+      </div>`;
+    });
+    html += `<div class="lag-option lag-option-add" onclick="toggleNyttLagInput()">
+      <span>＋</span> Nytt lag...
+    </div>`;
+    list.innerHTML = html;
+  }
+
+  function velgLag(navn) {
+    valgtLag = navn;
+    const txt = document.getElementById('lag-selected-text');
+    txt.textContent = navn;
+    txt.classList.remove('placeholder');
+    closeLagDropdown();
+  }
+
+  function toggleNyttLagInput() {
+    visNyttLagInput = !visNyttLagInput;
+    document.getElementById('lag-new-row').classList.toggle('visible', visNyttLagInput);
+    if (visNyttLagInput) setTimeout(() => document.getElementById('lag-new-input').focus(), 50);
+  }
+
+  function saveNewLagFromDropdown() {
+    const input = document.getElementById('lag-new-input');
+    const navn = input.value.trim();
+    if (!navn) return;
+    const profil = hentProfil();
+    if (!profil.lag.includes(navn)) {
+      profil.lag.push(navn);
+      localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+      renderProfilLagListe();
+    }
+    input.value = '';
+    velgLag(navn);
+  }
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.lag-selector-wrap')) closeLagDropdown();
+  });
+
+  // ════════════════════════════════ LOGG ════════════════════════════════
 
   let mal = 0, assist = 0, hjemme = 0, borte = 0, kamptype = 'hjemme';
-
-  window.addEventListener('load', () => {
-    document.getElementById('dato').value = new Date().toISOString().split('T')[0];
-    oppdaterResultat();
-  });
 
   function setKamptype(type) {
     kamptype = type;
@@ -163,12 +630,9 @@
 
   function oppdaterResultat() {
     const el = document.getElementById('resultat-display');
-    let r;
-    if (kamptype === 'hjemme') {
-      r = hjemme > borte ? 'seier' : hjemme < borte ? 'tap' : 'uavgjort';
-    } else {
-      r = borte > hjemme ? 'seier' : borte < hjemme ? 'tap' : 'uavgjort';
-    }
+    const r = kamptype === 'hjemme'
+      ? (hjemme > borte ? 'seier' : hjemme < borte ? 'tap' : 'uavgjort')
+      : (borte > hjemme ? 'seier' : borte < hjemme ? 'tap' : 'uavgjort');
     const labels = { seier: '🏆 Seier', uavgjort: '🤝 Uavgjort', tap: '💪 Tap' };
     el.textContent = labels[r];
     el.className = 'resultat-auto ' + r;
@@ -182,7 +646,7 @@
       else if (kamptype === 'borte' && borte < mal) { borte = mal; document.getElementById('borte-display').textContent = borte; }
       oppdaterResultat();
     }
-    if (type === 'assist') { assist = Math.max(0, assist+delta); document.getElementById('assist-display').textContent = assist; }
+    if (type === 'assist') { assist = Math.max(0, assist + delta); document.getElementById('assist-display').textContent = assist; }
     if (type === 'hjemme') {
       hjemme = Math.max(kamptype === 'hjemme' ? mal : 0, hjemme + delta);
       document.getElementById('hjemme-display').textContent = hjemme;
@@ -196,12 +660,11 @@
   }
 
   async function lagreKamp() {
-    const dato       = document.getElementById('dato').value;
+    const dato = document.getElementById('dato').value;
     const motstander = document.getElementById('motstander').value.trim();
-    const egetLag    = document.getElementById('eget-lag').value.trim();
-    const turnering  = document.getElementById('turnering').value.trim();
-    if (!dato || !motstander || !egetLag) {
-      showToast('Fyll inn dato, motstander og lag', 'error');
+    const turnering = document.getElementById('turnering').value.trim();
+    if (!dato || !motstander || !valgtLag) {
+      showToast('Fyll inn dato, motstander og velg lag', 'error');
       return;
     }
     const btn = document.getElementById('submit-btn');
@@ -210,28 +673,359 @@
       const res = await fetch(SUPABASE_URL + '/rest/v1/kamper', {
         method: 'POST',
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ dato, motstanderlag: motstander, eget_lag: egetLag, turnering, hjemme, borte, mal, assist, kamptype })
+        body: JSON.stringify({ dato, motstanderlag: motstander, eget_lag: valgtLag, turnering, hjemme, borte, mal, assist, kamptype })
       });
-      if (res.ok) { showToast('⚽ Kamp lagret!', 'success'); resetForm(); }
+      if (res.ok) { showToast('⚽ Kamp lagret!', 'success'); invalidateStatsCache(); resetForm(); }
       else { const err = await res.json(); showToast('Feil: ' + (err.message || 'ukjent'), 'error'); }
     } catch(e) { showToast('Nettverksfeil – prøv igjen', 'error'); }
     btn.disabled = false; btn.textContent = 'Lagre kamp';
   }
 
   function resetForm() {
-    ['motstander','eget-lag','turnering'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('motstander').value = '';
+    document.getElementById('turnering').value = '';
     mal = 0; assist = 0; hjemme = 0; borte = 0;
     ['mal','assist','hjemme','borte'].forEach(t => document.getElementById(t+'-display').textContent = '0');
     setKamptype('hjemme');
     oppdaterResultat();
     document.getElementById('dato').value = new Date().toISOString().split('T')[0];
+    // Reset lag: keep last selected if still valid
+    renderLagDropdown();
   }
+
+  // ════════════════════════════════ STATS ════════════════════════════════
+
+  let allKamper = [];
+  let activeSeason = '2025';
+
+  async function loadStats(forceRefresh = false) {
+    if (!forceRefresh) {
+      try {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (cached) { allKamper = JSON.parse(cached); renderStats(); return; }
+      } catch(e) {}
+    }
+    document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Henter statistikk...</div>';
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/kamper?select=*&order=dato.desc', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+      allKamper = await res.json();
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify(allKamper));
+      renderStats();
+    } catch(e) {
+      document.getElementById('stats-content').innerHTML = '<div class="loading">Klarte ikke laste data</div>';
+    }
+  }
+
+  function invalidateStatsCache() { sessionStorage.removeItem(CACHE_KEY); }
+
+  function getSeasons() {
+    const years = [...new Set(allKamper.map(k => k.dato.substring(0, 4)))].sort();
+    return years.length ? years : ['2025'];
+  }
+
+  function getResultat(k) {
+    if (k.kamptype === 'hjemme') return k.hjemme > k.borte ? 'seier' : k.hjemme < k.borte ? 'tap' : 'uavgjort';
+    return k.borte > k.hjemme ? 'seier' : k.borte < k.hjemme ? 'tap' : 'uavgjort';
+  }
+
+  function renderKampListe(kamper) {
+    return kamper.map(function(k) {
+      var r = getResultat(k);
+      var resIkon = r === 'seier' ? 'S' : r === 'uavgjort' ? 'U' : 'T';
+      var dato = new Date(k.dato).toLocaleDateString('no-NO', {day:'2-digit', month:'short'});
+      var lag = k.eget_lag || '';
+      var turn = k.turnering ? ' · ' + k.turnering : '';
+      var malTekst = (k.mal||0) > 0 ? ' · ' + k.mal + String.fromCodePoint(9917) + ((k.assist||0) > 0 ? ' ' + k.assist + String.fromCodePoint(127919) : '') : '';
+      var onclick = 'apneRedigerModal("' + k.id + '")';
+      return '<div class="kamp-item" onclick="' + onclick + '">' +
+        '<div class="kamp-res ' + r + '">' + resIkon + '</div>' +
+        '<div class="kamp-info">' +
+          '<div class="kamp-motstander">' + k.motstanderlag + '</div>' +
+          '<div class="kamp-meta">' + dato + ' · ' + lag + turn + malTekst + '</div>' +
+        '</div>' +
+        '<div class="kamp-score">' + k.hjemme + '–' + k.borte + '</div>' +
+        '<div class="kamp-edit-icon">✏️</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderStats() {
+    const seasons = getSeasons();
+    if (!seasons.includes(activeSeason)) activeSeason = seasons[0];
+    document.getElementById('season-selector').innerHTML = seasons.map(s =>
+      `<button class="season-pill ${s === activeSeason ? 'active' : ''}" onclick="setSeason('${s}')">${s}</button>`
+    ).join('');
+
+    // Lag filter pills – henter fra profil, ikke fra Supabase
+    const sesongsKamper = allKamper.filter(k => k.dato.startsWith(activeSeason));
+    const profilLag = hentProfil().lag || [];
+    if (!activeLag || (!profilLag.includes(activeLag) && activeLag !== 'alle')) activeLag = 'alle';
+    const lagPills = [{ key: 'alle', label: 'Alle lag' }, ...profilLag.map(l => ({ key: l, label: l }))];
+    document.getElementById('lag-filter-selector').innerHTML = lagPills.map(p =>
+      `<button class="season-pill ${activeLag === p.key ? 'active' : ''}" onclick="setLagFilter('${p.key.replace(/'/g,"\'")}')"> ${p.label}</button>`
+    ).join('');
+
+    const kamper = activeLag === 'alle' ? sesongsKamper : sesongsKamper.filter(k => k.eget_lag === activeLag);
+    const n = kamper.length;
+    const lagTekst = activeLag === 'alle' ? 'alle lag' : activeLag;
+    document.getElementById('stats-sub').textContent = `${n} kamper · ${lagTekst}`;
+    if (n === 0) { document.getElementById('stats-content').innerHTML = '<div class="loading">Ingen kamper denne sesongen</div>'; return; }
+    let seier = 0, uavgjort = 0, tap = 0, totalMal = 0, totalAssist = 0;
+    kamper.forEach(k => {
+      const r = getResultat(k);
+      if (r === 'seier') seier++; else if (r === 'uavgjort') uavgjort++; else tap++;
+      totalMal += k.mal || 0; totalAssist += k.assist || 0;
+    });
+    const pct = v => Math.round((v / n) * 100);
+    document.getElementById('stats-content').innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num lime">${seier}</div><div class="stat-lbl">Seier</div></div>
+        <div class="stat-card"><div class="stat-num gold">${uavgjort}</div><div class="stat-lbl">Uavgjort</div></div>
+        <div class="stat-card"><div class="stat-num danger">${tap}</div><div class="stat-lbl">Tap</div></div>
+      </div>
+      <div class="stat-row-card">
+        <div class="stat-row-title">Kampfordeling – ${n} kamper</div>
+        <div class="wdl-bar">
+          <div class="wdl-seg w" style="width:${pct(seier)}%"></div>
+          <div class="wdl-seg d" style="width:${pct(uavgjort)}%"></div>
+          <div class="wdl-seg l" style="width:${pct(tap)}%"></div>
+        </div>
+        <div class="wdl-labels">
+          <span class="wdl-label" style="color:var(--lime)">${pct(seier)}% S</span>
+          <span class="wdl-label" style="color:var(--gold)">${pct(uavgjort)}% U</span>
+          <span class="wdl-label" style="color:var(--danger)">${pct(tap)}% T</span>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num lime">${totalMal}</div><div class="stat-lbl">Mål</div></div>
+        <div class="stat-card"><div class="stat-num gold">${totalAssist}</div><div class="stat-lbl">Assist</div></div>
+        <div class="stat-card"><div class="stat-num">${totalMal + totalAssist}</div><div class="stat-lbl">G+A</div></div>
+      </div>
+      <div class="stat-row-card">
+        <div class="stat-row-title">Gjennomsnitt per kamp</div>
+        <div class="stat-row"><span class="stat-row-label">Mål per kamp</span><span class="stat-row-value">${(totalMal/n).toFixed(1)}</span></div>
+        <div class="stat-row"><span class="stat-row-label">Assist per kamp</span><span class="stat-row-value">${(totalAssist/n).toFixed(1)}</span></div>
+        <div class="stat-row"><span class="stat-row-label">G+A per kamp</span><span class="stat-row-value">${((totalMal+totalAssist)/n).toFixed(1)}</span></div>
+      </div>
+
+      <div class="kamp-liste-header">Kamphistorikk</div>
+      ${renderKampListe(kamper)}
+    `;
+  }
+
+  let activeLag = 'alle';
+  function setSeason(s) { activeSeason = s; activeLag = 'alle'; renderStats(); }
+  function setLagFilter(lag) { activeLag = lag; renderStats(); }
+
+  // ════════════════════════════════ TAB NAV ════════════════════════════════
+
+  function switchTab(tab) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'stats') loadStats();
+  }
+
+  // ════════════════════════════════ TOAST ════════════════════════════════
 
   function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast ' + type + ' show';
-    setTimeout(() => t.classList.remove('show'), 3500);
+    setTimeout(() => t.classList.remove('show'), 3000);
   }
+
+  // ════════════════════════════════ EDIT MODAL ════════════════════════════════
+
+  let modalKampId = null;
+  let mHjemme = 0, mBorte = 0, mMal = 0, mAssist = 0, mKamptype = 'hjemme';
+
+  function getResultatFarge(k) {
+    return getResultat(k);
+  }
+
+  function apneRedigerModal(id) {
+    const k = allKamper.find(function(k) { return String(k.id) === String(id); });
+    if (!k) return;
+    modalKampId = id;
+    mHjemme = k.hjemme || 0;
+    mBorte  = k.borte  || 0;
+    mMal    = k.mal    || 0;
+    mAssist = k.assist || 0;
+    mKamptype = k.kamptype || 'hjemme';
+
+    document.getElementById('modal-dato').value       = k.dato;
+    document.getElementById('modal-motstander').value = k.motstanderlag || '';
+    document.getElementById('modal-eget-lag').value   = k.eget_lag || '';
+    document.getElementById('modal-turnering').value  = k.turnering || '';
+    document.getElementById('modal-hjemme').textContent = mHjemme;
+    document.getElementById('modal-borte').textContent  = mBorte;
+    document.getElementById('modal-mal').textContent    = mMal;
+    document.getElementById('modal-assist').textContent = mAssist;
+    document.getElementById('modal-title').textContent  = k.motstanderlag || 'Rediger kamp';
+    setModalKamptype(mKamptype);
+
+    document.getElementById('modal-backdrop').classList.add('open');
+    document.getElementById('modal-sheet').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function lukkModal() {
+    document.getElementById('modal-backdrop').classList.remove('open');
+    document.getElementById('modal-sheet').classList.remove('open');
+    document.body.style.overflow = '';
+    modalKampId = null;
+  }
+
+  function setModalKamptype(type) {
+    mKamptype = type;
+    document.getElementById('modal-btn-hjemme').classList.toggle('active', type === 'hjemme');
+    document.getElementById('modal-btn-borte').classList.toggle('active', type === 'borte');
+  }
+
+  function modalAdjust(type, delta) {
+    if (type === 'hjemme') { mHjemme = Math.max(0, mHjemme + delta); document.getElementById('modal-hjemme').textContent = mHjemme; }
+    if (type === 'borte')  { mBorte  = Math.max(0, mBorte  + delta); document.getElementById('modal-borte').textContent  = mBorte; }
+    if (type === 'mal')    { mMal    = Math.max(0, mMal    + delta); document.getElementById('modal-mal').textContent    = mMal; }
+    if (type === 'assist') { mAssist = Math.max(0, mAssist + delta); document.getElementById('modal-assist').textContent = mAssist; }
+  }
+
+  async function lagreRedigertKamp() {
+    if (!modalKampId) return;
+    const body = {
+      dato:         document.getElementById('modal-dato').value,
+      motstanderlag:document.getElementById('modal-motstander').value.trim(),
+      eget_lag:     document.getElementById('modal-eget-lag').value.trim(),
+      turnering:    document.getElementById('modal-turnering').value.trim(),
+      hjemme: mHjemme, borte: mBorte, mal: mMal, assist: mAssist, kamptype: mKamptype
+    };
+    const btn = document.querySelector('.modal-save-btn');
+    btn.textContent = 'Lagrer...'; btn.disabled = true;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/kamper?id=eq.${modalKampId}`, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        // Update local cache
+        const idx = allKamper.findIndex(k => k.id === modalKampId);
+        if (idx !== -1) allKamper[idx] = { ...allKamper[idx], ...body };
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(allKamper));
+        lukkModal();
+        renderStats();
+        showToast('✓ Kamp oppdatert', 'success');
+      } else {
+        showToast('Feil ved lagring', 'error');
+      }
+    } catch(e) { showToast('Nettverksfeil', 'error'); }
+    btn.textContent = 'Lagre endringer'; btn.disabled = false;
+  }
+
+  async function slettKamp() {
+    if (!modalKampId) return;
+    if (!confirm('Sikker på at du vil slette denne kampen?')) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/kamper?id=eq.${modalKampId}`, {
+        method: 'DELETE',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+      if (res.ok) {
+        allKamper = allKamper.filter(k => k.id !== modalKampId);
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify(allKamper));
+        lukkModal();
+        renderStats();
+        showToast('🗑 Kamp slettet', 'success');
+      } else {
+        showToast('Feil ved sletting', 'error');
+      }
+    } catch(e) { showToast('Nettverksfeil', 'error'); }
+  }
+
+  // ════════════════════════════════ INIT ════════════════════════════════
+
+  window.addEventListener('load', () => {
+    document.getElementById('dato').value = new Date().toISOString().split('T')[0];
+    oppdaterResultat();
+    lastInnProfil();
+    renderLagDropdown();
+    renderLoggSub();
+  });
 </script>
+
+<!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="lukkModal()"></div>
+<div class="modal-sheet" id="modal-sheet">
+  <div class="modal-handle"></div>
+  <div class="modal-title" id="modal-title">Rediger kamp</div>
+  <div class="modal-body">
+    <div class="modal-field">
+      <label class="modal-label">Dato</label>
+      <input class="modal-input" type="date" id="modal-dato">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Hjemme / Borte</label>
+      <div class="toggle-row">
+        <button class="toggle-btn" id="modal-btn-hjemme" onclick="setModalKamptype('hjemme')">🏠 Hjemmekamp</button>
+        <button class="toggle-btn" id="modal-btn-borte" onclick="setModalKamptype('borte')">✈️ Bortekamp</button>
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Motstanderlag</label>
+      <input class="modal-input" type="text" id="modal-motstander" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Eget lag</label>
+      <input class="modal-input" type="text" id="modal-eget-lag" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Turnering</label>
+      <input class="modal-input" type="text" id="modal-turnering" autocomplete="off">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Score</label>
+      <div class="modal-score-row">
+        <div class="number-control">
+          <button class="num-btn" onclick="modalAdjust('hjemme',-1)">−</button>
+          <span class="num-display" id="modal-hjemme">0</span>
+          <button class="num-btn" onclick="modalAdjust('hjemme',1)">+</button>
+        </div>
+        <span class="score-separator">–</span>
+        <div class="number-control">
+          <button class="num-btn" onclick="modalAdjust('borte',-1)">−</button>
+          <span class="num-display" id="modal-borte">0</span>
+          <button class="num-btn" onclick="modalAdjust('borte',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-field">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label class="modal-label">Mål</label>
+          <div class="number-control">
+            <button class="num-btn" onclick="modalAdjust('mal',-1)">−</button>
+            <span class="num-display" id="modal-mal">0</span>
+            <button class="num-btn" onclick="modalAdjust('mal',1)">+</button>
+          </div>
+        </div>
+        <div>
+          <label class="modal-label">Assist</label>
+          <div class="number-control">
+            <button class="num-btn" onclick="modalAdjust('assist',-1)">−</button>
+            <span class="num-display" id="modal-assist">0</span>
+            <button class="num-btn" onclick="modalAdjust('assist',1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-actions">
+    <button class="modal-del-btn" onclick="slettKamp()">🗑 Slett</button>
+    <button class="modal-save-btn" onclick="lagreRedigertKamp()">Lagre endringer</button>
+  </div>
+</div>
+
 </body>
 </html>
