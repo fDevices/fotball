@@ -100,6 +100,17 @@
   .submit-btn:active { transform: scale(0.98); background: var(--lime-bright); }
   .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* ── SETTINGS ── */
+  .settings-section { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 14px; }
+  .settings-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lime); margin-bottom: 6px; }
+  .settings-desc { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; }
+  .settings-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .settings-pill { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; padding: 7px 16px; border-radius: 20px; border: 1.5px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .settings-pill:hover { border-color: var(--lime); color: var(--lime); }
+  .settings-pill.active { background: var(--lime); color: var(--grass); border-color: var(--lime); }
+  .settings-pill.soon { opacity: 0.4; cursor: default; pointer-events: none; }
+  .settings-version { text-align: center; font-size: 12px; color: var(--muted); opacity: 0.5; padding-bottom: 8px; }
+
   /* ── TOAST ── */
   .toast { position: fixed; bottom: calc(var(--tab-h) + 12px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
   .toast.show { transform: translateX(-50%) translateY(0); }
@@ -893,12 +904,121 @@
 
   // ════════════════════════════════ TAB NAV ════════════════════════════════
 
+  // ── SETTINGS FUNCTIONS ───────────────────────────────────────────────
+  function renderSettings() {
+    var s = hentSettings();
+    var sporter = [
+      { key: 'fotball', label: '⚽ Fotball', soon: false },
+      { key: 'orientering', label: '🧭 Orientering', soon: true },
+      { key: 'ski', label: '⛷️ Ski', soon: true }
+    ];
+    document.getElementById('settings-sport-options').innerHTML =
+      sporter.map(function(sp) {
+        var cls = 'settings-pill' + (sp.soon ? ' soon' : '') + (s.sport === sp.key ? ' active' : '');
+        var onclick = sp.soon ? '' : ' onclick="setSport(\'' + sp.key + '\')"';
+        var label = sp.label + (sp.soon ? ' <span style="font-size:10px">(snart)</span>' : '');
+        return '<button class="' + cls + '"' + onclick + '>' + label + '</button>';
+      }).join('');
+
+    var formater = [
+      { key: 'aar', label: '📅 År (2025)' },
+      { key: 'sesong', label: '🗓️ Sesong (2025–2026)' }
+    ];
+    document.getElementById('settings-sesong-options').innerHTML =
+      formater.map(function(f) {
+        return '<button class="settings-pill' + (s.sesongFormat === f.key ? ' active' : '') + '" onclick="setSesongFormat(\'' + f.key + '\')">' + f.label + '</button>';
+      }).join('');
+
+    renderAktivSesongPills();
+  }
+
+  function renderAktivSesongPills() {
+    var s = hentSettings();
+    var sesonger = hentAlleSesonger();
+    var el = document.getElementById('settings-aktiv-sesong-options');
+    if (!el) return;
+    if (sesonger.length === 0) {
+      el.innerHTML = '<span style="font-size:13px;color:var(--muted)">Ingen sesonger enda – legg til nedenfor</span>';
+      return;
+    }
+    el.innerHTML = sesonger.map(function(sesong) {
+      return '<button class="settings-pill' + (s.aktivSesong === sesong ? ' active' : '') + '" onclick="setAktivSesong(\'' + sesong + '\')">' + sesong + '</button>';
+    }).join('');
+  }
+
+  function hentAlleSesonger() {
+    var s = hentSettings();
+    var ekstra = s.ekstraSesonger || [];
+    var fraKamper = [];
+    if (typeof allKamper !== 'undefined') {
+      allKamper.forEach(function(k) {
+        var aar = k.dato ? k.dato.substring(0,4) : null;
+        if (aar && !fraKamper.includes(aar)) fraKamper.push(aar);
+      });
+    }
+    var sett = [];
+    fraKamper.concat(ekstra).forEach(function(aar) {
+      var label = byggSesongLabel(aar, s.sesongFormat);
+      if (!sett.includes(label)) sett.push(label);
+    });
+    return sett.sort();
+  }
+
+  function setSport(sport) {
+    var s = hentSettings(); s.sport = sport;
+    lagreSettings(s); renderSettings();
+    oppdaterLoggBadge();
+    showToast('Sport oppdatert', 'success');
+  }
+
+  function setSesongFormat(format) {
+    var s = hentSettings(); s.sesongFormat = format;
+    lagreSettings(s); renderSettings();
+    oppdaterLoggBadge();
+  }
+
+  function setAktivSesong(sesong) {
+    var s = hentSettings();
+    s.aktivSesong = (s.aktivSesong === sesong) ? '' : sesong;
+    lagreSettings(s);
+    renderAktivSesongPills();
+    oppdaterLoggBadge();
+    showToast('⭐ Aktiv sesong: ' + (s.aktivSesong || 'ingen'), 'success');
+  }
+
+  function leggTilSesong() {
+    var input = document.getElementById('settings-ny-sesong');
+    var val = input.value.trim().replace(/[^0-9]/g, '');
+    if (!val || val.length < 4) { showToast('Skriv inn et gyldig årstall', 'error'); return; }
+    var s = hentSettings();
+    if (!s.ekstraSesonger) s.ekstraSesonger = [];
+    if (s.ekstraSesonger.includes(val)) { showToast('Sesongen finnes allerede', 'error'); return; }
+    s.ekstraSesonger.push(val);
+    lagreSettings(s);
+    input.value = '';
+    renderAktivSesongPills();
+    showToast('✓ Sesong lagt til', 'success');
+  }
+
+  function oppdaterLoggBadge() {
+    var s = hentSettings();
+    var badge = document.querySelector('#screen-logg .header-badge');
+    if (!badge) return;
+    var aar = s.aktivSesong || String(new Date().getFullYear());
+    // strip sesong format back to year if needed
+    var baseAar = aar.split(/[–-]/)[0].trim();
+    var label = byggSesongLabel(baseAar, s.sesongFormat);
+    var icon = s.sport === 'orientering' ? '🧭' : s.sport === 'ski' ? '⛷️' : '⚽';
+    badge.textContent = icon + ' ' + label;
+  }
+
   function switchTab(tab) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('screen-' + tab).classList.add('active');
     document.getElementById('tab-' + tab).classList.add('active');
     if (tab === 'stats') loadStats();
+    if (tab === 'settings') renderSettings();
   }
 
   // ════════════════════════════════ TOAST ════════════════════════════════
@@ -1027,6 +1147,7 @@
       renderLagDropdown();
       renderLoggSub();
       if (p.favorittLag && p.lag.includes(p.favorittLag)) velgLag(p.favorittLag);
+      oppdaterLoggBadge();
     });
   });
 </script>
