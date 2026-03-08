@@ -293,3 +293,34 @@
   .page-btn:hover { border-color: var(--lime); color: var(--lime); }
   .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
   .page-info { font-family: 'Barlow Condensed',sans-serif; font-size: 12px; color: var(--muted); letter-spacing: 0.06em; min-width: 80px; text-align: center; }
+
+  /* ── FASE 2: STATS VIEW TOGGLE ── */
+  .stats-view-toggle { display: flex; gap: 0; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 4px; }
+  .stats-view-btn { flex: 1; padding: 10px 8px; background: none; border: none; color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .stats-view-btn.active { background: rgba(168,224,99,0.15); color: var(--lime); }
+  .stats-view-btn:first-child { border-right: 1px solid var(--border); }
+  .premium-star { font-size: 11px; }
+
+  /* ── FASE 2: FORM STREAK ── */
+  .form-streak-wrap { margin-bottom: 8px; }
+  .form-streak-title { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .form-streak-boxes { display: flex; gap: 5px; flex-wrap: nowrap; }
+  .form-streak-box { flex: 1; min-width: 0; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed',sans-serif; font-size: 13px; font-weight: 800; }
+  .form-streak-box.wins  { background: rgba(168,224,99,0.2); color: var(--lime); border: 1px solid rgba(168,224,99,0.3); }
+  .form-streak-box.draw { background: rgba(240,192,80,0.2);  color: var(--gold); border: 1px solid rgba(240,192,80,0.3); }
+  .form-streak-box.loss   { background: rgba(224,85,85,0.2);  color: var(--danger); border: 1px solid rgba(224,85,85,0.3); }
+  .form-streak-empty { font-size: 12px; color: var(--muted); text-align: center; padding: 8px; font-style: italic; }
+
+  /* ── FASE 2: CHART CARDS ── */
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 8px; }
+  .chart-card-title { font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+  .chart-canvas-wrap { position: relative; width: 100%; }
+
+  /* ── FASE 2: PREMIUM LOCK ── */
+  .chart-locked { position: relative; border-radius: 12px; overflow: hidden; }
+  .chart-locked-overlay { position: absolute; inset: 0; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background: rgba(22,43,26,0.75); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; }
+  .chart-locked-icon { font-size: 28px; }
+  .chart-locked-text { font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white); }
+  .chart-locked-sub { font-size: 12px; color: var(--muted); text-align: center; padding: 0 24px; line-height: 1.4; }
+  .chart-unlock-btn { margin-top: 4px; padding: 10px 20px; background: var(--lime); border: none; border-radius: 10px; color: var(--grass); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+  .chart-unlock-btn:active { background: var(--lime-bright); }

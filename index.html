@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -141,10 +142,18 @@
   </div>
   <div class="stats-body">
     <div class="form-section">
-      <div class="season-selector" id="season-selector"></div>
+      <div class="stats-view-toggle" id="stats-view-toggle">
+        <button class="stats-view-btn active" id="stats-view-btn-overview" onclick="switchStatsView('overview')">Oversikt</button>
+        <button class="stats-view-btn" id="stats-view-btn-analyse" onclick="switchStatsView('analyse')">Analyse <span class="premium-star">⭐</span></button>
+      </div>
     </div>
-    <div class="form-section" style="margin-bottom:12px">
-      <div class="season-selector" id="team-filter-selector"></div>
+    <div id="stats-filters">
+      <div class="form-section">
+        <div class="season-selector" id="season-selector"></div>
+      </div>
+      <div class="form-section" style="margin-bottom:12px">
+        <div class="season-selector" id="team-filter-selector"></div>
+      </div>
     </div>
     <div id="stats-content">
       <div class="loading"><div class="spinner"></div>Henter statistikk...</div>

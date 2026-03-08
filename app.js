@@ -8,6 +8,41 @@
   var _profileCache = null;
   var _settingsCache = null;
 
+  // ── Fase 2: Analyse ──────────────────────────────────────────────────────
+  var activeStatsView = 'overview';
+  var chartInstances = {};
+
+  var CHART_COLORS = {
+    lime:     '#a8e063',
+    gold:     '#f0c050',
+    danger:   '#e05555',
+    muted:    '#8a9a80',
+    card:     '#162b1a',
+    border:   'rgba(168,224,99,0.15)',
+    gridLine: 'rgba(168,224,99,0.08)'
+  };
+
+  function isPremium() {
+    return true; // hardkodet til Stripe er implementert (Fase 4)
+  }
+
+  function destroyCharts() {
+    Object.values(chartInstances).forEach(function(c) { if (c) c.destroy(); });
+    chartInstances = {};
+  }
+
+  function switchStatsView(view) {
+    activeStatsView = view;
+    var btnOversikt = document.getElementById('stats-view-btn-overview');
+    var btnAnalyse  = document.getElementById('stats-view-btn-analyse');
+    if (btnOversikt) btnOversikt.classList.toggle('active', view === 'overview');
+    if (btnAnalyse)  btnAnalyse.classList.toggle('active', view === 'analyse');
+    // Show/hide season+lag filters (not needed in analyse view header)
+    var filters = document.getElementById('stats-filters');
+    if (filters) filters.style.display = view === 'overview' ? '' : 'none';
+    renderStats();
+  }
+
   // ── i18n ─────────────────────────────────────────────────────────────────
   const TEKST = {
     no: {
@@ -908,9 +943,263 @@
     '</div>';
   }
 
+  function renderFormStreak(matches) {
+    // matches er sortert dato desc fra Supabase – ta siste 10, vis eldste til venstre
+    var last10 = matches.slice(0, 10).reverse();
+    if (last10.length === 0) {
+      return '<div class="stat-row-card form-streak-wrap">' +
+        '<div class="stat-row-title">Form (siste 10 kamper)</div>' +
+        '<div class="form-streak-empty">Ingen kamper enda</div>' +
+      '</div>';
+    }
+    var boxes = last10.map(function(k) {
+      var r = getResult(k);
+      var lbl = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
+      return '<div class="form-streak-box ' + r + '" title="' + k.motstanderlag + ' ' + k.hjemme + '-' + k.borte + '">' + lbl + '</div>';
+    }).join('');
+    return '<div class="stat-row-card form-streak-wrap">' +
+      '<div class="stat-row-title">Form (siste ' + last10.length + ' kamper)</div>' +
+      '<div class="form-streak-boxes">' + boxes + '</div>' +
+    '</div>';
+  }
+
+  function initChartDefaults() {
+    if (typeof Chart === 'undefined') return;
+    Chart.defaults.color = CHART_COLORS.muted;
+    Chart.defaults.borderColor = CHART_COLORS.gridLine;
+    Chart.defaults.font.family = 'Barlow Condensed';
+  }
+
+  function renderAnalyse(matches) {
+    destroyCharts();
+    initChartDefaults();
+
+    var container = document.getElementById('stats-content');
+    if (!container) return;
+
+    // Sort ascending for charts (matches comes in desc from Supabase)
+    var asc = matches.slice().sort(function(a, b) { return a.dato < b.dato ? -1 : 1; });
+
+    // Season + lag selectors shown inside analyse header instead of filters div
+    var seasons = getSeasons();
+    var profileTeams = getProfile().team || [];
+    var teamPills = [{ key: 'all', label: 'Alle team' }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
+
+    var selectorHTML =
+      '<div class="form-section" style="margin-bottom:8px">' +
+        '<div class="season-selector">' +
+          seasons.map(function(s) {
+            return '<button class="season-pill ' + (s === activeSeason ? 'active' : '') + '" onclick="setSeason(\'' + s + '\')">' + s + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      '<div class="form-section" style="margin-bottom:12px">' +
+        '<div class="season-selector">' +
+          teamPills.map(function(p) {
+            return '<button class="season-pill ' + (activeLag === p.key ? 'active' : '') + '" onclick="setTeamFilter(\'' + p.key.replace(/'/g, "\\'") + '\')">' + p.label + '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>';
+
+    var n = matches.length;
+    var teamText = activeLag === 'all' ? 'alle team' : activeLag;
+    document.getElementById('stats-sub').textContent = n + ' kamper · ' + teamText;
+
+    if (!isPremium()) {
+      container.innerHTML = selectorHTML + renderFormStreak(matches) +
+        '<div class="chart-locked">' +
+          '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +
+            '<div class="chart-card-title">Kumulativ seiersprosent</div>' +
+            '<div class="chart-canvas-wrap" style="height:160px;background:rgba(168,224,99,0.04);border-radius:8px"></div>' +
+          '</div>' +
+          '<div class="chart-locked-overlay">' +
+            '<div class="chart-locked-icon">🔒</div>' +
+            '<div class="chart-locked-text">Pro-funksjon</div>' +
+            '<div class="chart-locked-sub">Oppgrader til Pro for å se avanserte grafer og analyse</div>' +
+            '<button class="chart-unlock-btn" onclick="showToast(\'Coming soon – Stripe i Fase 4 🚀\', \'success\')">Lås opp Pro ⭐</button>' +
+          '</div>' +
+        '</div>';
+      return;
+    }
+
+    if (n === 0) {
+      container.innerHTML = selectorHTML + '<div class="loading">Ingen kamper denne sesongen</div>';
+      return;
+    }
+
+    // Build HTML shell with canvas elements
+    container.innerHTML = selectorHTML +
+      renderFormStreak(matches) +
+      '<div class="chart-card" id="chart-card-winpct">' +
+        '<div class="chart-card-title">Kumulativ seiersprosent</div>' +
+        '<div class="chart-canvas-wrap"><canvas id="chart-winpct" height="180"></canvas></div>' +
+      '</div>' +
+      '<div class="chart-card" id="chart-card-goals">' +
+        '<div class="chart-card-title">Mål & assist per kamp</div>' +
+        '<div class="chart-canvas-wrap"><canvas id="chart-goals" height="180"></canvas></div>' +
+      '</div>' +
+      '<div class="chart-card" id="chart-card-tournament">' +
+        '<div class="chart-card-title">Mål per turnering</div>' +
+        '<div class="chart-canvas-wrap" id="chart-tournament-wrap"><canvas id="chart-tournament"></canvas></div>' +
+      '</div>';
+
+    if (typeof Chart === 'undefined') {
+      container.querySelectorAll('.chart-canvas-wrap').forEach(function(el) {
+        el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px">Laster grafer...</div>';
+      });
+      return;
+    }
+
+    // ── Chart 1: Cumulative win percentage ──
+    var labels1 = [], winPctData = [];
+    var wins1 = 0;
+    asc.forEach(function(k, i) {
+      if (getResult(k) === 'wins') wins1++;
+      labels1.push(new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
+      winPctData.push(Math.round((wins1 / (i + 1)) * 100));
+    });
+    chartInstances['winpct'] = new Chart(document.getElementById('chart-winpct'), {
+      type: 'line',
+      data: {
+        labels: labels1,
+        datasets: [{
+          label: 'Seiersprosent %',
+          data: winPctData,
+          borderColor: CHART_COLORS.lime,
+          backgroundColor: 'rgba(168,224,99,0.08)',
+          borderWidth: 2,
+          pointRadius: asc.length > 20 ? 0 : 3,
+          pointHoverRadius: 5,
+          pointBackgroundColor: CHART_COLORS.lime,
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ctx.parsed.y + '%'; } } } },
+        scales: {
+          x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } },
+          y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; }, stepSize: 25, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }
+        }
+      }
+    });
+
+    // ── Chart 2: Goals & assists per match ──
+    var labels2 = [], goalData = [], assistData = [];
+    asc.forEach(function(k) {
+      labels2.push(new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
+      goalData.push(k.mal || 0);
+      assistData.push(k.assist || 0);
+    });
+    chartInstances['goals'] = new Chart(document.getElementById('chart-goals'), {
+      type: 'line',
+      data: {
+        labels: labels2,
+        datasets: [
+          {
+            label: 'Mål',
+            data: goalData,
+            borderColor: CHART_COLORS.lime,
+            backgroundColor: 'rgba(168,224,99,0.08)',
+            borderWidth: 2,
+            pointRadius: asc.length > 20 ? 0 : 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: CHART_COLORS.lime,
+            fill: true,
+            tension: 0.2
+          },
+          {
+            label: 'Assist',
+            data: assistData,
+            borderColor: CHART_COLORS.gold,
+            backgroundColor: 'rgba(240,192,80,0.06)',
+            borderWidth: 2,
+            pointRadius: asc.length > 20 ? 0 : 3,
+            pointHoverRadius: 5,
+            pointBackgroundColor: CHART_COLORS.gold,
+            fill: true,
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Barlow Condensed', weight: '700' }, boxWidth: 12, padding: 12 }
+          }
+        },
+        scales: {
+          x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } },
+          y: { min: 0, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }
+        }
+      }
+    });
+
+    // ── Chart 3: Goals per tournament (horizontal bar) ──
+    var tournMap = {};
+    matches.forEach(function(k) {
+      var tn = k.turnering || '—';
+      if (!tournMap[tn]) tournMap[tn] = { g: 0, a: 0 };
+      tournMap[tn].g += k.mal || 0;
+      tournMap[tn].a += k.assist || 0;
+    });
+    var tournKeys = Object.keys(tournMap).sort(function(a, b) { return tournMap[b].g - tournMap[a].g; });
+    var barHeight = Math.max(120, tournKeys.length * 44);
+    document.getElementById('chart-tournament-wrap').style.height = barHeight + 'px';
+    chartInstances['tournament'] = new Chart(document.getElementById('chart-tournament'), {
+      type: 'bar',
+      data: {
+        labels: tournKeys,
+        datasets: [
+          {
+            label: 'Mål',
+            data: tournKeys.map(function(k) { return tournMap[k].g; }),
+            backgroundColor: 'rgba(168,224,99,0.6)',
+            borderColor: CHART_COLORS.lime,
+            borderWidth: 1,
+            borderRadius: 4
+          },
+          {
+            label: 'Assist',
+            data: tournKeys.map(function(k) { return tournMap[k].a; }),
+            backgroundColor: 'rgba(240,192,80,0.5)',
+            borderColor: CHART_COLORS.gold,
+            borderWidth: 1,
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Barlow Condensed', weight: '700' }, boxWidth: 12, padding: 12 }
+          }
+        },
+        scales: {
+          x: { ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } },
+          y: { ticks: { font: { size: 11 } }, grid: { display: false } }
+        }
+      }
+    });
+  }
+
   function renderStats() {
+    destroyCharts();
+
     const seasons = getSeasons();
     if (!seasons.includes(activeSeason)) activeSeason = seasons[0];
+
+    // Always render season pills in filters div (hidden in analyse – selector rendered inline there)
+    var filtersDiv = document.getElementById('stats-filters');
+    if (filtersDiv) filtersDiv.style.display = activeStatsView === 'overview' ? '' : 'none';
+
     document.getElementById('season-selector').innerHTML = seasons.map(s =>
       `<button class="season-pill ${s === activeSeason ? 'active' : ''}" onclick="setSeason('${s}')">${s}</button>`
     ).join('');
@@ -928,12 +1217,20 @@
     const n = matches.length;
     const teamText = activeLag === 'all' ? 'alle team' : activeLag;
     document.getElementById('stats-sub').textContent = `${n} kamper · ${teamText}`;
+
+    // Route to analyse view
+    if (activeStatsView === 'analyse') {
+      renderAnalyse(matches);
+      return;
+    }
+
     if (n === 0) { document.getElementById('stats-content').innerHTML = '<div class="loading">Ingen kamper denne sesongen</div>'; return; }
 
     const s = calcWDL(matches);
     const pct = v => Math.round((v / n) * 100);
 
     document.getElementById('stats-content').innerHTML = `
+      ${renderFormStreak(matches)}
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-num lime">${s.w}</div><div class="stat-lbl">Seier</div></div>
         <div class="stat-card"><div class="stat-num gold">${s.d}</div><div class="stat-lbl">Uavgjort</div></div>
@@ -1232,6 +1529,7 @@
   }
 
   function switchTab(tab) {
+    if (tab !== 'stats') destroyCharts();
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('screen-' + tab).classList.add('active');
@@ -1370,6 +1668,7 @@
   window.addEventListener('load', () => {
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
     updateResult();
+    initChartDefaults();
     // Load profil - try Supabase first, fall back to localStorage
     fetchProfileFromSupabase().then(function(p) {
       loadProfileData(p);
