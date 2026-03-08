@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Athlytics">
 <title>Athlytics Sport</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -50,10 +52,10 @@
   .toggle-btn.active { background: rgba(168,224,99,0.15); border-color: var(--lime); color: var(--lime); }
 
   /* ── SCORE ── */
-  .score-team-labels { display: flex; gap: 10px; margin-bottom: 4px; }
-  .score-team-label { flex: 1; font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .score-team-labels { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; margin-bottom: 4px; }
+  .score-team-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); text-align: center; }
   .score-team-label.highlight { color: var(--lime); font-weight: 800; }
-  .sep-spacer { width: 20px; flex-shrink: 0; }
+  .sep-spacer { visibility: hidden; font-family: 'Barlow Condensed',sans-serif; font-size: 28px; font-weight: 800; user-select: none; line-height: 0; }
   .score-row { display: flex; align-items: center; gap: 10px; }
   .score-row .number-control { flex: 1; }
   .score-separator { font-family: 'Barlow Condensed',sans-serif; font-size: 28px; font-weight: 800; color: var(--muted); flex-shrink: 0; }
@@ -126,7 +128,7 @@
   .tournament-stat-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .tournament-stat-badges .t-badge.win  { margin-left: 0; }
   .tournament-wdl-sep { width: 1px; height: 16px; background: rgba(168,224,99,0.15); flex-shrink: 0; }
-  .t-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.04em; }
+  .t-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; padding: 3px 0; border-radius: 6px; letter-spacing: 0.04em; width: 46px; text-align: center; display: inline-block; }
   .t-badge.win  { background: rgba(168,224,99,0.15); color: var(--lime); }
   .t-badge.draw { background: rgba(240,192,80,0.15); color: var(--gold); }
   .t-badge.loss { background: rgba(224,85,85,0.15); color: var(--danger); }
@@ -297,6 +299,13 @@
   /* Saved indicator */
   .profil-saved { text-align: center; font-size: 13px; color: var(--lime); padding: 8px; opacity: 0; transition: opacity 0.3s; }
   .profil-saved.show { opacity: 1; }
+
+  /* ── PAGINATION ── */
+  .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 0 4px; }
+  .page-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; }
+  .page-btn:hover { border-color: var(--lime); color: var(--lime); }
+  .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .page-info { font-family: 'Barlow Condensed',sans-serif; font-size: 12px; color: var(--muted); letter-spacing: 0.06em; min-width: 80px; text-align: center; }
 </style>
 </head>
 <body>
@@ -357,6 +366,10 @@
         </div>
         <div class="team-dropdown" id="tournament-dropdown">
           <div id="tournament-options-list"></div>
+          <div class="team-new-row" id="tournament-new-row">
+            <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering..." onkeydown="if(event.key==='Enter')saveNewTournamentFromDropdown()">
+            <button class="team-new-save" onclick="saveNewTournamentFromDropdown()">Legg til</button>
+          </div>
         </div>
       </div>
     </div>
@@ -364,7 +377,7 @@
     <div class="form-section">
       <div class="score-team-labels">
         <span class="score-team-label highlight" id="label-home">Hjemmelag</span>
-        <span class="score-team-label sep-spacer"></span>
+        <span class="score-team-label sep-spacer">–</span>
         <span class="score-team-label" id="label-away">Bortelag</span>
       </div>
       <div class="score-row">
@@ -583,6 +596,10 @@
   const PROFIL_KEY   = 'athlytics_profil';
   const SETTINGS_KEY = 'athlytics_settings';
 
+  // ── In-memory caches (avoid repeated JSON.parse on every call) ──────────
+  var _profileCache = null;
+  var _settingsCache = null;
+
   // ── i18n ─────────────────────────────────────────────────────────────────
   const TEKST = {
     no: {
@@ -661,16 +678,22 @@
     }
   };
   function t(key) {
-    var s = getSettings ? getSettings() : { lang: 'no' };
-    var lang = s.lang || 'no';
+    var lang = (_settingsCache || getSettings()).lang || 'no';
     return (TEKST[lang] || TEKST.no)[key] || TEKST.no[key] || key;
   }
 
   // ════════════════════════════════ PROFIL ════════════════════════════════
 
   function getProfile() {
-    try { return JSON.parse(localStorage.getItem(PROFIL_KEY)) || { name: '', club: '', posisjon: '', team: [], favoriteTeam: '' }; }
-    catch(e) { return { name: '', club: '', posisjon: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' }; }
+    if (_profileCache) return _profileCache;
+    try { _profileCache = JSON.parse(localStorage.getItem(PROFIL_KEY)) || { name: '', club: '', posisjon: '', team: [], favoriteTeam: '' }; }
+    catch(e) { _profileCache = { name: '', club: '', posisjon: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' }; }
+    return _profileCache;
+  }
+
+  function saveProfile_local(profil) {
+    _profileCache = profil;
+    saveProfile_local(profil);
   }
 
   async function fetchProfileFromSupabase() {
@@ -690,7 +713,7 @@
           favoriteTournament: data[0].favorite_tournament || '',
           avatar: data[0].avatar_url || ''
         };
-        localStorage.setItem(PROFIL_KEY, JSON.stringify(p));
+        saveProfile_local(p);
         return p;
       }
     } catch(e) {}
@@ -732,7 +755,7 @@
       // Save to localStorage
       const profil = getProfile();
       profil.avatar = base64;
-      localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+      saveProfile_local(profil);
       // Show image
       showAvatarImage(base64);
     };
@@ -764,7 +787,7 @@
       favoriteTeam: getProfile().favoriteTeam || '',
       avatar: getProfile().avatar || ''
     };
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     await saveProfileToSupabase(profil);
     updateAvatar();
     renderProfileTeamList();
@@ -793,7 +816,7 @@
     const profil = getProfile();
     if (profil.team.includes(name)) { showToast('Laget finnes allerede', 'error'); return; }
     profil.team.push(name);
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     input.value = '';
     renderProfileTeamList();
     renderTeamDropdown();
@@ -803,7 +826,7 @@
     const profil = getProfile();
     profil.team = profil.team.filter(l => l !== name);
     if (profil.favoriteTeam === name) profil.favoriteTeam = '';
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     saveProfileToSupabase(profil);
     renderProfileTeamList();
     renderTeamDropdown();
@@ -812,7 +835,7 @@
   function setFavoriteTeam(name) {
     var profil = getProfile();
     profil.favoriteTeam = (profil.favoriteTeam === name) ? '' : name;
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     saveProfileToSupabase(profil);
     renderProfileTeamList();
     renderTeamDropdown();
@@ -843,8 +866,13 @@
     if (dd) dd.classList.remove('open');
     var chev = document.getElementById('tournament-chevron');
     if (chev) chev.classList.remove('open');
+    showNewTournamentInput = false;
+    var newRow = document.getElementById('tournament-new-row');
+    if (newRow) newRow.classList.remove('visible');
     renderTournamentDropdown();
   }
+
+  var showNewTournamentInput = false;
 
   function renderTournamentDropdown() {
     var profil = getProfile();
@@ -864,16 +892,32 @@
     var addDiv = document.createElement('div');
     addDiv.className = 'team-option team-option-add';
     addDiv.innerHTML = '<span>＋</span> Ny turnering...';
-    addDiv.onclick = function() {
-      var dd = document.getElementById('tournament-dropdown');
-      if (dd) dd.classList.remove('open');
-      switchTab('profil');
-      setTimeout(function() {
-        var el = document.getElementById('profile-new-tournament');
-        if (el) el.focus();
-      }, 200);
-    };
+    addDiv.onclick = function() { toggleNewTournamentInput(); };
     list.appendChild(addDiv);
+  }
+
+  function toggleNewTournamentInput() {
+    showNewTournamentInput = !showNewTournamentInput;
+    document.getElementById('tournament-new-row').classList.toggle('visible', showNewTournamentInput);
+    if (showNewTournamentInput) setTimeout(function() { document.getElementById('tournament-new-input').focus(); }, 50);
+  }
+
+  function saveNewTournamentFromDropdown() {
+    var input = document.getElementById('tournament-new-input');
+    var name = input.value.trim();
+    if (!name) return;
+    var profil = getProfile();
+    if (!profil.tournaments) profil.tournaments = [];
+    if (!profil.tournaments.includes(name)) {
+      profil.tournaments.push(name);
+      saveProfile_local(profil);
+      saveProfileToSupabase(profil);
+      renderProfileTournamentList();
+    }
+    input.value = '';
+    showNewTournamentInput = false;
+    document.getElementById('tournament-new-row').classList.remove('visible');
+    selectTournament(name);
   }
 
   // ── MODAL LAG + TURNERING DROPDOWNS ──────────────────────────────────
@@ -958,7 +1002,7 @@
     if (!profil.tournaments) profil.tournaments = [];
     if (profil.tournaments.includes(name)) { showToast('Turneringen finnes allerede', 'error'); return; }
     profil.tournaments.push(name);
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     saveProfileToSupabase(profil);
     if (input) input.value = '';
     renderProfileTournamentList();
@@ -970,7 +1014,7 @@
     var profil = getProfile();
     profil.tournaments = profil.tournaments.filter(function(t) { return t !== name; });
     if (profil.favoriteTournament === name) profil.favoriteTournament = '';
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     saveProfileToSupabase(profil);
     if (selectedTournament === name) selectTournament('');
     renderProfileTournamentList();
@@ -980,7 +1024,7 @@
   function setFavoriteTournament(name) {
     var profil = getProfile();
     profil.favoriteTournament = (profil.favoriteTournament === name) ? '' : name;
-    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+    saveProfile_local(profil);
     saveProfileToSupabase(profil);
     renderProfileTournamentList();
     renderTournamentDropdown();
@@ -1133,7 +1177,7 @@
     const profil = getProfile();
     if (!profil.team.includes(name)) {
       profil.team.push(name);
-      localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
+      saveProfile_local(profil);
       saveProfileToSupabase(profil);
       renderProfileTeamList();
     }
@@ -1322,6 +1366,47 @@
     }).join('');
   }
 
+  function renderMatchListPaged(matches) {
+    var total = matches.length;
+    var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (matchPage >= totalPages) matchPage = totalPages - 1;
+    var start = matchPage * PAGE_SIZE;
+    var pageMatches = matches.slice(start, start + PAGE_SIZE);
+    var html = renderMatchList(pageMatches);
+    if (totalPages > 1) {
+      var from = start + 1;
+      var to = Math.min(start + PAGE_SIZE, total);
+      html += '<div class="pagination">' +
+        '<button class="page-btn" onclick="setMatchPage(' + (matchPage - 1) + ')" ' + (matchPage === 0 ? 'disabled' : '') + '>← Forrige</button>' +
+        '<span class="page-info">' + from + '–' + to + ' av ' + total + '</span>' +
+        '<button class="page-btn" onclick="setMatchPage(' + (matchPage + 1) + ')" ' + (matchPage >= totalPages - 1 ? 'disabled' : '') + '>Neste →</button>' +
+      '</div>';
+    }
+    return html;
+  }
+
+  function setMatchPage(page) {
+    matchPage = page;
+    var statsContent = document.getElementById('stats-content');
+    if (!statsContent) return;
+    // Re-render just the match list + pagination (avoid full re-render)
+    var header = statsContent.querySelector('.match-list-header');
+    if (!header) { renderStats(); return; }
+    var seasonMatches = allMatches.filter(function(k) { return k.dato.startsWith(activeSeason); });
+    var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.eget_lag === activeLag; });
+    // Remove old match items and pagination
+    var toRemove = [];
+    var node = header.nextSibling;
+    while (node) { toRemove.push(node); node = node.nextSibling; }
+    toRemove.forEach(function(n) { n.parentNode.removeChild(n); });
+    // Insert new content
+    var temp = document.createElement('div');
+    temp.innerHTML = renderMatchListPaged(matches);
+    while (temp.firstChild) { statsContent.appendChild(temp.firstChild); }
+    // Scroll to header
+    header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function calcWDL(matchArr) {
     var w = 0, d = 0, l = 0, g = 0, a = 0;
     matchArr.forEach(function(k) {
@@ -1473,13 +1558,15 @@
       ${renderHomeAwaySection(matches)}
       ${renderTournamentSection(matches)}
       <div class="match-list-header">Kamphistorikk</div>
-      ${renderMatchList(matches)}
+      ${renderMatchListPaged(matches)}
     `;
   }
 
   let activeLag = 'all';
-  function setSeason(s) { activeSeason = s; activeLag = 'all'; renderStats(); }
-  function setTeamFilter(team) { activeLag = team; renderStats(); }
+  var matchPage = 0;
+  var PAGE_SIZE = 20;
+  function setSeason(s) { activeSeason = s; activeLag = 'all'; matchPage = 0; renderStats(); }
+  function setTeamFilter(team) { activeLag = team; matchPage = 0; renderStats(); }
 
   // ════════════════════════════════ TAB NAV ════════════════════════════════
 
@@ -1632,11 +1719,14 @@
   }
 
   function getSettings() {
-    try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaultSettings(); }
-    catch(e) { return defaultSettings(); }
+    if (_settingsCache) return _settingsCache;
+    try { _settingsCache = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaultSettings(); }
+    catch(e) { _settingsCache = defaultSettings(); }
+    return _settingsCache;
   }
 
   function saveSettings(s) {
+    _settingsCache = s;
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
     saveSettingsToSupabase(s);
   }
@@ -2044,7 +2134,7 @@
   <div class="modal-body">
     <div class="modal-field">
       <label class="modal-label">Dato</label>
-      <input class="modal-input" type="date" id="modal-date">
+      <input class="modal-input" type="date" id="modal-dato">
     </div>
     <div class="modal-field">
       <label class="modal-label">Hjemme / Borte</label>
@@ -2055,7 +2145,7 @@
     </div>
     <div class="modal-field">
       <label class="modal-label">Motstanderlag</label>
-      <input class="modal-input" type="text" id="modal-opponent" autocomplete="off">
+      <input class="modal-input" type="text" id="modal-motstander" autocomplete="off">
     </div>
     <div class="modal-field">
       <label class="modal-label">Eget team</label>
