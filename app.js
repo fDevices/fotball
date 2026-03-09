@@ -8,6 +8,16 @@
   var _profileCache = null;
   var _settingsCache = null;
 
+  // ── HTML escape helper – use on ALL user-provided strings in innerHTML ──
+  function esc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // ── Fase 2: Analyse ──────────────────────────────────────────────────────
   var activeStatsView = 'overview';
   var chartInstances = {};
@@ -136,7 +146,7 @@
 
   function saveProfile_local(profil) {
     _profileCache = profil;
-    saveProfile_local(profil);
+    localStorage.setItem(PROFIL_KEY, JSON.stringify(profil));
   }
 
   async function fetchProfileFromSupabase() {
@@ -222,13 +232,16 @@
   }
 
   async function saveProfile() {
+    const existing = getProfile();
     const profil = {
       name: document.getElementById('profil-name').value.trim(),
       club: document.getElementById('profil-club').value.trim(),
       posisjon: document.getElementById('profil-posisjon').value.trim(),
-      team: getProfile().team,
-      favoriteTeam: getProfile().favoriteTeam || '',
-      avatar: getProfile().avatar || ''
+      team: existing.team || [],
+      favoriteTeam: existing.favoriteTeam || '',
+      tournaments: existing.tournaments || [],
+      favoriteTournament: existing.favoriteTournament || '',
+      avatar: existing.avatar || ''
     };
     saveProfile_local(profil);
     await saveProfileToSupabase(profil);
@@ -336,7 +349,7 @@
     tournamentList.forEach(function(name) {
       var div = document.createElement('div');
       div.className = 'team-option' + (selectedTournament === name ? ' selected' : '');
-      div.innerHTML = name + (selectedTournament === name ? ' <span style="color:var(--lime)">✓</span>' : '');
+      div.innerHTML = esc(name) + (selectedTournament === name ? ' <span style="color:var(--lime)">✓</span>' : '');
       div.onclick = function() { selectTournament(name); };
       list.appendChild(div);
     });
@@ -386,7 +399,7 @@
     teamList.forEach(function(name) {
       var div = document.createElement('div');
       div.className = 'team-option' + (modalSelectedTeam === name ? ' selected' : '');
-      div.innerHTML = name + (modalSelectedTeam === name ? ' <span style="color:var(--lime)">✓</span>' : '');
+      div.innerHTML = esc(name) + (modalSelectedTeam === name ? ' <span style="color:var(--lime)">✓</span>' : '');
       div.onclick = function() { selectModalTeam(name); };
       list.appendChild(div);
     });
@@ -421,7 +434,7 @@
     tournamentList.forEach(function(name) {
       var div = document.createElement('div');
       div.className = 'team-option' + (modalSelectedTournament === name ? ' selected' : '');
-      div.innerHTML = name + (modalSelectedTournament === name ? ' <span style="color:var(--lime)">✓</span>' : '');
+      div.innerHTML = esc(name) + (modalSelectedTournament === name ? ' <span style="color:var(--lime)">✓</span>' : '');
       div.onclick = function() { selectModalTournament(name); };
       list.appendChild(div);
     });
@@ -532,7 +545,7 @@
       var isFav = name === favoritt;
       return '<div class="team-list-item">' +
         '<button class="team-star ' + (isFav ? 'active' : '') + '" onclick="setFavoriteTeam(\'' + name.replace(/'/g, "\\'") + '\')">' + (isFav ? '&#9733;' : '&#9734;') + '</button>' +
-        '<span class="team-list-name' + (isFav ? ' favoritt' : '') + '">' + name + (isFav ? ' <span class=\"team-fav-badge\">standard</span>' : '') + '</span>' +
+        '<span class="team-list-name' + (isFav ? ' favoritt' : '') + '">' + esc(name) + (isFav ? ' <span class=\"team-fav-badge\">standard</span>' : '') + '</span>' +
         '<button class="team-list-del" onclick="deleteTeam(\'' + name.replace(/'/g, "\\'") + '\')">×</button>' +
       '</div>';
     }).join('');
@@ -597,7 +610,7 @@
     let html = '';
     profil.team.forEach(name => {
       html += `<div class="team-option ${selectedTeam === name ? 'selected' : ''}" onclick="selectTeam('${name.replace(/'/g,"\\'")}')">
-        ${name}
+        ${esc(name)}
         ${selectedTeam === name ? '<span style="color:var(--lime)">✓</span>' : ''}
       </div>`;
     });
@@ -799,15 +812,15 @@
       var resIkon = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
       var date = new Date(k.dato).toLocaleDateString('no-NO', {day:'2-digit', month:'short'});
       var team = k.eget_lag || '';
-      var tournament = k.turnering ? ' · ' + k.turnering : '';
+      var tournament = k.turnering ? ' · ' + esc(k.turnering) : '';
       var goalText = (k.mal||0) > 0 ? ' · ' + k.mal + String.fromCodePoint(9917) + ((k.assist||0) > 0 ? ' ' + k.assist + String.fromCodePoint(127919) : '') : '';
       var onclick = "openEditModal('" + k.id + "')";
       return '<div class="match-item" onclick="' + onclick + '">' +
         '<div class="match-result ' + r + '">' + resIkon + '</div>' +
         '<div class="match-info">' +
           '<div class="match-title-row">' +
-            '<div class="match-opponent">' + k.motstanderlag + '</div>' +
-            (team ? '<div class="match-team-name">· ' + team + '</div>' : '') +
+            '<div class="match-opponent">' + esc(k.motstanderlag) + '</div>' +
+            (team ? '<div class="match-team-name">· ' + esc(team) + '</div>' : '') +
           '</div>' +
           '<div class="match-meta">' + date + tournament + goalText + '</div>' +
         '</div>' +
@@ -932,7 +945,7 @@
     var rows = tournaments.map(function(tn) {
       var s = calcWDL(tournamentMap[tn]);
       return '<div class="tournament-stat-row">' +
-        '<div class="tournament-stat-name">' + tn + ' <span style="color:var(--muted);font-size:12px;font-weight:400">(' + s.n + ' kamper)</span></div>' +
+        '<div class="tournament-stat-name">' + esc(tn) + ' <span style="color:var(--muted);font-size:12px;font-weight:400">(' + s.n + ' kamper)</span></div>' +
         '<div class="tournament-stat-badges">' +
           '<span class="t-badge win">' + s.w + 'S</span>' +
           '<span class="t-badge draw">' + s.d + 'U</span>' +
@@ -963,7 +976,7 @@
     var boxes = last10.map(function(k) {
       var r = getResult(k);
       var lbl = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
-      return '<div class="form-streak-box ' + r + '" title="' + k.motstanderlag + ' ' + k.hjemme + '-' + k.borte + '">' + lbl + '</div>';
+      return '<div class="form-streak-box ' + r + '" title="' + esc(k.motstanderlag) + ' ' + k.hjemme + '-' + k.borte + '">' + lbl + '</div>';
     }).join('');
     return '<div class="stat-row-card form-streak-wrap">' +
       '<div class="stat-row-title">Form (siste ' + last10.length + ' kamper)</div>' +
@@ -1329,7 +1342,7 @@
       summaryHTML = opponents.map(function(opp) {
         var s = calcWDL(oppMap[opp]);
         return '<div class="opponent-search-row">' +
-          '<div class="opponent-search-name">' + opp + ' <span class="opponent-search-count">(' + s.n + ')</span></div>' +
+          '<div class="opponent-search-name">' + esc(opp) + ' <span class="opponent-search-count">(' + s.n + ')</span></div>' +
           '<div class="opponent-search-badges">' +
             '<span class="t-badge win">' + s.w + 'S</span>' +
             '<span class="t-badge draw">' + s.d + 'U</span>' +
@@ -1867,9 +1880,9 @@
       var awayTeam = k.kamptype === 'hjemme' ? (k.motstanderlag || '') : (k.eget_lag || '');
       return '<tr>' +
         '<td>' + date + '</td>' +
-        '<td>' + homeTeam + '</td>' +
-        '<td>' + awayTeam + '</td>' +
-        '<td>' + (k.turnering || '') + '</td>' +
+        '<td>' + esc(homeTeam) + '</td>' +
+        '<td>' + esc(awayTeam) + '</td>' +
+        '<td>' + esc(k.turnering || '') + '</td>' +
         '<td style="text-align:center">' + k.hjemme + '–' + k.borte + '</td>' +
         '<td style="text-align:center">' + (k.mal || 0) + '</td>' +
         '<td style="text-align:center">' + (k.assist || 0) + '</td>' +
@@ -1891,8 +1904,8 @@
       '.footer{margin-top:24px;font-size:11px;color:#999;text-align:center}' +
       '@media print{body{margin:16px}}' +
       '</style></head><body>' +
-      '<h1>Athlytics Sport' + (profil.name ? ' – ' + profil.name : '') + '</h1>' +
-      '<h2>Sesong ' + season + (profil.club ? ' · ' + profil.club : '') + '</h2>' +
+      '<h1>Athlytics Sport' + (profil.name ? ' – ' + esc(profil.name) : '') + '</h1>' +
+      '<h2>Sesong ' + season + (profil.club ? ' · ' + esc(profil.club) : '') + '</h2>' +
       '<div class="summary">' +
         '<div class="stat"><div class="stat-n">' + n + '</div><div class="stat-l">Kamper</div></div>' +
         '<div class="stat"><div class="stat-n" style="color:#4caf50">' + w + '</div><div class="stat-l">Seier</div></div>' +
