@@ -8,6 +8,26 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
+
+  /* ── LANDSCAPE BLOCK ── */
+  .landscape-block {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--grass);
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+  }
+  .landscape-block-inner { text-align: center; }
+  .landscape-block-icon { font-size: 48px; margin-bottom: 12px; }
+  .landscape-block-text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 18px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--white);
+  }
+  @media (orientation: landscape) and (max-height: 600px) {
+    .landscape-block { display: flex; }
+  }
   body { font-family: 'Barlow', sans-serif; background: var(--grass); color: var(--white); min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden; }
   body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px); pointer-events: none; z-index: 0; }
 
@@ -324,3 +344,36 @@
   .chart-locked-sub { font-size: 12px; color: var(--muted); text-align: center; padding: 0 24px; line-height: 1.4; }
   .chart-unlock-btn { margin-top: 4px; padding: 10px 20px; background: var(--lime); border: none; border-radius: 10px; color: var(--grass); font-family: 'Barlow Condensed',sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
   .chart-unlock-btn:active { background: var(--lime-bright); }
+
+  /* ── FASE 1.6: NULLSTILL TURNERING ── */
+  .team-option-reset { color: var(--muted); border-bottom: 1px solid var(--border); margin-bottom: 2px; }
+  .team-option-reset:hover { color: var(--danger); background: rgba(224,85,85,0.08); }
+
+  /* ── FASE 1.6: MOTSTANDERSØK ── */
+  .opponent-search-wrap { margin-bottom: 0; }
+  .opponent-search-field-wrap { position: relative; display: flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px; margin-bottom: 10px; }
+  .opponent-search-icon { font-size: 14px; margin-right: 8px; opacity: 0.6; flex-shrink: 0; }
+  .opponent-search-input { flex: 1; background: transparent; border: none; outline: none; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 14px; padding: 10px 0; }
+  .opponent-search-input::placeholder { color: var(--muted); }
+  .opponent-search-clear { background: transparent; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+  .opponent-search-clear:hover { color: var(--danger); }
+  .opponent-search-row { display: flex; flex-direction: column; gap: 6px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .opponent-search-row:last-child { border-bottom: none; }
+  .opponent-search-name { font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 700; color: var(--white); }
+  .opponent-search-count { font-size: 12px; font-weight: 400; color: var(--muted); }
+  .opponent-search-badges { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
+
+  /* ── FASE 1.6: SLETT CONFIRM DIALOG ── */
+  .delete-confirm-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .delete-confirm-backdrop.open { opacity: 1; pointer-events: auto; }
+  .delete-confirm-dialog { position: fixed; left: 50%; bottom: -200px; transform: translateX(-50%); z-index: 301; background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 16px 16px; padding: 28px 24px 24px; width: min(360px, calc(100vw - 32px)); text-align: center; transition: bottom 0.28s cubic-bezier(0.34,1.56,0.64,1); }
+  .delete-confirm-dialog.open { bottom: 24px; }
+  .delete-confirm-icon { font-size: 32px; margin-bottom: 8px; }
+  .delete-confirm-title { font-family: 'Barlow Condensed',sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--white); margin-bottom: 8px; }
+  .delete-confirm-sub { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+  .delete-confirm-sub strong { color: var(--white); }
+  .delete-confirm-actions { display: flex; gap: 10px; }
+  .delete-confirm-cancel { flex: 1; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+  .delete-confirm-cancel:active { background: rgba(255,255,255,0.05); }
+  .delete-confirm-ok { flex: 1; padding: 13px; background: var(--danger); border: none; border-radius: 12px; color: #fff; font-family: 'Barlow Condensed',sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; }
+  .delete-confirm-ok:active { background: #c04040; }

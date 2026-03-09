@@ -2,10 +2,11 @@
 <html lang="no">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Athlytics">
+<meta name="screen-orientation" content="portrait">
 <title>Athlytics Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,6 +15,13 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
 </head>
 <body>
+
+<div class="landscape-block">
+  <div class="landscape-block-inner">
+    <div class="landscape-block-icon">📱</div>
+    <div class="landscape-block-text">Roter telefonen til stående modus</div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════ LOGG ══════════════════════════════════ -->
 <div class="screen active" id="screen-log">
@@ -301,6 +309,18 @@
 </nav>
 
 <div class="toast" id="toast"></div>
+
+<!-- Delete confirm dialog -->
+<div class="delete-confirm-backdrop" id="delete-confirm-backdrop" onclick="cancelDeleteMatch()"></div>
+<div class="delete-confirm-dialog" id="delete-confirm-dialog">
+  <div class="delete-confirm-icon">🗑</div>
+  <div class="delete-confirm-title">Slett kamp?</div>
+  <div class="delete-confirm-sub">Kampen mot <strong id="delete-confirm-name"></strong> slettes permanent.</div>
+  <div class="delete-confirm-actions">
+    <button class="delete-confirm-cancel" onclick="cancelDeleteMatch()">Avbryt</button>
+    <button class="delete-confirm-ok" onclick="confirmDeleteMatch()">Slett</button>
+  </div>
+</div>
 
 
 <script src="app.js"></script>

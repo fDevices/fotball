@@ -322,6 +322,14 @@
     var list = document.getElementById('tournament-options-list');
     if (!list) return;
     list.innerHTML = '';
+    // "Nullstill" option at top when a tournament is selected
+    if (selectedTournament) {
+      var resetDiv = document.createElement('div');
+      resetDiv.className = 'team-option team-option-reset';
+      resetDiv.innerHTML = '<span style="color:var(--muted)">✕</span> Nullstill turnering';
+      resetDiv.onclick = function() { selectTournament(''); };
+      list.appendChild(resetDiv);
+    }
     // Include current value even if not in profile
     var tournamentList = profil.tournaments || [];
     if (selectedTournament && !tournamentList.includes(selectedTournament)) tournamentList = [selectedTournament].concat(tournamentList);
@@ -1262,7 +1270,21 @@
       </div>
       ${renderHomeAwaySection(matches)}
       ${renderTournamentSection(matches)}
-      <div class="match-list-header">Kamphistorikk</div>
+      <div class="opponent-search-wrap">
+        <div class="match-list-header" style="margin-bottom:8px">Kamphistorikk</div>
+        <div class="opponent-search-field-wrap">
+          <span class="opponent-search-icon">🔍</span>
+          <input
+            type="text"
+            id="opponent-search-input"
+            class="opponent-search-input"
+            placeholder="Søk motstander..."
+            value="${opponentSearch}"
+            oninput="setOpponentSearch(this.value)"
+          />
+          ${opponentSearch ? '<button class="opponent-search-clear" onclick="var i=document.getElementById(&quot;opponent-search-input&quot;);i.value=&quot;&quot;;setOpponentSearch(&quot;&quot;);">✕</button>' : ''}
+        </div>
+      </div>
       ${renderMatchListPaged(matches)}
     `;
   }
@@ -1270,8 +1292,74 @@
   let activeLag = 'all';
   var matchPage = 0;
   var PAGE_SIZE = 20;
-  function setSeason(s) { activeSeason = s; activeLag = 'all'; matchPage = 0; renderStats(); }
-  function setTeamFilter(team) { activeLag = team; matchPage = 0; renderStats(); }
+  var opponentSearch = '';
+
+  function setSeason(s) { activeSeason = s; activeLag = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
+  function setTeamFilter(team) { activeLag = team; matchPage = 0; opponentSearch = ''; renderStats(); }
+
+  function setOpponentSearch(val) {
+    opponentSearch = val.trim().toLowerCase();
+    matchPage = 0;
+    var statsContent = document.getElementById('stats-content');
+    if (!statsContent) return;
+    if (opponentSearch) {
+      renderOpponentSearchResults(statsContent);
+    } else {
+      renderStats();
+    }
+  }
+
+  function renderOpponentSearchResults(container) {
+    var query = opponentSearch;
+    var pool = activeLag === 'all' ? allMatches : allMatches.filter(function(k) { return k.eget_lag === activeLag; });
+    var hits = pool.filter(function(k) { return (k.motstanderlag || '').toLowerCase().includes(query); });
+
+    var oppMap = {};
+    hits.forEach(function(k) {
+      var name = k.motstanderlag || '—';
+      if (!oppMap[name]) oppMap[name] = [];
+      oppMap[name].push(k);
+    });
+    var opponents = Object.keys(oppMap).sort();
+
+    var summaryHTML = '';
+    if (hits.length === 0) {
+      summaryHTML = '<div class="loading" style="padding:20px 0">Ingen kamper mot &quot;' + query + '&quot;</div>';
+    } else {
+      summaryHTML = opponents.map(function(opp) {
+        var s = calcWDL(oppMap[opp]);
+        return '<div class="opponent-search-row">' +
+          '<div class="opponent-search-name">' + opp + ' <span class="opponent-search-count">(' + s.n + ')</span></div>' +
+          '<div class="opponent-search-badges">' +
+            '<span class="t-badge win">' + s.w + 'S</span>' +
+            '<span class="t-badge draw">' + s.d + 'U</span>' +
+            '<span class="t-badge loss">' + s.l + 'T</span>' +
+            '<span class="tournament-wdl-sep"></span>' +
+            '<span class="t-badge goals">⚽' + s.g + '</span>' +
+            '<span class="t-badge assist">🎯' + s.a + '</span>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+      summaryHTML = '<div class="stat-row-card" style="margin-bottom:8px">' +
+        '<div class="stat-row-title">Motstandersøk – ' + hits.length + ' kamper</div>' +
+        summaryHTML +
+      '</div>';
+      summaryHTML += '<div class="match-list-header">Kamper</div>' + renderMatchListPaged(hits);
+    }
+
+    var searchWrap = container.querySelector('.opponent-search-wrap');
+    if (searchWrap) {
+      var toRemove = [];
+      var node = searchWrap.nextSibling;
+      while (node) { toRemove.push(node); node = node.nextSibling; }
+      toRemove.forEach(function(n) { n.parentNode.removeChild(n); });
+      var temp = document.createElement('div');
+      temp.innerHTML = summaryHTML;
+      while (temp.firstChild) { container.appendChild(temp.firstChild); }
+    } else {
+      renderStats();
+    }
+  }
 
   // ════════════════════════════════ TAB NAV ════════════════════════════════
 
@@ -1643,9 +1731,20 @@
     btn.textContent = 'Lagre endringer'; btn.disabled = false;
   }
 
-  async function deleteMatch() {
+  function deleteMatch() {
     if (!modalMatchId) return;
-    if (!confirm('Sikker på at du vil slette denne kampen?')) return;
+    // Show custom confirm dialog instead of browser confirm()
+    var k = allMatches.find(function(m) { return String(m.id) === String(modalMatchId); });
+    var oppName = k ? (k.motstanderlag || 'denne kampen') : 'denne kampen';
+    document.getElementById('delete-confirm-name').textContent = oppName;
+    document.getElementById('delete-confirm-backdrop').classList.add('open');
+    document.getElementById('delete-confirm-dialog').classList.add('open');
+  }
+
+  async function confirmDeleteMatch() {
+    document.getElementById('delete-confirm-backdrop').classList.remove('open');
+    document.getElementById('delete-confirm-dialog').classList.remove('open');
+    if (!modalMatchId) return;
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/kamper?id=eq.${modalMatchId}`, {
         method: 'DELETE',
@@ -1661,6 +1760,11 @@
         showToast('Feil ved sletting', 'error');
       }
     } catch(e) { showToast('Nettverksfeil', 'error'); }
+  }
+
+  function cancelDeleteMatch() {
+    document.getElementById('delete-confirm-backdrop').classList.remove('open');
+    document.getElementById('delete-confirm-dialog').classList.remove('open');
   }
 
   // ════════════════════════════════ INIT ════════════════════════════════
