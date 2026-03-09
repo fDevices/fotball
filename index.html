@@ -27,12 +27,12 @@
 <div class="screen active" id="screen-log">
   <div class="header">
     <div class="header-badge" id="log-badge">⚽ Sesong 2025</div>
-    <button class="lang-flag-btn" id="lang-flag-btn-log" onclick="toggleLangPicker(this)" title="Change language"></button>
+    <button class="lang-flag-btn" id="lang-flag-btn-log" data-action="toggleLangPicker" title="Change language"></button>
     <h1>Kamp<span>logger</span></h1>
     <p class="header-sub" id="log-sub">Klar til å logge kamp 🟢</p>
     <div class="lang-picker-dropdown" id="lang-picker-dropdown-log">
-      <button onclick="setLang('no')">🇳🇴 Norsk</button>
-      <button onclick="setLang('en')">🇬🇧 English</button>
+      <button data-action="setLang" data-lang="no">🇳🇴 Norsk</button>
+      <button data-action="setLang" data-lang="en">🇬🇧 English</button>
     </div>
   </div>
   <div class="form-body">
@@ -43,8 +43,8 @@
     <div class="form-section">
       <label class="form-label" id="label-matchType">Hjemme eller away?</label>
       <div class="toggle-row">
-        <button class="toggle-btn active" id="btn-home-toggle" onclick="setMatchType('hjemme')">🏠 Hjemmekamp</button>
-        <button class="toggle-btn" id="btn-away-toggle" onclick="setMatchType('away')">✈️ Bortekamp</button>
+        <button class="toggle-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="hjemme">🏠 Hjemmekamp</button>
+        <button class="toggle-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away">✈️ Bortekamp</button>
       </div>
     </div>
     <div class="form-section">
@@ -56,15 +56,15 @@
     <div class="form-section">
       <label class="form-label" id="label-egetlag">Eget team / tropp</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" id="team-selected" onclick="toggleTeamDropdown()">
+        <div class="team-selected" id="team-selected" data-action="toggleTeamDropdown">
           <span class="team-selected-text placeholder" id="team-selected-text">Velg team...</span>
           <span class="team-chevron" id="team-chevron">▼</span>
         </div>
         <div class="team-dropdown" id="team-dropdown">
           <div id="team-options-list"></div>
           <div class="team-new-row" id="team-new-row">
-            <input class="team-new-input" id="team-new-input" placeholder="Navn på nytt team..." onkeydown="if(event.key==='Enter')saveNewTeamFromDropdown()">
-            <button class="team-new-save" onclick="saveNewTeamFromDropdown()">Legg til</button>
+            <input class="team-new-input" id="team-new-input" placeholder="Navn på nytt team...">
+            <button class="team-new-save" data-action="saveNewTeamFromDropdown">Legg til</button>
           </div>
         </div>
       </div>
@@ -73,15 +73,15 @@
     <div class="form-section">
       <label class="form-label" id="label-turnering">Turnering / serie</label>
       <div class="team-selector-wrap" id="tournament-selector-wrap">
-        <div class="team-selected" onclick="toggleTournamentDropdown()">
+        <div class="team-selected" data-action="toggleTournamentDropdown">
           <span class="team-selected-text placeholder" id="tournament-selected-text">— Velg turnering —</span>
           <span class="team-chevron" id="tournament-chevron">▼</span>
         </div>
         <div class="team-dropdown" id="tournament-dropdown">
           <div id="tournament-options-list"></div>
           <div class="team-new-row" id="tournament-new-row">
-            <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering..." onkeydown="if(event.key==='Enter')saveNewTournamentFromDropdown()">
-            <button class="team-new-save" onclick="saveNewTournamentFromDropdown()">Legg til</button>
+            <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering...">
+            <button class="team-new-save" data-action="saveNewTournamentFromDropdown">Legg til</button>
           </div>
         </div>
       </div>
@@ -95,15 +95,15 @@
       </div>
       <div class="score-row">
         <div class="number-control">
-          <button class="num-btn" onclick="adjust('home',-1)">−</button>
+          <button class="num-btn" data-action="adjust" data-type="home" data-delta="-1">−</button>
           <span class="num-display" id="home-display">0</span>
-          <button class="num-btn" onclick="adjust('home',1)">+</button>
+          <button class="num-btn" data-action="adjust" data-type="home" data-delta="1">+</button>
         </div>
         <span class="score-separator">–</span>
         <div class="number-control">
-          <button class="num-btn" onclick="adjust('away',-1)">−</button>
+          <button class="num-btn" data-action="adjust" data-type="away" data-delta="-1">−</button>
           <span class="num-display" id="away-display">0</span>
-          <button class="num-btn" onclick="adjust('away',1)">+</button>
+          <button class="num-btn" data-action="adjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
     </div>
@@ -117,22 +117,22 @@
         <div>
           <span class="num-label" id="label-goals">Mål</span>
           <div class="number-control">
-            <button class="num-btn" onclick="adjust('goals',-1)">−</button>
+            <button class="num-btn" data-action="adjust" data-type="goals" data-delta="-1">−</button>
             <span class="num-display" id="goals-display">0</span>
-            <button class="num-btn" onclick="adjust('goals',1)">+</button>
+            <button class="num-btn" data-action="adjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
         <div>
           <span class="num-label" id="label-assist">Assist</span>
           <div class="number-control">
-            <button class="num-btn" onclick="adjust('assist',-1)">−</button>
+            <button class="num-btn" data-action="adjust" data-type="assist" data-delta="-1">−</button>
             <span class="num-display" id="assist-display">0</span>
-            <button class="num-btn" onclick="adjust('assist',1)">+</button>
+            <button class="num-btn" data-action="adjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
       </div>
     </div>
-    <button class="submit-btn" id="submit-btn" onclick="saveMatch()">Lagre kamp</button>
+    <button class="submit-btn" id="submit-btn" data-action="saveMatch">Lagre kamp</button>
   </div>
 </div>
 
@@ -140,19 +140,19 @@
 <div class="screen" id="screen-stats">
   <div class="header">
     <div class="header-badge">📊 Statistikk</div>
-    <button class="lang-flag-btn" id="lang-flag-btn-stats" onclick="toggleLangPicker(this)" title="Change language"></button>
+    <button class="lang-flag-btn" id="lang-flag-btn-stats" data-action="toggleLangPicker" title="Change language"></button>
     <h1>Sesongen<span> 2025</span></h1>
     <p class="header-sub" id="stats-sub">Laster data...</p>
     <div class="lang-picker-dropdown" id="lang-picker-dropdown-stats">
-      <button onclick="setLang('no')">🇳🇴 Norsk</button>
-      <button onclick="setLang('en')">🇬🇧 English</button>
+      <button data-action="setLang" data-lang="no">🇳🇴 Norsk</button>
+      <button data-action="setLang" data-lang="en">🇬🇧 English</button>
     </div>
   </div>
   <div class="stats-body">
     <div class="form-section">
       <div class="stats-view-toggle" id="stats-view-toggle">
-        <button class="stats-view-btn active" id="stats-view-btn-overview" onclick="switchStatsView('overview')">Oversikt</button>
-        <button class="stats-view-btn" id="stats-view-btn-analyse" onclick="switchStatsView('analyse')">Analyse <span class="premium-star">⭐</span></button>
+        <button class="stats-view-btn active" id="stats-view-btn-overview" data-action="switchStatsView" data-view="overview">Oversikt</button>
+        <button class="stats-view-btn" id="stats-view-btn-analyse" data-action="switchStatsView" data-view="analyse">Analyse <span class="premium-star">⭐</span></button>
       </div>
     </div>
     <div id="stats-filters">
@@ -173,12 +173,12 @@
 <div class="screen" id="screen-profil">
   <div class="header">
     <div class="header-badge">👤 Profil</div>
-    <button class="lang-flag-btn" id="lang-flag-btn-profil" onclick="toggleLangPicker(this)" title="Change language"></button>
+    <button class="lang-flag-btn" id="lang-flag-btn-profil" data-action="toggleLangPicker" title="Change language"></button>
     <h1>Min<span> profil</span></h1>
     <p class="header-sub" id="profil-sub">Innstillinger og team</p>
     <div class="lang-picker-dropdown" id="lang-picker-dropdown-profil">
-      <button onclick="setLang('no')">🇳🇴 Norsk</button>
-      <button onclick="setLang('en')">🇬🇧 English</button>
+      <button data-action="setLang" data-lang="no">🇳🇴 Norsk</button>
+      <button data-action="setLang" data-lang="en">🇬🇧 English</button>
     </div>
   </div>
   <div class="profil-body">
@@ -189,7 +189,7 @@
         <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
         <span id="avatar-emoji">⚽</span>
       </div>
-      <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="uploadImage(this)">
+      <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="window._uploadImage(this)">
       <div class="avatar-upload-hint" id="avatar-upload-hint">Trykk for å laste opp bilde</div>
       <div class="avatar-name" id="avatar-name">–</div>
       <div class="avatar-club" id="avatar-club">–</div>
@@ -200,11 +200,11 @@
       <div class="profil-card-title">Spillerinfo</div>
       <div class="profil-field">
         <span class="profil-field-label">Navn</span>
-        <input class="profil-field-input" id="profil-name" type="text" placeholder="Fullt navn" autocomplete="off" oninput="updateAvatar()">
+        <input class="profil-field-input" id="profil-name" type="text" placeholder="Fullt navn" autocomplete="off" data-action="updateAvatar">
       </div>
       <div class="profil-field">
         <span class="profil-field-label">Klubb</span>
-        <input class="profil-field-input" id="profil-club" type="text" placeholder="F.eks. Stabæk" autocomplete="off" oninput="updateAvatar()">
+        <input class="profil-field-input" id="profil-club" type="text" placeholder="F.eks. Stabæk" autocomplete="off" data-action="updateAvatar">
       </div>
       <div class="profil-field">
         <span class="profil-field-label">Posisjon</span>
@@ -217,8 +217,8 @@
       <div class="profil-card-title">🏆 Mine turneringer / serier</div>
       <div class="team-list" id="profile-tournament-list" style="margin-bottom:10px;"></div>
       <div class="add-team-row">
-        <input class="add-team-input" id="profile-new-tournament" placeholder="Legg til turnering..." autocomplete="off" onkeydown="if(event.key==='Enter')addTournament()">
-        <button class="add-team-btn" onclick="addTournament()">＋</button>
+        <input class="add-team-input" id="profile-new-tournament" placeholder="Legg til turnering..." autocomplete="off">
+        <button class="add-team-btn" data-action="addTournament">＋</button>
       </div>
     </div>
 
@@ -227,12 +227,12 @@
       <div class="profil-card-title">Mine team / tropper</div>
       <div class="team-list" id="profile-team-list"></div>
       <div class="add-team-row">
-        <input class="add-team-input" id="profile-team-input" placeholder="Legg til team..." onkeydown="if(event.key==='Enter')addTeamFromProfile()">
-        <button class="add-team-btn" onclick="addTeamFromProfile()">＋</button>
+        <input class="add-team-input" id="profile-team-input" placeholder="Legg til team...">
+        <button class="add-team-btn" data-action="addTeamFromProfile">＋</button>
       </div>
     </div>
 
-    <button class="profil-save-btn" onclick="saveProfile()">Lagre profil</button>
+    <button class="profil-save-btn" data-action="saveProfile">Lagre profil</button>
     <div class="profil-saved" id="profil-saved">✓ Lagret</div>
   </div>
 </div>
@@ -242,15 +242,21 @@
 <div class="screen" id="screen-settings">
   <div class="header">
     <div class="header-badge">⚙️ Innstillinger</div>
-    <button class="lang-flag-btn" id="lang-flag-btn-settings" onclick="toggleLangPicker(this)" title="Change language"></button>
+    <button class="lang-flag-btn" id="lang-flag-btn-settings" data-action="toggleLangPicker" title="Change language"></button>
     <h1>Innstil<span>linger</span></h1>
     <p class="header-sub" id="settings-sub">Tilpass Athlytics Sport</p>
     <div class="lang-picker-dropdown" id="lang-picker-dropdown-settings">
-      <button onclick="setLang('no')">🇳🇴 Norsk</button>
-      <button onclick="setLang('en')">🇬🇧 English</button>
+      <button data-action="setLang" data-lang="no">🇳🇴 Norsk</button>
+      <button data-action="setLang" data-lang="en">🇬🇧 English</button>
     </div>
   </div>
   <div class="pad">
+
+    <div class="settings-section">
+      <div class="settings-section-title" id="st-lang-title">🌍 Språk</div>
+      <div class="settings-desc" id="st-lang-desc">Velg språk for appen.</div>
+      <div class="settings-options" id="settings-lang-options"></div>
+    </div>
 
     <div class="settings-section">
       <div class="settings-section-title">🏅 Sport</div>
@@ -270,7 +276,7 @@
       <div class="settings-options" id="settings-aktiv-sesong-options"></div>
       <div class="settings-add-season-row">
         <input id="settings-ny-sesong" type="text" class="settings-add-season-input" placeholder="Legg til sesong (f.eks. 2027)">
-        <button onclick="addSeason()" class="settings-add-season-btn">+ Legg til</button>
+        <button data-action="addSeason" class="settings-add-season-btn">+ Legg til</button>
       </div>
     </div>
 
@@ -279,8 +285,8 @@
       <div class="export-title">📤 Eksporter data</div>
       <div class="export-desc">Last ned kamphistorikken din som CSV eller PDF-rapport. Tilgjengelig for Pro-brukere.</div>
       <div class="export-btns">
-        <button class="export-btn" onclick="exportCSV()">📊 Last ned CSV</button>
-        <button class="export-btn pdf-btn" onclick="exportPDF()">📄 Last ned PDF</button>
+        <button class="export-btn" data-action="exportCSV">📊 Last ned CSV</button>
+        <button class="export-btn pdf-btn" data-action="exportPDF">📄 Last ned PDF</button>
       </div>
     </div>
 
@@ -290,19 +296,19 @@
 </div>
 
 <nav class="tab-bar">
-  <button class="tab-btn active" id="tab-log" onclick="switchTab('log')">
+  <button class="tab-btn active" id="tab-log" data-action="switchTab" data-tab="log">
     <span class="tab-icon">⚽</span>
     <span class="tab-label">Logg</span>
   </button>
-  <button class="tab-btn" id="tab-stats" onclick="switchTab('stats')">
+  <button class="tab-btn" id="tab-stats" data-action="switchTab" data-tab="stats">
     <span class="tab-icon">📊</span>
     <span class="tab-label">Statistikk</span>
   </button>
-  <button class="tab-btn" id="tab-profil" onclick="switchTab('profil')">
+  <button class="tab-btn" id="tab-profil" data-action="switchTab" data-tab="profil">
     <span class="tab-icon">👤</span>
     <span class="tab-label">Profil</span>
   </button>
-  <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">
+  <button class="tab-btn" id="tab-settings" data-action="switchTab" data-tab="settings">
     <span class="tab-icon">⚙️</span>
     <span class="tab-label">Innstillinger</span>
   </button>
@@ -311,19 +317,19 @@
 <div class="toast" id="toast"></div>
 
 <!-- Delete confirm dialog -->
-<div class="delete-confirm-backdrop" id="delete-confirm-backdrop" onclick="cancelDeleteMatch()"></div>
+<div class="delete-confirm-backdrop" id="delete-confirm-backdrop" data-action="cancelDeleteMatch"></div>
 <div class="delete-confirm-dialog" id="delete-confirm-dialog">
   <div class="delete-confirm-icon">🗑</div>
   <div class="delete-confirm-title">Slett kamp?</div>
   <div class="delete-confirm-sub">Kampen mot <strong id="delete-confirm-name"></strong> slettes permanent.</div>
   <div class="delete-confirm-actions">
-    <button class="delete-confirm-cancel" onclick="cancelDeleteMatch()">Avbryt</button>
-    <button class="delete-confirm-ok" onclick="confirmDeleteMatch()">Slett</button>
+    <button class="delete-confirm-cancel" data-action="cancelDeleteMatch">Avbryt</button>
+    <button class="delete-confirm-ok" data-action="confirmDeleteMatch">Slett</button>
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ --> id="modal-backdrop" onclick="closeModal()"></div>
+<!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-backdrop" data-action="closeModal"></div>
 <div class="modal-sheet" id="modal-sheet">
   <div class="modal-handle"></div>
   <div class="modal-title" id="modal-title">Rediger kamp</div>
@@ -335,8 +341,8 @@
     <div class="modal-field">
       <label class="modal-label">Hjemme / Borte</label>
       <div class="toggle-row">
-        <button class="toggle-btn" id="modal-btn-home" onclick="setModalMatchType('hjemme')">🏠 Hjemmekamp</button>
-        <button class="toggle-btn" id="modal-btn-away" onclick="setModalMatchType('away')">✈️ Bortekamp</button>
+        <button class="toggle-btn" id="modal-btn-home" data-action="setModalMatchType" data-match-type="hjemme">🏠 Hjemmekamp</button>
+        <button class="toggle-btn" id="modal-btn-away" data-action="setModalMatchType" data-match-type="away">✈️ Bortekamp</button>
       </div>
     </div>
     <div class="modal-field">
@@ -346,7 +352,7 @@
     <div class="modal-field">
       <label class="modal-label">Eget team</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" onclick="toggleModalTeamDropdown()">
+        <div class="team-selected" data-action="toggleModalTeamDropdown">
           <span class="team-selected-text placeholder" id="modal-own-team-text">Velg team...</span>
           <span class="team-chevron" id="modal-team-chevron">▼</span>
         </div>
@@ -359,7 +365,7 @@
     <div class="modal-field">
       <label class="modal-label">Turnering</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" onclick="toggleModalTournamentDropdown()">
+        <div class="team-selected" data-action="toggleModalTournamentDropdown">
           <span class="team-selected-text placeholder" id="modal-tournament-text">Velg turnering...</span>
           <span class="team-chevron" id="modal-tournament-chevron">▼</span>
         </div>
@@ -373,15 +379,15 @@
       <label class="modal-label">Score</label>
       <div class="modal-score-row">
         <div class="number-control">
-          <button class="num-btn" onclick="modalAdjust('home',-1)">−</button>
+          <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="-1">−</button>
           <span class="num-display" id="modal-home">0</span>
-          <button class="num-btn" onclick="modalAdjust('home',1)">+</button>
+          <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="1">+</button>
         </div>
         <span class="score-separator">–</span>
         <div class="number-control">
-          <button class="num-btn" onclick="modalAdjust('away',-1)">−</button>
+          <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="-1">−</button>
           <span class="num-display" id="modal-away">0</span>
-          <button class="num-btn" onclick="modalAdjust('away',1)">+</button>
+          <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
     </div>
@@ -390,28 +396,28 @@
         <div>
           <label class="modal-label">Mål</label>
           <div class="number-control">
-            <button class="num-btn" onclick="modalAdjust('goals',-1)">−</button>
+            <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="-1">−</button>
             <span class="num-display" id="modal-goals">0</span>
-            <button class="num-btn" onclick="modalAdjust('goals',1)">+</button>
+            <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
         <div>
           <label class="modal-label">Assist</label>
           <div class="number-control">
-            <button class="num-btn" onclick="modalAdjust('assist',-1)">−</button>
+            <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="-1">−</button>
             <span class="num-display" id="modal-assist">0</span>
-            <button class="num-btn" onclick="modalAdjust('assist',1)">+</button>
+            <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="modal-actions">
-    <button class="modal-del-btn" onclick="deleteMatch()">🗑 Slett</button>
-    <button class="modal-save-btn" onclick="saveEditedMatch()">Lagre endringer</button>
+    <button class="modal-del-btn" data-action="deleteMatch">🗑 Slett</button>
+    <button class="modal-save-btn" data-action="saveEditedMatch">Lagre endringer</button>
   </div>
 </div>
 
-<script src="app.js"></script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
