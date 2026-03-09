@@ -32,27 +32,6 @@
     gridLine: 'rgba(168,224,99,0.08)'
   };
 
-  // ── Fase 3: Sport themes ─────────────────────────────────────────────────
-  var THEMES = {
-    fotball:     { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
-    orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
-    ski:         { grass: '#1a1a3a', lime: '#a0a8e0', card: '#161628' }
-  };
-
-  function applyTheme(sport) {
-    var th = THEMES[sport] || THEMES.fotball;
-    Object.keys(th).forEach(function(k) {
-      document.documentElement.style.setProperty('--' + k, th[k]);
-    });
-    // Sync CHART_COLORS.lime to new theme lime for Chart.js
-    if (typeof CHART_COLORS !== 'undefined') {
-      CHART_COLORS.lime = th.lime;
-      CHART_COLORS.card = th.card;
-      CHART_COLORS.border = th.lime.replace(')', ',0.15)').replace('rgb', 'rgba');
-      CHART_COLORS.gridLine = th.lime.replace(')', ',0.08)').replace('rgb', 'rgba');
-    }
-  }
-
   function isPremium() {
     return true; // hardkodet til Stripe er implementert (Fase 4)
   }
@@ -103,7 +82,6 @@
       ph_new_season:'Legg til sesong (f.eks. 2027)',
       format_aar:'📅 År (2025)', format_season:'🗓️ Sesong (2025–2026)',
       sport_fotball:'⚽ Fotball', sport_ori:'🧭 Orientering', sport_ski:'⛷️ Ski', snart:'snart',
-      sport_icon:'⚽', stat1_label:'Mål', stat2_label:'Assist',
       modal_rediger:'Rediger kamp', save_changes:'Lagre endringer', delete_btn:'🗑 Slett',
       toast_profile_saved:'✓ Profil saved', toast_lag_finnes:'Laget finnes allerede',
       toast_fyll_inn:'Fyll inn date, opponent og velg team', toast_match_saved:'⚽ Kamp saved!',
@@ -141,7 +119,6 @@
       ph_new_season:'Add season (e.g. 2027)',
       format_aar:'📅 Year (2025)', format_season:'🗓️ Season (2025–2026)',
       sport_fotball:'⚽ Football', sport_ori:'🧭 Orienteering', sport_ski:'⛷️ Skiing', snart:'soon',
-      sport_icon:'⚽', stat1_label:'Goals', stat2_label:'Assists',
       modal_rediger:'Edit match', save_changes:'Save changes', delete_btn:'🗑 Delete',
       toast_profile_saved:'✓ Profile saved', toast_lag_finnes:'Team already exists',
       toast_fyll_inn:'Fill in date, opponent and select team', toast_match_saved:'⚽ Match saved!',
@@ -930,11 +907,11 @@
         '<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">' +
           '<div style="text-align:center">' +
             '<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--lime)">' + s.g + '</div>' +
-            '<div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat1_label') + '</div>' +
+            '<div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">Mål</div>' +
           '</div>' +
           '<div style="text-align:center">' +
             '<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--gold)">' + s.a + '</div>' +
-            '<div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat2_label') + '</div>' +
+            '<div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">Assist</div>' +
           '</div>' +
           '<div style="text-align:center">' +
             '<div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--white)">' + (s.g + s.a) + '</div>' +
@@ -1079,11 +1056,11 @@
         '<div class="chart-canvas-wrap"><canvas id="chart-winpct" height="180"></canvas></div>' +
       '</div>' +
       '<div class="chart-card" id="chart-card-goals">' +
-        '<div class="chart-card-title">' + t('stat1_label') + ' & ' + t('stat2_label').toLowerCase() + ' per kamp</div>' +
+        '<div class="chart-card-title">Mål & assist per kamp</div>' +
         '<div class="chart-canvas-wrap"><canvas id="chart-goals" height="180"></canvas></div>' +
       '</div>' +
       '<div class="chart-card" id="chart-card-tournament">' +
-        '<div class="chart-card-title">' + t('stat1_label') + ' per turnering</div>' +
+        '<div class="chart-card-title">Mål per turnering</div>' +
         '<div class="chart-canvas-wrap" id="chart-tournament-wrap"><canvas id="chart-tournament"></canvas></div>' +
       '</div>';
 
@@ -1142,7 +1119,7 @@
         labels: labels2,
         datasets: [
           {
-            label: t('stat1_label'),
+            label: 'Mål',
             data: goalData,
             borderColor: CHART_COLORS.lime,
             backgroundColor: 'rgba(168,224,99,0.08)',
@@ -1154,7 +1131,7 @@
             tension: 0.2
           },
           {
-            label: t('stat2_label'),
+            label: 'Assist',
             data: assistData,
             borderColor: CHART_COLORS.gold,
             backgroundColor: 'rgba(240,192,80,0.06)',
@@ -1199,7 +1176,7 @@
         labels: tournKeys,
         datasets: [
           {
-            label: t('stat1_label'),
+            label: 'Mål',
             data: tournKeys.map(function(k) { return tournMap[k].g; }),
             backgroundColor: 'rgba(168,224,99,0.6)',
             borderColor: CHART_COLORS.lime,
@@ -1207,7 +1184,7 @@
             borderRadius: 4
           },
           {
-            label: t('stat2_label'),
+            label: 'Assist',
             data: tournKeys.map(function(k) { return tournMap[k].a; }),
             backgroundColor: 'rgba(240,192,80,0.5)',
             borderColor: CHART_COLORS.gold,
@@ -1251,7 +1228,7 @@
     // Lag filter pills
     const seasonMatches = allMatches.filter(k => k.dato.startsWith(activeSeason));
     const profileTeams = getProfile().team || [];
-    if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'alle')) activeLag = 'all';
+    if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'all')) activeLag = 'all';
     const teamPills = [{ key: 'all', label: 'Alle team' }, ...profileTeams.map(l => ({ key: l, label: l }))];
     document.getElementById('team-filter-selector').innerHTML = teamPills.map(p =>
       `<button class="season-pill ${activeLag === p.key ? 'active' : ''}" onclick="setTeamFilter('${p.key.replace(/'/g,"\'")}')"> ${p.label}</button>`
@@ -1294,14 +1271,14 @@
         </div>
       </div>
       <div class="stat-grid">
-        <div class="stat-card"><div class="stat-num lime">${s.g}</div><div class="stat-lbl">${t('stat1_label')}</div></div>
-        <div class="stat-card"><div class="stat-num gold">${s.a}</div><div class="stat-lbl">${t('stat2_label')}</div></div>
+        <div class="stat-card"><div class="stat-num lime">${s.g}</div><div class="stat-lbl">Mål</div></div>
+        <div class="stat-card"><div class="stat-num gold">${s.a}</div><div class="stat-lbl">Assist</div></div>
         <div class="stat-card"><div class="stat-num">${s.g + s.a}</div><div class="stat-lbl">G+A</div></div>
       </div>
       <div class="stat-row-card">
         <div class="stat-row-title">Gjennomsnitt per kamp</div>
-        <div class="stat-row"><span class="stat-row-label">${t('stat1_label')} per kamp</span><span class="stat-row-value">${(s.g/n).toFixed(1)}</span></div>
-        <div class="stat-row"><span class="stat-row-label">${t('stat2_label')} per kamp</span><span class="stat-row-value">${(s.a/n).toFixed(1)}</span></div>
+        <div class="stat-row"><span class="stat-row-label">Mål per kamp</span><span class="stat-row-value">${(s.g/n).toFixed(1)}</span></div>
+        <div class="stat-row"><span class="stat-row-label">Assist per kamp</span><span class="stat-row-value">${(s.a/n).toFixed(1)}</span></div>
         <div class="stat-row"><span class="stat-row-label">G+A per kamp</span><span class="stat-row-value">${((s.g+s.a)/n).toFixed(1)}</span></div>
       </div>
       ${renderHomeAwaySection(matches)}
@@ -1606,9 +1583,7 @@
 
   function setSport(sport) {
     var s = getSettings(); s.sport = sport;
-    saveSettings(s);
-    applyTheme(sport);
-    renderSettings();
+    saveSettings(s); renderSettings();
     updateLogBadge();
     showToast('Sport oppdatert', 'success');
   }
@@ -1650,7 +1625,7 @@
     // strip sesong format back to year if needed
     var baseAar = aar.split(/[–-]/)[0].trim();
     var label = buildSeasonLabel(baseAar, s.seasonFormat);
-    var icon = s.sport === 'orientering' ? '🧭' : s.sport === 'ski' ? '⛷️' : t('sport_icon');
+    var icon = s.sport === 'orientering' ? '🧭' : s.sport === 'ski' ? '⛷️' : '⚽';
     badge.textContent = icon + ' ' + label;
   }
 
@@ -1731,10 +1706,34 @@
   }
 
   function modalAdjust(type, delta) {
-    if (type === 'hjemme') { mHome = Math.max(0, mHome + delta); document.getElementById('modal-home').textContent = mHome; }
-    if (type === 'away')  { mAway  = Math.max(0, mAway  + delta); document.getElementById('modal-away').textContent  = mAway; }
-    if (type === 'goals')    { mGoals    = Math.max(0, mGoals    + delta); document.getElementById('modal-goals').textContent    = mGoals; }
-    if (type === 'assist') { mAssists = Math.max(0, mAssists + delta); document.getElementById('modal-assist').textContent = mAssists; }
+    var ownScore = mMatchType === 'hjemme' ? mHome : mAway;
+    if (type === 'goals') {
+      mGoals = Math.min(ownScore, Math.max(0, mGoals + delta));
+      mAssists = Math.min(mAssists, ownScore - mGoals);
+      document.getElementById('modal-goals').textContent  = mGoals;
+      document.getElementById('modal-assist').textContent = mAssists;
+    } else if (type === 'assist') {
+      mAssists = Math.min(ownScore - mGoals, Math.max(0, mAssists + delta));
+      document.getElementById('modal-assist').textContent = mAssists;
+    } else if (type === 'home') {
+      mHome = Math.max(0, mHome + delta);
+      if (mMatchType === 'hjemme') {
+        mGoals   = Math.min(mGoals, mHome);
+        mAssists = Math.min(mAssists, mHome - mGoals);
+        document.getElementById('modal-goals').textContent  = mGoals;
+        document.getElementById('modal-assist').textContent = mAssists;
+      }
+      document.getElementById('modal-home').textContent = mHome;
+    } else if (type === 'away') {
+      mAway = Math.max(0, mAway + delta);
+      if (mMatchType === 'away') {
+        mGoals   = Math.min(mGoals, mAway);
+        mAssists = Math.min(mAssists, mAway - mGoals);
+        document.getElementById('modal-goals').textContent  = mGoals;
+        document.getElementById('modal-assist').textContent = mAssists;
+      }
+      document.getElementById('modal-away').textContent = mAway;
+    }
   }
 
   async function saveEditedMatch() {
@@ -1811,7 +1810,6 @@
     document.getElementById('date').value = new Date().toISOString().split('T')[0];
     updateResult();
     initChartDefaults();
-    applyTheme(getSettings().sport || 'fotball');
     // Load profil - try Supabase first, fall back to localStorage
     fetchProfileFromSupabase().then(function(p) {
       loadProfileData(p);
@@ -1937,8 +1935,8 @@
         '<div class="stat"><div class="stat-n" style="color:#4caf50">' + w + '</div><div class="stat-l">Seier</div></div>' +
         '<div class="stat"><div class="stat-n" style="color:#f0c050">' + d + '</div><div class="stat-l">Uavgjort</div></div>' +
         '<div class="stat"><div class="stat-n" style="color:#e05555">' + l + '</div><div class="stat-l">Tap</div></div>' +
-        '<div class="stat"><div class="stat-n" style="color:#1a3a1f">' + g + '</div><div class="stat-l">' + t('stat1_label') + '</div></div>' +
-        '<div class="stat"><div class="stat-n">' + a + '</div><div class="stat-l">' + t('stat2_label') + '</div></div>' +
+        '<div class="stat"><div class="stat-n" style="color:#1a3a1f">' + g + '</div><div class="stat-l">Mål</div></div>' +
+        '<div class="stat"><div class="stat-n">' + a + '</div><div class="stat-l">Assist</div></div>' +
         '<div class="stat"><div class="stat-n">' + (g + a) + '</div><div class="stat-l">G+A</div></div>' +
       '</div>' +
       '<table><thead><tr><th>Dato</th><th>Hjemmelag</th><th>Bortelag</th><th>Turnering</th><th style="text-align:center">Resultat</th><th style="text-align:center">Mål</th><th style="text-align:center">Ast</th><th style="text-align:center">Res</th></tr></thead>' +

@@ -25,7 +25,7 @@
 
 <!-- ══════════════════════════════════ LOGG ══════════════════════════════════ -->
 <div class="screen active" id="screen-log">
-  <div class="header" style="position:relative;">
+  <div class="header">
     <div class="header-badge" id="log-badge">⚽ Sesong 2025</div>
     <button class="lang-flag-btn" id="lang-flag-btn-log" onclick="toggleLangPicker(this)" title="Change language"></button>
     <h1>Kamp<span>logger</span></h1>
@@ -37,7 +37,7 @@
   </div>
   <div class="form-body">
     <div class="form-section">
-      <label class="form-label" id="label-date">Dato</label>
+      <label class="form-label" id="label-date" for="date">Dato</label>
       <input type="date" id="date">
     </div>
     <div class="form-section">
@@ -48,7 +48,7 @@
       </div>
     </div>
     <div class="form-section">
-      <label class="form-label" id="label-opponent">Motstanderlag</label>
+      <label class="form-label" id="label-opponent" for="opponent">Motstanderlag</label>
       <input type="text" id="opponent" placeholder="F.eks. Brann IL" autocomplete="off">
     </div>
 
@@ -138,7 +138,7 @@
 
 <!-- ══════════════════════════════════ STATS ══════════════════════════════════ -->
 <div class="screen" id="screen-stats">
-  <div class="header" style="position:relative;">
+  <div class="header">
     <div class="header-badge">📊 Statistikk</div>
     <button class="lang-flag-btn" id="lang-flag-btn-stats" onclick="toggleLangPicker(this)" title="Change language"></button>
     <h1>Sesongen<span> 2025</span></h1>
@@ -159,7 +159,7 @@
       <div class="form-section">
         <div class="season-selector" id="season-selector"></div>
       </div>
-      <div class="form-section" style="margin-bottom:12px">
+      <div class="form-section team-filter-row">
         <div class="season-selector" id="team-filter-selector"></div>
       </div>
     </div>
@@ -171,7 +171,7 @@
 
 <!-- ══════════════════════════════════ PROFIL ══════════════════════════════════ -->
 <div class="screen" id="screen-profil">
-  <div class="header" style="position:relative;">
+  <div class="header">
     <div class="header-badge">👤 Profil</div>
     <button class="lang-flag-btn" id="lang-flag-btn-profil" onclick="toggleLangPicker(this)" title="Change language"></button>
     <h1>Min<span> profil</span></h1>
@@ -200,7 +200,7 @@
       <div class="profil-card-title">Spillerinfo</div>
       <div class="profil-field">
         <span class="profil-field-label">Navn</span>
-        <input class="profil-field-input" id="profil-name" type="text" placeholder="Fullt name" autocomplete="off" oninput="updateAvatar()">
+        <input class="profil-field-input" id="profil-name" type="text" placeholder="Fullt navn" autocomplete="off" oninput="updateAvatar()">
       </div>
       <div class="profil-field">
         <span class="profil-field-label">Klubb</span>
@@ -214,7 +214,7 @@
 
     <!-- Turnering liste -->
     <div class="profil-card">
-      <div class="profil-card-title">🏆 Mine tournaments / serier</div>
+      <div class="profil-card-title">🏆 Mine turneringer / serier</div>
       <div class="team-list" id="profile-tournament-list" style="margin-bottom:10px;"></div>
       <div class="add-team-row">
         <input class="add-team-input" id="profile-new-tournament" placeholder="Legg til turnering..." autocomplete="off" onkeydown="if(event.key==='Enter')addTournament()">
@@ -240,7 +240,7 @@
 <!-- ══════════════════════════════════ TAB BAR ══════════════════════════════════ -->
 <!-- ══════════════════ SETTINGS ══════════════════ -->
 <div class="screen" id="screen-settings">
-  <div class="header" style="position:relative;">
+  <div class="header">
     <div class="header-badge">⚙️ Innstillinger</div>
     <button class="lang-flag-btn" id="lang-flag-btn-settings" onclick="toggleLangPicker(this)" title="Change language"></button>
     <h1>Innstil<span>linger</span></h1>
@@ -268,9 +268,9 @@
       <div class="settings-section-title">⭐ Aktiv sesong</div>
       <div class="settings-desc">Forhåndsvalgt sesong i Logg og Statistikk.</div>
       <div class="settings-options" id="settings-aktiv-sesong-options"></div>
-      <div style="margin-top:10px;display:flex;gap:8px;align-items:center;">
-        <input id="settings-ny-sesong" type="text" style="flex:1;font-size:14px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--white);font-family:'Barlow',sans-serif;outline:none;" placeholder="Legg til sesong (f.eks. 2027)">
-        <button onclick="addSeason()" style="padding:8px 16px;font-size:13px;font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:0.05em;background:rgba(168,224,99,0.15);border:1px solid var(--lime);border-radius:8px;color:var(--lime);cursor:pointer;white-space:nowrap;">+ Legg til</button>
+      <div class="settings-add-season-row">
+        <input id="settings-ny-sesong" type="text" class="settings-add-season-input" placeholder="Legg til sesong (f.eks. 2027)">
+        <button onclick="addSeason()" class="settings-add-season-btn">+ Legg til</button>
       </div>
     </div>
 
@@ -284,7 +284,7 @@
       </div>
     </div>
 
-    <div style="height:24px;"></div>
+    <div class="settings-spacer"></div>
     <div class="settings-version">Athlytics Sport v0.1 · fotball</div>
   </div>
 </div>
@@ -304,7 +304,7 @@
   </button>
   <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">
     <span class="tab-icon">⚙️</span>
-    <span class="tab-label">Settings</span>
+    <span class="tab-label">Innstillinger</span>
   </button>
 </nav>
 
@@ -323,17 +323,13 @@
 </div>
 
 
-<script src="app.js"></script>
-
-
-<!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ -->
-<div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+<!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ --> id="modal-backdrop" onclick="closeModal()"></div>
 <div class="modal-sheet" id="modal-sheet">
   <div class="modal-handle"></div>
   <div class="modal-title" id="modal-title">Rediger kamp</div>
   <div class="modal-body">
     <div class="modal-field">
-      <label class="modal-label">Dato</label>
+      <label class="modal-label" for="modal-dato">Dato</label>
       <input class="modal-input" type="date" id="modal-dato">
     </div>
     <div class="modal-field">
@@ -344,7 +340,7 @@
       </div>
     </div>
     <div class="modal-field">
-      <label class="modal-label">Motstanderlag</label>
+      <label class="modal-label" for="modal-motstander">Motstanderlag</label>
       <input class="modal-input" type="text" id="modal-motstander" autocomplete="off">
     </div>
     <div class="modal-field">
@@ -390,7 +386,7 @@
       </div>
     </div>
     <div class="modal-field">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-stats-grid">
         <div>
           <label class="modal-label">Mål</label>
           <div class="number-control">
@@ -416,5 +412,6 @@
   </div>
 </div>
 
+<script src="app.js"></script>
 </body>
 </html>
