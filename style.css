@@ -180,7 +180,7 @@
   .toast.error   { border-color: var(--danger); color: var(--danger); }
 
   /* ── TAB BAR ── */
-  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-start; padding-top: 8px; }
+  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-start; padding-top: 8px; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; padding: 0 8px; transition: all 0.15s; }
   .tab-icon { font-size: 22px; line-height: 1; filter: grayscale(1) opacity(0.5); transition: all 0.2s; }
   .tab-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; }
