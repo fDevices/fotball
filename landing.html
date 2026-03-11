@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Athlytics Sport – Logg kamper, følg statistikk og analyser sesongen din. For spillere, foreldre og trenere.">
+  <title>Athlytics Sport – Din fotballstatistikk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <span class="nav-logo-icon">⚽</span>
+        <span class="nav-logo-text">ATHLYTICS<span class="nav-logo-accent">SPORT</span></span>
+      </a>
+      <div class="nav-actions">
+        <button class="nav-lang" id="nav-lang-toggle" aria-label="Bytt språk">
+          <span id="nav-lang-label">EN</span>
+        </button>
+        <a href="/app" class="btn-nav-cta" data-i18n="nav_cta">Åpne appen</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-bg-glow"></div>
+    <div class="container">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        <span data-i18n="hero_eyebrow">Fotballstatistikk for alle nivåer</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="hero-title-line1" data-i18n="hero_line1">LOGG.</span>
+        <span class="hero-title-line2" data-i18n="hero_line2">ANALYSER.</span>
+        <span class="hero-title-line3" data-i18n="hero_line3">VINN MER.</span>
+      </h1>
+      <p class="hero-sub" data-i18n="hero_sub">
+        Den enkleste måten å holde oversikt over kamper, mål, assist og sesongstatistikk – rett i mobilnettleseren.
+      </p>
+      <div class="hero-ctas">
+        <a href="/app" class="btn-primary" data-i18n="hero_cta_primary">Prøv gratis</a>
+        <a href="#features" class="btn-secondary" data-i18n="hero_cta_secondary">Se features ↓</a>
+      </div>
+      <div class="hero-proof">
+        <div class="proof-item">
+          <span class="proof-num">51</span>
+          <span class="proof-label" data-i18n="proof_matches">kamper logget</span>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+          <span class="proof-num">100%</span>
+          <span class="proof-label" data-i18n="proof_free">gratis å starte</span>
+        </div>
+        <div class="proof-divider"></div>
+        <div class="proof-item">
+          <span class="proof-num">0</span>
+          <span class="proof-label" data-i18n="proof_install">apper å installere</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock phone -->
+    <div class="hero-phone-wrap">
+      <div class="hero-phone">
+        <div class="phone-screen">
+          <div class="mock-header">
+            <div class="mock-badge">⚽ 2025</div>
+            <div class="mock-title">KAMP<span>LOGGER</span></div>
+            <div class="mock-sub">Klar til å logge kamp 🟢</div>
+          </div>
+          <div class="mock-stat-row">
+            <div class="mock-stat wins">
+              <div class="mock-stat-num">37</div>
+              <div class="mock-stat-label">SEIER</div>
+            </div>
+            <div class="mock-stat draw">
+              <div class="mock-stat-num">3</div>
+              <div class="mock-stat-label">UAVGJORT</div>
+            </div>
+            <div class="mock-stat loss">
+              <div class="mock-stat-num">11</div>
+              <div class="mock-stat-label">TAP</div>
+            </div>
+          </div>
+          <div class="mock-bar-wrap">
+            <div class="mock-bar-label">72% S · 6% U · 22% T</div>
+            <div class="mock-bar">
+              <div class="mock-bar-fill wins" style="width:72%"></div>
+              <div class="mock-bar-fill draw" style="width:6%"></div>
+              <div class="mock-bar-fill loss" style="width:22%"></div>
+            </div>
+          </div>
+          <div class="mock-goals-row">
+            <div class="mock-goals-item">
+              <div class="mock-goals-num lime">141</div>
+              <div class="mock-goals-lbl">MÅL</div>
+            </div>
+            <div class="mock-goals-item">
+              <div class="mock-goals-num gold">110</div>
+              <div class="mock-goals-lbl">ASSIST</div>
+            </div>
+            <div class="mock-goals-item">
+              <div class="mock-goals-num white">251</div>
+              <div class="mock-goals-lbl">G+A</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-label" data-i18n="features_label">FEATURES</div>
+      <h2 class="section-title" data-i18n="features_title">Alt du trenger.<br>Ingenting du ikke trenger.</h2>
+      <div class="features-grid">
+
+        <div class="feature-card feature-card--large">
+          <div class="feature-icon">📋</div>
+          <h3 data-i18n="feat1_title">Kamplogger</h3>
+          <p data-i18n="feat1_desc">Logg hjemme- og bortekamper med score, mål, assist og turnering. Automatisk resultatkalkulator basert på kamptype.</p>
+          <div class="feature-tag" data-i18n="feat1_tag">Gratis</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 data-i18n="feat2_title">Sesongstatistikk</h3>
+          <p data-i18n="feat2_desc">W/D/L-oversikt, mål per kamp, hjemme vs borte, per turnering – alt på ett sted.</p>
+          <div class="feature-tag" data-i18n="feat2_tag">Gratis</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3 data-i18n="feat3_title">Analysegrafer</h3>
+          <p data-i18n="feat3_desc">Kumulativ seiersprosent, mål/assist-trend og mål per turnering visualisert med Chart.js.</p>
+          <div class="feature-tag pro" data-i18n="feat3_tag">Pro</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🏆</div>
+          <h3 data-i18n="feat4_title">Flere lag og turneringer</h3>
+          <p data-i18n="feat4_desc">Spiller du på flere lag? Legg til alle og filtrer statistikk per lag og sesong.</p>
+          <div class="feature-tag" data-i18n="feat4_tag">Gratis</div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3 data-i18n="feat5_title">Eksport</h3>
+          <p data-i18n="feat5_desc">Last ned kamphistorikken din som CSV eller PDF-rapport.</p>
+          <div class="feature-tag pro" data-i18n="feat5_tag">Pro</div>
+        </div>
+
+        <div class="feature-card feature-card--coming">
+          <div class="feature-icon">🎿</div>
+          <h3 data-i18n="feat6_title">Multi-sport</h3>
+          <p data-i18n="feat6_desc">Orientering og ski kommer snart – samme app, tilpasset din sport.</p>
+          <div class="feature-tag coming" data-i18n="feat6_tag">Kommer snart</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="container">
+      <div class="section-label" data-i18n="pricing_label">PRISER</div>
+      <h2 class="section-title" data-i18n="pricing_title">Start gratis.<br>Oppgrader når du er klar.</h2>
+      <div class="pricing-grid">
+
+        <div class="price-card">
+          <div class="price-tier" data-i18n="tier_free_name">Gratis</div>
+          <div class="price-amount">
+            <span class="price-num">0</span>
+            <span class="price-currency">kr</span>
+          </div>
+          <div class="price-period" data-i18n="price_forever">for alltid</div>
+          <ul class="price-features">
+            <li data-i18n="free_f1">✓ 1 lag, 1 sesong</li>
+            <li data-i18n="free_f2">✓ Ubegrenset kamplogging</li>
+            <li data-i18n="free_f3">✓ Basis statistikk</li>
+            <li data-i18n="free_f4">✓ Form-streak (siste 10 kamper)</li>
+            <li class="dim" data-i18n="free_f5">– Analysegrafer</li>
+            <li class="dim" data-i18n="free_f6">– Eksport CSV / PDF</li>
+          </ul>
+          <a href="/app" class="btn-price-secondary" data-i18n="free_cta">Kom i gang</a>
+        </div>
+
+        <div class="price-card price-card--pro">
+          <div class="price-popular" data-i18n="popular_label">MEST POPULÆR</div>
+          <div class="price-tier" data-i18n="tier_pro_name">Pro</div>
+          <div class="price-amount">
+            <span class="price-num">49</span>
+            <span class="price-currency">kr</span>
+          </div>
+          <div class="price-period" data-i18n="price_per_month">per måned</div>
+          <ul class="price-features">
+            <li data-i18n="pro_f1">✓ Ubegrenset lag og sesonger</li>
+            <li data-i18n="pro_f2">✓ Alle gratisfunksjoner</li>
+            <li data-i18n="pro_f3">✓ Analysegrafer</li>
+            <li data-i18n="pro_f4">✓ Eksport CSV og PDF</li>
+            <li data-i18n="pro_f5">✓ Motstanderstatistikk</li>
+            <li data-i18n="pro_f6">✓ Per turnering-analyse</li>
+          </ul>
+          <a href="/app" class="btn-price-primary" data-i18n="pro_cta">Prøv Pro</a>
+        </div>
+
+        <div class="price-card">
+          <div class="price-tier" data-i18n="tier_club_name">Club</div>
+          <div class="price-amount">
+            <span class="price-num">199</span>
+            <span class="price-currency">kr</span>
+          </div>
+          <div class="price-period" data-i18n="price_per_month">per måned</div>
+          <ul class="price-features">
+            <li data-i18n="club_f1">✓ Alt i Pro</li>
+            <li data-i18n="club_f2">✓ Flere brukere</li>
+            <li data-i18n="club_f3">✓ Lagdeling og admin</li>
+            <li data-i18n="club_f4">✓ Desktop-visning</li>
+            <li class="dim coming-soon" data-i18n="club_f5">⏳ Kommer i Fase 4</li>
+          </ul>
+          <a href="#" class="btn-price-secondary disabled" data-i18n="club_cta">Kommer snart</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <span>⚽</span>
+          <span>ATHLYTICS SPORT</span>
+        </div>
+        <p class="footer-copy" data-i18n="footer_copy">© 2026 Athlytics Sport. Alle rettigheter forbeholdt.</p>
+        <a href="/app" class="footer-app-link" data-i18n="footer_app_link">Åpne appen →</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ── i18n ──
+    const TEKST = {
+      no: {
+        nav_cta: 'Åpne appen',
+        hero_eyebrow: 'Fotballstatistikk for alle nivåer',
+        hero_line1: 'LOGG.',
+        hero_line2: 'ANALYSER.',
+        hero_line3: 'VINN MER.',
+        hero_sub: 'Den enkleste måten å holde oversikt over kamper, mål, assist og sesongstatistikk – rett i mobilnettleseren.',
+        hero_cta_primary: 'Prøv gratis',
+        hero_cta_secondary: 'Se features ↓',
+        proof_matches: 'kamper logget',
+        proof_free: 'gratis å starte',
+        proof_install: 'apper å installere',
+        features_label: 'FEATURES',
+        features_title: 'Alt du trenger.<br>Ingenting du ikke trenger.',
+        feat1_title: 'Kamplogger', feat1_desc: 'Logg hjemme- og bortekamper med score, mål, assist og turnering. Automatisk resultatkalkulator basert på kamptype.', feat1_tag: 'Gratis',
+        feat2_title: 'Sesongstatistikk', feat2_desc: 'W/D/L-oversikt, mål per kamp, hjemme vs borte, per turnering – alt på ett sted.', feat2_tag: 'Gratis',
+        feat3_title: 'Analysegrafer', feat3_desc: 'Kumulativ seiersprosent, mål/assist-trend og mål per turnering visualisert med Chart.js.', feat3_tag: 'Pro',
+        feat4_title: 'Flere lag og turneringer', feat4_desc: 'Spiller du på flere lag? Legg til alle og filtrer statistikk per lag og sesong.', feat4_tag: 'Gratis',
+        feat5_title: 'Eksport', feat5_desc: 'Last ned kamphistorikken din som CSV eller PDF-rapport.', feat5_tag: 'Pro',
+        feat6_title: 'Multi-sport', feat6_desc: 'Orientering og ski kommer snart – samme app, tilpasset din sport.', feat6_tag: 'Kommer snart',
+        pricing_label: 'PRISER',
+        pricing_title: 'Start gratis.<br>Oppgrader når du er klar.',
+        popular_label: 'MEST POPULÆR',
+        tier_free_name: 'Gratis', tier_pro_name: 'Pro', tier_club_name: 'Club',
+        price_forever: 'for alltid', price_per_month: 'per måned',
+        free_f1: '✓ 1 lag, 1 sesong', free_f2: '✓ Ubegrenset kamplogging', free_f3: '✓ Basis statistikk', free_f4: '✓ Form-streak (siste 10 kamper)', free_f5: '– Analysegrafer', free_f6: '– Eksport CSV / PDF',
+        free_cta: 'Kom i gang',
+        pro_f1: '✓ Ubegrenset lag og sesonger', pro_f2: '✓ Alle gratisfunksjoner', pro_f3: '✓ Analysegrafer', pro_f4: '✓ Eksport CSV og PDF', pro_f5: '✓ Motstanderstatistikk', pro_f6: '✓ Per turnering-analyse',
+        pro_cta: 'Prøv Pro',
+        club_f1: '✓ Alt i Pro', club_f2: '✓ Flere brukere', club_f3: '✓ Lagdeling og admin', club_f4: '✓ Desktop-visning', club_f5: '⏳ Kommer i Fase 4',
+        club_cta: 'Kommer snart',
+        footer_copy: '© 2026 Athlytics Sport. Alle rettigheter forbeholdt.',
+        footer_app_link: 'Åpne appen →',
+      },
+      en: {
+        nav_cta: 'Open app',
+        hero_eyebrow: 'Football stats for every level',
+        hero_line1: 'LOG.',
+        hero_line2: 'ANALYSE.',
+        hero_line3: 'WIN MORE.',
+        hero_sub: 'The simplest way to track matches, goals, assists and season stats – right in your mobile browser.',
+        hero_cta_primary: 'Try for free',
+        hero_cta_secondary: 'See features ↓',
+        proof_matches: 'matches logged',
+        proof_free: 'free to start',
+        proof_install: 'apps to install',
+        features_label: 'FEATURES',
+        features_title: 'Everything you need.<br>Nothing you don\'t.',
+        feat1_title: 'Match Logger', feat1_desc: 'Log home and away matches with score, goals, assists and tournament. Automatic result calculator based on match type.', feat1_tag: 'Free',
+        feat2_title: 'Season Stats', feat2_desc: 'W/D/L overview, goals per match, home vs away, per tournament – all in one place.', feat2_tag: 'Free',
+        feat3_title: 'Analysis Charts', feat3_desc: 'Cumulative win rate, goals/assist trend and goals per tournament visualised with Chart.js.', feat3_tag: 'Pro',
+        feat4_title: 'Multiple teams & tournaments', feat4_desc: 'Playing on multiple teams? Add them all and filter stats by team and season.', feat4_tag: 'Free',
+        feat5_title: 'Export', feat5_desc: 'Download your match history as CSV or PDF report.', feat5_tag: 'Pro',
+        feat6_title: 'Multi-sport', feat6_desc: 'Orienteering and skiing coming soon – same app, adapted to your sport.', feat6_tag: 'Coming soon',
+        pricing_label: 'PRICING',
+        pricing_title: 'Start free.<br>Upgrade when you\'re ready.',
+        popular_label: 'MOST POPULAR',
+        tier_free_name: 'Free', tier_pro_name: 'Pro', tier_club_name: 'Club',
+        price_forever: 'forever', price_per_month: 'per month',
+        free_f1: '✓ 1 team, 1 season', free_f2: '✓ Unlimited match logging', free_f3: '✓ Basic statistics', free_f4: '✓ Form streak (last 10 matches)', free_f5: '– Analysis charts', free_f6: '– Export CSV / PDF',
+        free_cta: 'Get started',
+        pro_f1: '✓ Unlimited teams & seasons', pro_f2: '✓ All free features', pro_f3: '✓ Analysis charts', pro_f4: '✓ Export CSV and PDF', pro_f5: '✓ Opponent statistics', pro_f6: '✓ Per tournament analysis',
+        pro_cta: 'Try Pro',
+        club_f1: '✓ Everything in Pro', club_f2: '✓ Multiple users', club_f3: '✓ Team sharing & admin', club_f4: '✓ Desktop view', club_f5: '⏳ Coming in Phase 4',
+        club_cta: 'Coming soon',
+        footer_copy: '© 2026 Athlytics Sport. All rights reserved.',
+        footer_app_link: 'Open app →',
+      }
+    };
+
+    var activeLang = 'no';
+
+    function applyLang(lang) {
+      activeLang = lang;
+      var t = TEKST[lang];
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.dataset.i18n;
+        if (t[key] !== undefined) {
+          if (key === 'features_title' || key === 'pricing_title') {
+            el.innerHTML = t[key];
+          } else {
+            el.textContent = t[key];
+          }
+        }
+      });
+      document.getElementById('nav-lang-label').textContent = lang === 'no' ? 'EN' : 'NO';
+      document.documentElement.lang = lang;
+    }
+
+    document.getElementById('nav-lang-toggle').addEventListener('click', function() {
+      applyLang(activeLang === 'no' ? 'en' : 'no');
+    });
+
+    // ── Scroll-triggered nav shadow ──
+    window.addEventListener('scroll', function() {
+      document.getElementById('nav').classList.toggle('nav--scrolled', window.scrollY > 20);
+    });
+
+    // ── Smooth scroll for anchor links ──
+    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        var target = document.querySelector(this.getAttribute('href'));
+        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+
+    // ── Intersection observer for card reveal ──
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.feature-card, .price-card').forEach(function(el) {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>

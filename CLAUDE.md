@@ -245,8 +245,11 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 ## Filstruktur
 
 ```
-index.html              – HTML-skall, laster kun <script type="module" src="js/main.js">
-style.css               – all CSS
+landing.html            – Landing page (/) – marketing, norsk/engelsk toggle, ingen appen-avhengigheter
+landing.css             – CSS for landing page – separat fra style.css, eget design-system
+app.html                – App-skallet (flyttes fra index.html) – laster kun <script type="module" src="js/main.js">
+style.css               – all CSS for appen
+vercel.json             – Routing: / → landing.html, /app → app.html
 js/
   config.js             – SUPABASE_URL, SUPABASE_KEY, storage-nøkler
   supabase.js           – alle HTTP-kall mot Supabase REST API
@@ -538,6 +541,20 @@ Kall `applyTheme(sport)` fra `setSport()` i `settings-render.js`.
 ## Roadmap
 
 > Ferdigstilte faser ligger i `CHANGELOG.md`.
+
+### Fase 2.5 – Landing page ✅
+- [x] `landing.html` – hero, features, priser (Gratis/Pro/Club), footer
+- [x] `landing.css` – polert marketing-design, Barlow Condensed, mørk grønn med lime-aksenter
+- [x] `vercel.json` – routing: `/` → `landing.html`, `/app` → `app.html`
+- [x] `index.html` renames til `app.html` (app flyttes til `/app`)
+- [x] Norsk/engelsk toggle inline i `landing.html` (eget `TEKST`-objekt, uavhengig av app-i18n)
+- [x] Responsiv – fungerer på mobil og desktop
+
+**Landing page-arkitektur:**
+- Ingen avhengigheter til app-koden (`js/`-moduler, `style.css`)
+- Eget `TEKST`-objekt inline i `<script>` nederst i `landing.html`
+- `landing.css` bruker egne CSS-variabler (deler fargepalett med appen, men eget design)
+- Lenker til `/app` for CTA-knapper
 
 ### Fase 1.6 – UX-polish (backlog)
 - [ ] Bytt `confirm()`-dialog ved sletting med custom in-app modal
