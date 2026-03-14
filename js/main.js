@@ -76,6 +76,7 @@ function setupDateToggle() {
   var btn = document.getElementById('date-toggle-btn');
   var input = document.getElementById('date');
   if (!btn || !input) return;
+  var blurTimer = null;
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
     var isOpen = input.classList.toggle('open');
@@ -85,7 +86,12 @@ function setupDateToggle() {
     updateDateLabel(input.value);
   });
   input.addEventListener('blur', function() {
-    input.classList.remove('open');
+    blurTimer = setTimeout(function() {
+      input.classList.remove('open');
+    }, 200);
+  });
+  input.addEventListener('focus', function() {
+    clearTimeout(blurTimer);
   });
 }
 
