@@ -63,17 +63,25 @@ const ACTIONS = {
 function updateDateLabel(val) {
   var el = document.getElementById('date-display-label');
   if (!el) return;
-  var d = val ? new Date(val + 'T00:00:00') : new Date();
-  el.textContent = d.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+  var today = new Date().toISOString().split('T')[0];
+  if (!val || val === today) {
+    el.textContent = 'I dag';
+  } else {
+    var d = new Date(val + 'T00:00:00');
+    el.textContent = d.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
 }
 
 function setupDateToggle() {
   var btn = document.getElementById('date-toggle-btn');
   var input = document.getElementById('date');
   if (!btn || !input) return;
-  btn.addEventListener('click', function() {
-    input.classList.toggle('open');
-    if (input.classList.contains('open')) input.showPicker && input.showPicker();
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = input.classList.toggle('open');
+    if (isOpen && input.showPicker) {
+      try { input.showPicker(); } catch(err) {}
+    }
   });
   input.addEventListener('change', function() {
     updateDateLabel(input.value);
