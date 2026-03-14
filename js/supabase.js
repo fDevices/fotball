@@ -7,10 +7,10 @@ function headers(extra) {
   }, extra);
 }
 
-// ── Kamper ──────────────────────────────────────────────────────────────────
+// ── Matches ──────────────────────────────────────────────────────────────────
 
 export async function fetchKamper() {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/kamper?select=*&order=dato.desc', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/matches?select=*&order=date.desc', {
     headers: headers()
   });
   if (!res.ok) throw new Error('fetchKamper failed: ' + res.status);
@@ -18,7 +18,7 @@ export async function fetchKamper() {
 }
 
 export async function insertKamp(body) {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/kamper', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/matches', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' }),
     body: JSON.stringify(body)
@@ -27,7 +27,7 @@ export async function insertKamp(body) {
 }
 
 export async function updateKamp(id, body) {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/kamper?id=eq.' + id, {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/matches?id=eq.' + id, {
     method: 'PATCH',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
     body: JSON.stringify(body)
@@ -36,17 +36,17 @@ export async function updateKamp(id, body) {
 }
 
 export async function deleteKamp(id) {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/kamper?id=eq.' + id, {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/matches?id=eq.' + id, {
     method: 'DELETE',
     headers: headers()
   });
   return res;
 }
 
-// ── Profil ──────────────────────────────────────────────────────────────────
+// ── Profile ──────────────────────────────────────────────────────────────────
 
 export async function fetchProfil() {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/profiler?id=eq.default&select=*', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.default&select=*', {
     headers: headers()
   });
   if (!res.ok) throw new Error('fetchProfil failed: ' + res.status);
@@ -55,7 +55,7 @@ export async function fetchProfil() {
 }
 
 export async function upsertProfil(body) {
-  await fetch(SUPABASE_URL + '/rest/v1/profiler', {
+  await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
@@ -65,7 +65,7 @@ export async function upsertProfil(body) {
 // ── Settings ─────────────────────────────────────────────────────────────────
 
 export async function fetchSettings() {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/profiler?id=eq.default&select=sport,season_format,active_season,lang', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.default&select=sport,season_format,active_season,lang', {
     headers: headers()
   });
   if (!res.ok) throw new Error('fetchSettings failed: ' + res.status);
@@ -74,7 +74,7 @@ export async function fetchSettings() {
 }
 
 export async function upsertSettings(body) {
-  await fetch(SUPABASE_URL + '/rest/v1/profiler', {
+  await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
