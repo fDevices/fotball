@@ -60,7 +60,7 @@ export async function saveProfileToSupabase(profil) {
       tournaments: profil.tournaments || [],
       favorite_tournament: profil.favoriteTournament || '',
       avatar_url: profil.avatar || '',
-      oppdatert: new Date().toISOString()
+      updated_at: new Date().toISOString()
     });
   } catch(e) { console.log('Supabase profil error:', e); }
 }

@@ -28,7 +28,7 @@ async function saveSettingsToSupabase(s) {
       season_format: s.seasonFormat,
       active_season: s.activeSeason || '',
       lang: s.lang || 'no',
-      oppdatert: new Date().toISOString()
+      updated_at: new Date().toISOString()
     });
   } catch(e) { console.warn('saveSettingsToSupabase failed:', e); }
 }
