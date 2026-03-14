@@ -58,12 +58,16 @@
 - `saveProfile_local()` normaliserer `team`/`tournaments` til `[]` og lagrer kopi ✅
 - `fetchProfileFromSupabase()` logger feil med `console.warn` i stedet for stille catch ✅
 
-### Kode-gjeld fikset (Fase 1.6-økt)
-- **supabase.js** – `res.ok`-sjekk + `throw` i `fetchKamper`, `fetchProfil`, `fetchSettings`
-- **state.js** – array-validering og `console.warn` i `setAllMatches`; `console.warn` i `invalidateMatchCache`
-- **settings.js** – `console.warn` i `saveSettingsToSupabase`
-- **main.js** – guard clauses (`if (!el) return`) på alle `closest()`-kall i ACTIONS-map; `toggleLangPicker` sender `e.target.closest('[data-action]')`
-- **i18n.js** – `toggleLangPicker` bruker `{ once: true }` (eliminerer listener-opphopning) og `btn.closest('.lang-picker-wrap')` (robust DOM-referanse)
+### Kode-gjeld og bugfikser (økt 2, Fase 1.6/1.7)
+- **supabase.js** – tabellnavn oppdatert til `matches` og `profiles`; `updated_at` brukes (ikke `oppdatert`)
+- **supabase.js, log.js, modal.js, stats.js, export.js** – importnavn synkronisert med eksportnavn (`fetchKamper`, `insertKamp`, `updateKamp`, `deleteKamp`)
+- **modal.js** – `deleteMatch_action` renamed til `deleteMatch` (eksportnavnet manglet)
+- **profile.js, settings.js** – `oppdatert` → `updated_at` i upsert-body
+- **i18n.js** – `setLang()` lukker nå alle `.lang-picker-dropdown` (ikke bare én hardkodet ID)
+- **app.html** – `data-match-type="hjemme"` → `"home"` på logg- og modal-knapper
+- **app.html** – flagg-knapp og sesong-badge på samme linje (`header-top-row`), `lang-picker-wrap` wrapper for korrekt dropdown-posisjonering
+- **style.css** – `lang-flag-btn` ikke lenger `position: absolute`; ny `.header-top-row` og `.lang-picker-wrap` CSS
+- **main.js** – dato-toggle: lukker på `blur` med 200ms delay (unngår lukking mellom dag/måned/år-feltene på desktop)
 
 ---
 
