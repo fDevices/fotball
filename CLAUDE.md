@@ -520,38 +520,9 @@ export function t(key) { ... }
 
 ### Ikonsystem (implementert)
 
-SVG-ikoner ligger i `/icons/`-mappen i reporoten. Ikonene brukes via CSS `mask-image` slik at fargen styres med `background-color: currentColor` — ikke hardkodet i SVG-filen.
+SVG-ikoner ligger i `/icons/`-mappen. Tab-ikoner fargestyres via CSS `mask-image`; flaggikoner brukes som `<img>`. For å bytte et ikon: erstatt SVG-filen — ingen kodeendringer nødvendig.
 
-**Filer:**
-```
-icons/
-  tab-log.svg          – fotball (tab-bar: logg)
-  tab-stats.svg        – søylediagram + linje (tab-bar: statistikk)
-  tab-profile.svg      – personsilhuett (tab-bar: profil)
-  tab-settings.svg     – tannhjul (tab-bar: innstillinger)
-  match-home.svg       – hus (hjemmekamp-knapp)
-  match-away.svg       – fly (bortekamp-knapp)
-  result-win.svg       – pokal (seier)
-  result-draw.svg      – sirkel med strek (uavgjort)
-  result-loss.svg      – utropstegn (tap)
-  flag-no.svg          – norsk flagg (språkvelger)
-  flag-en.svg          – britisk flagg (språkvelger)
-```
-
-**CSS-mønster for tab-ikoner (mask-image):**
-```css
-.tab-svg-icon { -webkit-mask-image: url('/icons/tab-log.svg'); mask-image: url('/icons/tab-log.svg'); background-color: var(--muted); }
-.tab-btn.active .tab-svg-icon { background-color: var(--lime); }
-```
-
-**CSS-mønster for match-ikoner:**
-```css
-.match-svg-icon { -webkit-mask-image: url('/icons/match-home.svg'); mask-image: url('/icons/match-home.svg'); background-color: currentColor; }
-```
-
-**Flaggikoner** brukes som vanlig `<img>` (ikke mask) siden de trenger ekte farger.
-
-For å bytte ut et ikon: erstatt SVG-filen i `/icons/` — ingen kodeendringer nødvendig.
+Se **`ICONS.md`** for alle SVG-filinnhold og CSS-mønster.
 
 ### Portrait-lås (implementert)
 Appen er portrait-only. Landscape viser en overlay: "Roter telefonen til stående modus".
