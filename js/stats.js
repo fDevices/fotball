@@ -1,4 +1,4 @@
-import { fetchMatches } from './supabase.js';
+import { fetchKamper } from './supabase.js';
 import { allMatches, setAllMatches } from './state.js';
 import { CACHE_KEY } from './config.js';
 import { getSettings } from './settings.js';
@@ -59,7 +59,7 @@ export async function loadStats(forceRefresh) {
   }
   document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Henter statistikk...</div>';
   try {
-    var data = await fetchMatches();
+    var data = await fetchKamper();
     setAllMatches(data);
     renderStats();
   } catch(e) {
