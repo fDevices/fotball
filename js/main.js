@@ -60,6 +60,32 @@ const ACTIONS = {
   showProToast:                  () => showToast('Coming soon \u2013 Stripe i Fase 4 \u{1F680}', 'success'),
 };
 
+function updateDateLabel(val) {
+  var el = document.getElementById('date-display-label');
+  if (!el) return;
+  var today = new Date().toISOString().split('T')[0];
+  if (!val || val === today) {
+    el.textContent = 'I dag';
+  } else {
+    var d = new Date(val + 'T00:00:00');
+    el.textContent = d.toLocaleDateString('no-NO', { day: 'numeric', month: 'long' });
+  }
+}
+
+function setupDateToggle() {
+  var btn = document.getElementById('date-toggle-btn');
+  var input = document.getElementById('date');
+  if (!btn || !input) return;
+  btn.addEventListener('click', function() {
+    input.classList.toggle('open');
+    if (input.classList.contains('open')) input.showPicker && input.showPicker();
+  });
+  input.addEventListener('change', function() {
+    updateDateLabel(input.value);
+    input.classList.remove('open');
+  });
+}
+
 function setupEventDelegation() {
   document.addEventListener('click', function(e) {
     // Close dropdowns when clicking outside team-selector-wrap
@@ -128,7 +154,10 @@ window._uploadImage = uploadImage;
 window.addEventListener('load', async function() {
   try {
     initChartDefaults();
-    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;
+    updateDateLabel(today);
+    setupDateToggle();
     updateResult();
     setupEventDelegation();
 
