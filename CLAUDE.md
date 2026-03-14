@@ -105,7 +105,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `TEKST`-objektet inneholder blandet norsk/engelsk i verdiene (`'Eget team / tropp'`, `'Kamp saved!'`, `'Fullt name'` osv.) | 🟠 Høy | Rydd opp og velg konsekvent språk per nøkkel i både `no`- og `en`-grenene |
 | `updateAllText()` bruker hardkodet språkgren for `profil-sub` og `settings-sub` i stedet for `t('profile_sub')` / `t('settings_sub')` | 🟠 Høy | Bytt til `t()`-oppslag – nøklene finnes allerede i `TEKST` |
-| `toggleLangPicker()` registrerer ny `document`-click-listener ved hvert kall – mulig opphopning | 🟡 Medium | Bruk én global outside-click-listener, eller styr åpen/lukket state eksplisitt i `main.js` |
+| `toggleLangPicker()` registrerer ny `document`-click-listener ved hvert kall – mulig opphopning | ✅ Ferdig | Erstattet med én global outside-click-listener i `main.js` |
 | `setLang()` lukker kun `#lang-picker-dropdown` – ikke alle tabs sine dropdowns | 🟡 Medium | Bytt til `querySelectorAll('.lang-picker-dropdown').forEach(el => el.classList.remove('open'))` |
 | `toggleLangPicker(btn)` bruker `btn.parentElement.querySelector()` – skjør DOM-avhengighet | 🟡 Medium | Bruk `btn.closest('.lang-picker-wrap').querySelector('.lang-picker-dropdown')` |
 | `updateAllText()` bruker `innerHTML` der bare tekst/emoji settes | 🟡 Medium | Bytt til `textContent` der markup ikke trengs – konsekvent defensiv praksis |
@@ -129,7 +129,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `addTeamFromProfile()` synker ikke til Supabase – lokal-only lagring | 🟠 Høy | Legg til `saveProfileToSupabase(profil)` etter `saveProfile_local(profil)` |
-| Lag/turnering-deduplisering er case-sensitiv – `Oppsal` og `oppsal` behandles som ulike | 🟠 Høy | Sammenlign på `trim().toLowerCase()`, lagre original casing bevisst |
+| Lag/turnering-deduplisering er case-sensitiv – `Oppsal` og `oppsal` behandles som ulike | ✅ Ferdig | Sammenligner med `.toLowerCase()` alle 4 steder |
 | Mange DOM-funksjoner mangler guard clauses (`toggleTeamDropdown`, `closeLagDropdown`, `selectTeam` m.fl.) | 🟠 Høy | Legg til null-sjekk på alle `getElementById()`-kall før `.classList`-operasjoner |
 | Hardkodede tekster uten `t()`: "Nytt team…", "Nullstill turnering", "Laget finnes allerede" m.fl. | 🟠 Høy | Flytt inn i `TEKST`-objektet i `i18n.js` |
 | `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | 🟡 Medium | Reset alle interne state-variabler, ikke bare DOM-klasser |
@@ -143,7 +143,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | 🟡 Medium | Bruk `setAllMatches([newMatch, ...allMatches])` – ingen direkte mutasjon av delt state |
-| `saveMatch()` har hardkodet 'Lagrer...' og `'Feil: ' + err.message` – ikke i18n | 🟡 Medium | Flytt til `t()`-nøkler i `TEKST` |
+| `saveMatch()` har hardkodet 'Lagrer...' og `'Feil: ' + err.message` – ikke i18n | ✅ Ferdig | Bruker nå `t('saving')` med norsk/engelsk oversettelse |
 | `saveMatch()` antar at feilrespons alltid er JSON med `err.message` – kan krasje ved tom body | 🟡 Medium | Wrap JSON-parsing i try/catch, gi meningsfull fallback-feilmelding |
 | `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | 🟢 Lav | Dokumenter som bevisst valg, eller legg til eksplisitt reset |
 | `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | 🟢 Lav | Null-sjekk på `getElementById`-kall |
@@ -208,17 +208,17 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | 🟡 Medium | Legg til `t('none')` eller tilsvarende nøkkel i `TEKST` |
 | `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | 🟡 Medium | Nullstill eller oppdater `activeSeason` når format endres |
 | `setSport()` har ingen validering av gyldige sportverdier | 🟡 Medium | Valider mot en tillatt-liste; definer som konstant for gjenbruk i Fase 3 |
-| `addSeason()` godtar årstall med mer enn 4 siffer (f.eks. `20256`) | 🟡 Medium | Bytt til `val.length === 4` som krav, ikke bare `>= 4` |
+| `addSeason()` godtar årstall med mer enn 4 siffer (f.eks. `20256`) | ✅ Ferdig | Validerer med `val.length !== 4 \|\| !/^\d{4}$/.test(val)` |
 | `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |
 
 ### toast.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Ingen null-check på `#toast` – kaster hvis elementet mangler i DOM | 🟠 Høy | `var el = document.getElementById('toast'); if (!el) return;` |
-| Ikke robust mot raske samtidige kall – tidligere `setTimeout` kan slette nyere toast | 🟠 Høy | Lagre timeout-referanse, kall `clearTimeout` før ny toast settes |
-| `className = 'toast ' + type + ' show'` overskriver alle klasser – skjørt | 🟡 Medium | Behold basis-klasse, bruk `classList.add/remove` for variants og `show` |
-| `type`-parameter valideres ikke – ukjent verdi gir inkonsistent stil | 🟢 Lav | Valider mot `['success', 'error', 'info']` eller silent-fallback til `'info'` |
+| Ingen null-check på `#toast` – kaster hvis elementet mangler i DOM | ✅ Ferdig | Fikset |
+| Ikke robust mot raske samtidige kall – tidligere `setTimeout` kan slette nyere toast | ✅ Ferdig | Fikset med `_toastTimer` + `clearTimeout` |
+| `className = 'toast ' + type + ' show'` overskriver alle klasser – skjørt | ✅ Ferdig | Fikset med typevalidering |
+| `type`-parameter valideres ikke – ukjent verdi gir inkonsistent stil | ✅ Ferdig | Validerer mot `['success','error','info']` |
 
 ### utils.js
 
