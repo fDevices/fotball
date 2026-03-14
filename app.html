@@ -38,20 +38,20 @@
   <div class="form-body">
     <div class="form-section date-compact-section">
       <div class="date-compact-row">
-        <span class="date-compact-label" id="date-display-label">I dag</span>
-        <button class="date-toggle-btn" id="date-toggle-btn" title="Endre dato">📅</button>
+        <div class="date-left">
+          <span class="date-compact-label" id="date-display-label">I dag</span>
+          <button class="date-toggle-btn" id="date-toggle-btn" title="Endre dato">📅</button>
+        </div>
+        <div class="match-type-mini-toggle">
+          <button class="match-type-mini-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="hjemme">🏠 Hjemme</button>
+          <button class="match-type-mini-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away">✈️ Borte</button>
+        </div>
       </div>
       <input type="date" id="date" class="date-input-hidden">
     </div>
     <div class="form-section">
       <label class="form-label" id="label-opponent" for="opponent">Motstanderlag</label>
-      <div class="opponent-match-type-row">
-        <div class="match-type-mini-toggle">
-          <button class="match-type-mini-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="hjemme" title="Hjemmekamp">🏠</button>
-          <button class="match-type-mini-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away" title="Bortekamp">✈️</button>
-        </div>
-        <input type="text" id="opponent" placeholder="F.eks. Brann IL" autocomplete="off">
-      </div>
+      <input type="text" id="opponent" placeholder="F.eks. Brann IL" autocomplete="off">
     </div>
 
     <!-- Lag dropdown -->
