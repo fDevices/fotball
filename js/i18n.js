@@ -86,8 +86,7 @@ export function setLang(lang) {
   var s = getSettings();
   s.lang = lang;
   saveSettings(s);
-  var d = document.getElementById('lang-picker-dropdown');
-  if (d) d.classList.remove('open');
+  document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
   updateFlags();
   updateAllText();
   showToastLang(lang);
