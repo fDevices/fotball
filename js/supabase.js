@@ -55,11 +55,12 @@ export async function fetchProfil() {
 }
 
 export async function upsertProfil(body) {
-  await fetch(SUPABASE_URL + '/rest/v1/profiles', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
   });
+  if (!res.ok) throw new Error('upsertProfil failed: ' + res.status);
 }
 
 // ── Settings ─────────────────────────────────────────────────────────────────
@@ -74,9 +75,10 @@ export async function fetchSettings() {
 }
 
 export async function upsertSettings(body) {
-  await fetch(SUPABASE_URL + '/rest/v1/profiles', {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
   });
+  if (!res.ok) throw new Error('upsertSettings failed: ' + res.status);
 }

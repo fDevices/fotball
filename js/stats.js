@@ -184,7 +184,7 @@ function renderOpponentSearchResults(container) {
 
   var summaryHTML = '';
   if (hits.length === 0) {
-    summaryHTML = '<div class="loading" style="padding:20px 0">Ingen kamper mot &quot;' + query + '&quot;</div>';
+    summaryHTML = '<div class="loading" style="padding:20px 0">Ingen kamper mot &quot;' + esc(query) + '&quot;</div>';
   } else {
     summaryHTML = opponents.map(function(opp) {
       var s = calcWDL(oppMap[opp]);
