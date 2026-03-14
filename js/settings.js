@@ -23,14 +23,14 @@ export function saveSettings(s) {
 async function saveSettingsToSupabase(s) {
   try {
     await upsertSettings({
-      id:            'default',
-      sport:         s.sport,
+      id: 'default',
+      sport: s.sport,
       season_format: s.seasonFormat,
       active_season: s.activeSeason || '',
-      lang:          s.lang || 'no',
-      updated_at:    new Date().toISOString()
+      lang: s.lang || 'no',
+      oppdatert: new Date().toISOString()
     });
-  } catch(e) { console.warn('saveSettingsToSupabase error:', e); }
+  } catch(e) { console.warn('saveSettingsToSupabase failed:', e); }
 }
 
 export function buildSeasonLabel(aar, format) {
@@ -45,7 +45,7 @@ export function getAllSeasons(allMatches) {
   var fromMatches = [];
   if (allMatches) {
     allMatches.forEach(function(k) {
-      var aar = k.date ? k.date.substring(0, 4) : null;
+      var aar = k.dato ? k.dato.substring(0, 4) : null;
       if (aar && !fromMatches.includes(aar)) fromMatches.push(aar);
     });
   }

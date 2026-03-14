@@ -110,15 +110,15 @@ export function updateFlags() {
 
 export function toggleLangPicker(btn) {
   document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
-  var dd = btn ? btn.parentElement.querySelector('.lang-picker-dropdown') : document.querySelector('.lang-picker-dropdown');
+  var wrap = btn ? btn.closest('.lang-picker-wrap') : null;
+  var dd = wrap ? wrap.querySelector('.lang-picker-dropdown') : document.querySelector('.lang-picker-dropdown');
   if (dd) dd.classList.toggle('open');
   setTimeout(function() {
     document.addEventListener('click', function closePicker(e) {
       if (!e.target.closest('.lang-flag-btn') && !e.target.closest('.lang-picker-dropdown')) {
         document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
-        document.removeEventListener('click', closePicker);
       }
-    });
+    }, { once: true });
   }, 50);
 }
 

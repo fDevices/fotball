@@ -4,24 +4,6 @@
 
 ---
 
-## Fase 1.7 – DB-migrering og kodekonsolidering ✅
-
-- Droppet og recreated Supabase-tabeller med engelske navn: `kamper`→`matches`, `profiler`→`profiles`
-- Engelske kolonnenavn: `dato`→`date`, `motstanderlag`→`opponent`, `eget_lag`→`own_team`, `turnering`→`tournament`, `hjemme`→`home_score`, `borte`→`away_score`, `mal`→`goals`, `assist`→`assists`, `kamptype`→`match_type`
-- `match_type`-verdier endret fra `'hjemme'`→`'home'` (borte var allerede `'away'`)
-- Selvvurdering-kolonner lagt til på `matches`: `rating_effort`, `rating_focus`, `rating_technique`, `rating_team_play`, `rating_impact` (SMALLINT nullable), `reflection_good`, `reflection_improve` (TEXT nullable)
-- Oppdaterte filer: `supabase.js`, `config.js`, `log.js`, `modal.js`, `stats.js`, `profile.js`, `export.js`, `settings.js`, `settings-render.js`, `main.js`
-- Nye funksjonsnavn i `supabase.js`: `fetchMatches`, `insertMatch`, `updateMatch`, `deleteMatch`, `fetchProfile`, `upsertProfile`
-- `res.ok`-sjekk og `console.warn` lagt til i alle Supabase-funksjoner
-- `CACHE_KEY` endret til `athlytics_matches` i `config.js`
-- `modal.js`: `deleteMatch` omdøpt til `deleteMatch_action` for å unngå navnekonflikt med Supabase-funksjonen
-- `settings-render.js`: bruker nå `CACHE_KEY`-import i stedet for hardkodet `'athlytics_kamper'`
-- `settings.js`: `oppdatert`→`updated_at`, `k.dato`→`k.date`
-- Testdata reimportert: Julian 2025, 52 kamper, nye kolonnenavn, turneringer: Cup Gjelleråsen / Cup KFMU / Cup Heming / Cup Oppegård / Seriespill
-- Tab-bar CSS-fix: `--tab-h` økt fra `64px` til `72px` for Safari iPhone-kompatibilitet
-
----
-
 ## Fase 2 – Analyse (grafer, Premium) ✅
 
 - Chart.js CDN i `<head>` (defer)
@@ -71,6 +53,17 @@
 
 ### Fase 1.6 – UX-polish (delvis)
 - "Nullstill turnering"-valg i logg-dropdown ✅
+- Custom delete-confirm modal (erstattet `window.confirm()`) ✅
+- `saveProfile()` henter fersk remote-profil før lagring – forhindrer tap av `team`/`tournaments` ✅
+- `saveProfile_local()` normaliserer `team`/`tournaments` til `[]` og lagrer kopi ✅
+- `fetchProfileFromSupabase()` logger feil med `console.warn` i stedet for stille catch ✅
+
+### Kode-gjeld fikset (Fase 1.6-økt)
+- **supabase.js** – `res.ok`-sjekk + `throw` i `fetchKamper`, `fetchProfil`, `fetchSettings`
+- **state.js** – array-validering og `console.warn` i `setAllMatches`; `console.warn` i `invalidateMatchCache`
+- **settings.js** – `console.warn` i `saveSettingsToSupabase`
+- **main.js** – guard clauses (`if (!el) return`) på alle `closest()`-kall i ACTIONS-map; `toggleLangPicker` sender `e.target.closest('[data-action]')`
+- **i18n.js** – `toggleLangPicker` bruker `{ once: true }` (eliminerer listener-opphopning) og `btn.closest('.lang-picker-wrap')` (robust DOM-referanse)
 
 ---
 
@@ -125,7 +118,14 @@ Desktop kobles naturlig til **Club-planen** (Fase 4). Ved implementering: sideba
 
 ## Testdata – Julian 2025
 
-Reimportert 14.03.2026 via SQL etter Fase 1.7-migrering. 52 kamper fra 2025-sesongen.
+Importert 08.03.2026 via SQL. 51 kamper fra 2025-sesongen (fjernes ved DB-migrering i Fase 1.7):
 
-**Lag i bruk:** Oppsal, Flamme  
-**Turneringer:** Cup Gjelleråsen, Cup KFMU, Cup Heming, Cup Oppegård, Seriespill
+| | |
+|---|---|
+| Kamper | 51 |
+| Seier / Uavgjort / Tap | 37 / 3 / 11 |
+| Mål | 141 |
+| Assist | 110 |
+
+**Lag i bruk:** Oppsal, Oppsal Flamme, Oppsal MS  
+**Turneringer:** Cup Gjelleråsen, Cup KFMU, Heming Cup, Serie, Seriespill, Kretscup

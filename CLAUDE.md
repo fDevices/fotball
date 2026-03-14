@@ -29,19 +29,6 @@
 3. Vercel auto-deployer fra `main`
 4. Ny samtale startes etter større endringer
 
-## Git-workflow (lokal Mac)
-Etter endringer i prosjektfiler:
-```bash
-git add .
-git commit -m "beskrivelse av endringen"
-git push
-```
-Vercel auto-deployer fra `main` innen 30–60 sekunder etter push.
-### Oppsett (gjort én gang)
-- Git installert via `xcode-select --install`
-- Repo klonet til `~/Documents/fotball`
-- GitHub autentisering via Personal Access Token (classic, repo-scope)
-
 ---
 
 ## ⛔ MVP-gjeld – løs før skalering
@@ -54,7 +41,9 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Ingen autentisering (Supabase Auth ikke implementert) | 🔴 Kritisk | Fase 4 – `auth.js` er reservert plass i modulstrukturen |
 | `innerHTML`-kall escaper ikke alltid brukerdata | 🔴 Kritisk | Sanitiser input FØR lansering til andre brukere |
 | Supabase anon key er hardkodet i `js/config.js` | 🟠 Høy | Flytt til miljøvariabel via Vercel ved auth-implementasjon |
-| `supabase.js` feilhåndtering – `res.ok` + `console.warn` lagt til, men ikke full `throw` | 🟢 Lav | Forbedres ved auth i Fase 4 |
+| `supabase.js` sjekker ikke `res.ok` – HTTP-feil (401/500 osv.) håndteres ikke | 🟠 Høy | Legg til `if (!res.ok) throw new Error(...)` i alle fetch-funksjoner |
+| `upsertProfil()` og `upsertSettings()` ignorerer respons – silent failure ved lagring | 🟠 Høy | Sjekk `res.ok`, kast feil ved HTTP-feil |
+| **Supabase-tabeller og localStorage-nøkler byttes til engelsk** – `kamper`→`matches`, `profiler`→`profiles`, alle kolonner | 🔴 Kritisk | **Planlagt migrering:** drop og recreate tabeller med engelske navn; oppdater alle referanser i `supabase.js`, `profile.js`, `log.js`, `modal.js`, `stats.js`, `export.js`, `config.js` (CACHE_KEY). Purge testdata og importer på nytt. |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
@@ -243,11 +232,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 ## Filstruktur
 
 ```
-landing.html            – Landing page (/) – marketing, norsk/engelsk toggle, ingen appen-avhengigheter
-landing.css             – CSS for landing page – separat fra style.css, eget design-system
-app.html                – App-skallet (flyttes fra index.html) – laster kun <script type="module" src="js/main.js">
-style.css               – all CSS for appen
-vercel.json             – Routing: / → landing.html, /app → app.html
+index.html              – HTML-skall, laster kun <script type="module" src="js/main.js">
+style.css               – all CSS
 js/
   config.js             – SUPABASE_URL, SUPABASE_KEY, storage-nøkler
   supabase.js           – alle HTTP-kall mot Supabase REST API
@@ -273,9 +259,7 @@ js/
 
 ## Event delegation
 
-All brukerinteraksjon går via sentralisert event delegation i `main.js`. Bruk `data-action` og ACTIONS-map for alle nye knapper.
-
-> **Unntak (midlertidig teknisk gjeld):** Avatar-upload bruker `onchange` i HTML og `window._uploadImage` – eneste gjenværende `on*`-attributt. Migreres til delegert `input`-lytter.
+All brukerinteraksjon går via sentralisert event delegation i `main.js`. **Ingen** `onclick`-attributter i `index.html`.
 
 ### Mønster i HTML:
 ```html
@@ -434,11 +418,9 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 ### activeLag – filterverdier
 `activeLag` bruker alltid strengen `'all'` som standardverdi og "alle team"-nøkkel. **Aldri bruk `'alle'`**.
 
-### match_type-verdier
-
-`match_type` bruker `'home'` og `'away'` overalt – migrering fullført i Fase 1.7.
-
-> ⚠️ Bruk aldri `'hjemme'` eller `'borte'` – disse er utdaterte.
+### kamptype-verdier
+`matchType` bruker **'hjemme'** og **'away'** (ikke 'borte', ikke 'home').
+Dette gjelder overalt: JS-variabler, `kamptype`-feltet i Supabase-payloads, og all logikk som sjekker kamptype.
 
 ### CSS-klasser for resultat
 `.result-auto` bruker klassene **'wins'**, **'draw'**, **'loss'** – disse må matche nøyaktig med verdiene `getResult()` returnerer.
@@ -481,9 +463,33 @@ Uten dette lekkjer Chart.js-instanser og grafer tegnes dobbelt ved re-render.
 I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-content` (siden `#stats-filters` er skjult).
 
 ### Avatar upload
-`uploadImage()` er eksponert globalt som `window._uploadImage` fra `main.js` fordi avatar-input bruker `onchange`-attributt i HTML. Dette er eneste gjenværende `on*`-attributt og kjent teknisk gjeld – migreres til delegert `input`-lytter.
+`uploadImage()` er eksponert globalt som `window._uploadImage` fra `main.js` fordi avatar-input bruker `onchange`-attributt i HTML (eneste gjenværende `on*`-attributt).
 
 ---
+
+## Nøkkelfunksjoner implementert ✅
+
+- Kamplogger med hjemme/borte-toggle og automatisk beregnet resultat
+- Statistikk-tab med sesongvelger, lag-filter, seier/uavgjort/tap-kort, mål/assist/G+A
+- **Form-streak** – siste 10 kamper som fargede bokser (S/U/T), vises i begge stats-visninger
+- **Hjemme vs Borte-seksjon** – to kort med W/D/L, mål/assist/G+A og mini-bar per kamptype
+- **Per turnering-seksjon** – turneringsnavn + antall kamper, S/U/T + G/A/G+A med uniform badge-bredde
+- Kamphistorikk med paginering (20 per side) og slide-up redigeringsmodal (edit + slett)
+- **Analyse-tab (Fase 2)** – Chart.js-grafer bak toggle:
+  - Kumulativ seiersprosent over tid (linjegraf)
+  - Mål & assist per kamp (dobbel linjegraf, lime + gull)
+  - Mål per turnering (horisontal søylediagram, grouped)
+- **Premium-gate** – gratis ser form-streak + låst kort med blur-overlay; `isPremium()` hardkodet `true` til Fase 4
+- Profil synkronisert til Supabase
+- Lag-dropdown i logg (fra profil), med favorittlag
+- Turnering-dropdown i logg og redigeringsmodal – ny turnering opprettes inline
+- Profil: mine lag-liste og mine turneringer med ☆ favoritt og slett
+- Settings-tab: sport, sesongformat, aktiv sesong
+- **Eksport** – CSV-nedlasting og PDF-rapport (merket ⭐ Premium i UI)
+- Fullt i18n-system (norsk/engelsk) med flagg-velger på alle tabs
+- Toast-notifikasjoner
+- Google Fonts med preconnect + font-display swap
+- **Filsplitt** – `app.js` erstattet av `js/`-moduler med ES module imports/exports
 
 ## i18n-system
 
@@ -499,6 +505,32 @@ export function t(key) { ... }
 - **OBS:** Tab-nøkler i `TEKST` heter `tab_log`, `tab_stats`, `tab_profile`, `tab_settings` – merk `tab_profile` (ikke `tab_profil`)
 
 **⚠️ i18n er ikke komplett.** Hardkodede norske strenger finnes fortsatt i `stats.js` (bl.a. "Hjemme vs Borte", "Per turnering", "Ingen kamper", "Kampfordeling", "Gjennomsnitt per kamp", "Søk motstander...") og `export.js` (kolonnenavn, labels). Datoformatering bruker alltid `'no-NO'` uavhengig av språkinnstilling. Fullføres i Fase 3-refaktoren.
+
+---
+
+## Design
+
+- Font: **Barlow Condensed** (overskrifter) + **Barlow** (brødtekst)
+- Farger: `--grass: #1a3a1f` · `--lime: #a8e063` · `--card: #162b1a` · `--danger: #e05555` · `--gold: #f0c050`
+- Mørk grønn estetikk, grid-mønster bakgrunn, max-width 480px sentrert
+- Chart.js via CDN: `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` (defer i `<head>`)
+
+---
+
+## Plattform-beslutninger
+
+### Portrait-lås (implementert)
+Appen er portrait-only. Landscape viser en overlay: "Roter telefonen til stående modus".
+- CSS: `.landscape-block` med `@media (orientation: landscape) and (max-height: 600px)`
+- Meta: `<meta name="screen-orientation" content="portrait">`
+- Threshold `max-height: 600px` unngår at overlayden vises på desktop-browsere i smalt vindu
+
+### Desktop (Fase 3/4)
+Desktop-versjon venter til Fase 3/4. Bruksmønster:
+- **Mobil** – logging av kamper, rask sjekk av enkeltstatistikk
+- **Desktop** – full analyse, større grafer, coach/admin-visning
+
+Desktop kobles naturlig til **Club-planen** (Fase 4). Ved implementering: sidebar-nav istedet for tab-bar, to-kolonne stats-layout, grafer med mer plass og detalj.
 
 ---
 
@@ -535,89 +567,74 @@ Kall `applyTheme(sport)` fra `setSport()` i `settings-render.js`.
 
 ---
 
-## Selvvurdering etter kamp (planlagt feature)
+## Testdata – Julian 2025
 
-### Konsept
-Etter at en kamp er lagret kan spilleren vurdere egen prestasjon på 5 kategorier. Funksjonen er **valgfri** og vises bak en "expand"-knapp/toggle som dukker opp etter lagring – ikke som del av selve logg-skjemaet. Kun for kamper, ikke trening.
+Importert 08.03.2026 via SQL. 51 kamper fra 2025-sesongen:
 
-**Premium-feature** – gated bak `isPremium()` på samme måte som analyse-grafer.
+| | |
+|---|---|
+| Kamper | 51 |
+| Seier / Uavgjort / Tap | 37 / 3 / 11 |
+| Mål | 141 |
+| Assist | 110 |
 
-### Kategorier (JS-identifikatorer og UI-labels)
-
-| JS-felt | UI-label (NO) | UI-label (EN) |
-|---|---|---|
-| `rating_effort` | Innsats | Effort |
-| `rating_focus` | Fokus | Focus |
-| `rating_technique` | Teknikk | Technique |
-| `rating_team_play` | Lagspill | Teamwork |
-| `rating_impact` | Påvirkning | Impact |
-
-### Skala (1–5, samme tekst for alle kategorier)
-| Verdi | NO | EN |
-|---|---|---|
-| 1 | Veldig dårlig | Very poor |
-| 2 | Under mitt nivå | Below my level |
-| 3 | Greit | Okay |
-| 4 | Bra | Good |
-| 5 | Veldig bra | Very good |
-
-### Refleksjonsfelter (fritekst, valgfrie)
-- `reflection_good` – "Hva gikk bra?" / "What went well?"
-- `reflection_improve` – "Hva vil jeg forbedre?" / "What do I want to improve?"
-
-### Framing
-Vis ikke som "objektiv vurdering" – bruk framing: **"Hvordan vurderer du deg selv i dag?"** Verdien ligger i gjentatte mønstre over tid, ikke enkeltscorer.
-
-### DB-implikasjoner
-7 nye nullable kolonner på `matches`-tabellen (alle kan være NULL for eksisterende kamper):
-```
-rating_effort      SMALLINT (1–5)
-rating_focus       SMALLINT (1–5)
-rating_technique   SMALLINT (1–5)
-rating_team_play   SMALLINT (1–5)
-rating_impact      SMALLINT (1–5)
-reflection_good    TEXT
-reflection_improve TEXT
-```
-Legges inn som del av **Fase 1.7**-migreringen (naturlig tidspunkt siden tabellene recreates uansett).
-
-### Statistikk-utnyttelse (Fase 3)
-Trendvisning per kategori (gjennomsnitt over sesong), utvikling per kamp, evt. korrelasjon med seier/tap. Implementeres i stats-tab som del av Fase 3 – ikke Fase 2.
-
-### UI-pattern
-1. Kamp lagres → toast "Kamp lagret ✓"
-2. Under/ved siden av toasten (eller inline i skjemaet som ekspanderer): knapp "⭐ Vurder deg selv" (premium-merket)
-3. Klikk → expand-seksjon med 5 sliders/stjerner + 2 tekstfelter
-4. "Lagre vurdering"-knapp → `PATCH`/`updateKamp()` med ratings-feltene
+**Lag i bruk:** Oppsal, Oppsal Flamme, Oppsal MS  
+**Turneringer:** Cup Gjelleråsen, Cup KFMU, Heming Cup, Serie, Seriespill, Kretscup
 
 ---
 
 ## Roadmap
 
-> Ferdigstilte faser ligger i `CHANGELOG.md`.
+### Fase 1 – MVP ✅
+- [x] Kamplogger, Vercel, custom domain
+- [x] Hjemme/borte, automatisk resultat
+- [x] Statistikk med caching
+- [x] Profil (navn, klubb, posisjon, bilde, lag-liste)
+- [x] Lag-dropdown med favoritt
+- [x] Kamphistorikk med rediger/slett
+- [x] Profil synket til Supabase
+- [x] Settings-tab
+- [x] i18n – full dekning, alle strings bruker t()
+- [x] Flagg-velger på alle tabs
+- [x] Turnering-dropdown med favoritt
+- [x] Testdata – Julian 2025 (51 kamper)
+- [x] Kode-refaktor: ingen æøå i kodeidentifikatorer
+- [x] Statistikk: hjemme vs borte-seksjon (inkl. mål/assist/G+A)
+- [x] Statistikk: per turnering med S/U/T/G/A/G+A og antall kamper
+- [x] Eksport: CSV og PDF (merket Premium)
+- [x] Bugfiks: logg-skjema score/mål/assist-logikk
+- [x] Bugfiks: modal-dato/modal-motstander ID-mismatch
+- [ ] Innlogging (Supabase Auth) – `auth.js` lages i Fase 4
+- [ ] **Sikkerhet:** Escape brukerdata i innerHTML-kall – gjøres FØR lansering til andre brukere
 
-### Fase 2.5 – Landing page ✅
-- [x] `landing.html` – hero, features, priser (Gratis/Pro/Club), footer
-- [x] `landing.css` – polert marketing-design, Barlow Condensed, mørk grønn med lime-aksenter
-- [x] `vercel.json` – routing: `/` → `landing.html`, `/app` → `app.html`
-- [x] `index.html` renames til `app.html` (app flyttes til `/app`)
-- [x] Norsk/engelsk toggle inline i `landing.html` (eget `TEKST`-objekt, uavhengig av app-i18n)
-- [x] Responsiv – fungerer på mobil og desktop
-
-**Landing page-arkitektur:**
-- Ingen avhengigheter til app-koden (`js/`-moduler, `style.css`)
-- Eget `TEKST`-objekt inline i `<script>` nederst i `landing.html`
-- `landing.css` bruker egne CSS-variabler (deler fargepalett med appen, men eget design)
-- Lenker til `/app` for CTA-knapper
+### Fase 1.5 – Teknisk opprydding ✅
+- [x] Cache `getSettings()` / `getProfile()` i minnet mellom kall
+- [x] Paginering av kamphistorikk (20 per side)
+- [x] Google Fonts: preconnect + font-display swap
+- [x] Inline turnering-oppretting i logg-dropdown
+- [x] Uniform badge-bredde i turnering-statistikk
+- [x] Filsplitt: `app.js` → `js/`-moduler med ES module imports
 
 ### Fase 1.6 – UX-polish (backlog)
+- [x] "Nullstill turnering"-valg i logg-dropdown
 - [ ] Bytt `confirm()`-dialog ved sletting med custom in-app modal
 - [ ] Profil: `tournaments`/`team` fra Supabase synkes ikke ved `saveProfile()` – kan miste data
+
+### Fase 2 – Analyse (grafer, Premium) ✅
+- [x] Chart.js CDN i `<head>` (defer)
+- [x] `isPremium()`, `switchStatsView()`, `destroyCharts()`, `initChartDefaults()`, `CHART_COLORS`
+- [x] Toggle-UI øverst i stats-tab (Oversikt / Analyse ⭐)
+- [x] Form-streak – siste 10 kamper som fargede bokser (gratis, begge views)
+- [x] Kumulativ seiersprosent (Chart.js linje)
+- [x] Mål & assist per kamp (Chart.js dobbel linje)
+- [x] Mål per turnering (Chart.js horisontal søyle, grouped)
+- [x] Premium-gate med blur-overlay og "Lås opp Pro"-knapp
+- [x] Sesong/lag-filter tilgjengelig i analyse-visning (rendres inline i stats-content)
+- [x] Motstandersøk i Statistikk-tab – søkefelt over kamphistorikk, mini W/D/L-oppsummering
 
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
 - [ ] Forberedelse: `THEMES`-objekt, `sport_icon` + stat-labels i TEKST
-- [ ] Selvvurdering-statistikk i stats-tab: gjennomsnitt per kategori, trendvisning per sesong, evt. korrelasjon med seier/tap
 
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon
@@ -631,7 +648,7 @@ Trendvisning per kategori (gjennomsnitt over sesong), utvikling per kamp, evt. k
 | Nivå | Innhold | Pris |
 |------|---------|------|
 | Gratis | 1 lag, 1 sesong, basis statistikk, form-streak | kr 0 |
-| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF, selvvurdering etter kamp | ~kr 49/mnd |
+| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF | ~kr 49/mnd |
 | Club | Flere brukere, deling, lagadmin | ~kr 199/mnd |
 
 **Uavklart:** Per turnering-statistikk (gratis eller Pro?), multi-sport (Pro-tillegg?), PDF alene vs CSV+PDF samlet
