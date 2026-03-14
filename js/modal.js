@@ -115,7 +115,7 @@ export async function saveEditedMatch() {
   btn.textContent = t('save_changes'); btn.disabled = false;
 }
 
-export function deleteMatch_action() {
+export function deleteMatch() {
   if (!modalMatchId) return;
   var k = allMatches.find(function(m) { return String(m.id) === String(modalMatchId); });
   var oppName = k ? (k.opponent || 'denne kampen') : 'denne kampen';
