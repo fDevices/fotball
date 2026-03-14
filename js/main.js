@@ -83,6 +83,8 @@ function setupDateToggle() {
   });
   input.addEventListener('change', function() {
     updateDateLabel(input.value);
+  });
+  input.addEventListener('blur', function() {
     input.classList.remove('open');
   });
 }
