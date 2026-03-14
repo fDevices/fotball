@@ -1,5 +1,5 @@
 import { allMatches } from './state.js';
-import { fetchMatches } from './supabase.js';
+import { fetchKamper } from './supabase.js';
 import { CACHE_KEY } from './config.js';
 import { getSettings } from './settings.js';
 import { getProfile } from './profile.js';
@@ -14,7 +14,7 @@ async function getMatchesForExport() {
     if (cached) return JSON.parse(cached);
   } catch(e) {}
   try {
-    return await fetchMatches();
+    return await fetchKamper();
   } catch(e) { return []; }
 }
 

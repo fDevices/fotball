@@ -1,5 +1,5 @@
 import { allMatches, setAllMatches } from './state.js';
-import { updateMatch, deleteMatch } from './supabase.js';
+import { updateKamp, deleteKamp } from './supabase.js';
 import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, renderModalTournamentDropdown } from './teams.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -100,7 +100,7 @@ export async function saveEditedMatch() {
   var btn = document.querySelector('.modal-save-btn');
   btn.textContent = 'Lagrer...'; btn.disabled = true;
   try {
-    var res = await updateMatch(modalMatchId, body);
+    var res = await updateKamp(modalMatchId, body);
     if (res.ok) {
       var idx = allMatches.findIndex(function(k) { return k.id === modalMatchId; });
       if (idx !== -1) allMatches[idx] = Object.assign({}, allMatches[idx], body);
@@ -129,7 +129,7 @@ export async function confirmDeleteMatch() {
   document.getElementById('delete-confirm-dialog').classList.remove('open');
   if (!modalMatchId) return;
   try {
-    var res = await deleteMatch(modalMatchId);
+    var res = await deleteKamp(modalMatchId);
     if (res.ok) {
       var updated = allMatches.filter(function(k) { return k.id !== modalMatchId; });
       setAllMatches(updated);
