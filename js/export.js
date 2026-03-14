@@ -1,5 +1,5 @@
 import { allMatches } from './state.js';
-import { fetchKamper } from './supabase.js';
+import { fetchMatches } from './supabase.js';
 import { CACHE_KEY } from './config.js';
 import { getSettings } from './settings.js';
 import { getProfile } from './profile.js';
@@ -14,14 +14,14 @@ async function getMatchesForExport() {
     if (cached) return JSON.parse(cached);
   } catch(e) {}
   try {
-    return await fetchKamper();
+    return await fetchMatches();
   } catch(e) { return []; }
 }
 
 function getActiveSeasonMatches(all, s) {
   var season = s.activeSeason || String(new Date().getFullYear());
   var baseYear = season.split(/[\u2013-]/)[0].trim();
-  return { matches: all.filter(function(k) { return k.dato && k.dato.startsWith(baseYear); }), season: season };
+  return { matches: all.filter(function(k) { return k.date && k.date.startsWith(baseYear); }), season: season };
 }
 
 function buildMatchResultLabel(k) {
@@ -31,8 +31,8 @@ function buildMatchResultLabel(k) {
 
 function buildHomeAwayTeams(k) {
   return {
-    homeTeam: k.kamptype === 'hjemme' ? (k.eget_lag || '') : (k.motstanderlag || ''),
-    awayTeam: k.kamptype === 'hjemme' ? (k.motstanderlag || '') : (k.eget_lag || '')
+    homeTeam: k.match_type === 'home' ? (k.own_team  || '') : (k.opponent || ''),
+    awayTeam: k.match_type === 'home' ? (k.opponent  || '') : (k.own_team || '')
   };
 }
 
@@ -48,8 +48,8 @@ export async function exportCSV() {
     var teams = buildHomeAwayTeams(k);
     function csvEsc(v) { var str = String(v || ''); return str.includes(',') ? '"' + str.replace(/"/g, '""') + '"' : str; }
     lines.push([
-      csvEsc(k.dato), csvEsc(teams.homeTeam), csvEsc(teams.awayTeam), csvEsc(k.turnering),
-      k.hjemme || 0, k.borte || 0, k.mal || 0, k.assist || 0,
+      csvEsc(k.date), csvEsc(teams.homeTeam), csvEsc(teams.awayTeam), csvEsc(k.tournament),
+      k.home_score || 0, k.away_score || 0, k.goals || 0, k.assists || 0,
       csvEsc(resLabel)
     ].join(','));
   });
@@ -75,7 +75,7 @@ export async function exportPDF() {
   matches.forEach(function(k) {
     var r = getResult(k);
     if (r === 'wins') w++; else if (r === 'draw') d++; else l++;
-    g += k.mal || 0; a += k.assist || 0;
+    g += k.goals || 0; a += k.assists || 0;
   });
   var n = matches.length;
 
@@ -83,16 +83,16 @@ export async function exportPDF() {
     var r = getResult(k);
     var color = r === 'wins' ? '#4caf50' : r === 'draw' ? '#f0c050' : '#e05555';
     var resLabel = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
-    var date = new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' });
+    var date = new Date(k.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' });
     var teams = buildHomeAwayTeams(k);
     return '<tr>' +
       '<td>' + date + '</td>' +
       '<td>' + esc(teams.homeTeam) + '</td>' +
       '<td>' + esc(teams.awayTeam) + '</td>' +
-      '<td>' + esc(k.turnering || '') + '</td>' +
-      '<td style="text-align:center">' + k.hjemme + '\u2013' + k.borte + '</td>' +
-      '<td style="text-align:center">' + (k.mal || 0) + '</td>' +
-      '<td style="text-align:center">' + (k.assist || 0) + '</td>' +
+      '<td>' + esc(k.tournament || '') + '</td>' +
+      '<td style="text-align:center">' + k.home_score + '\u2013' + k.away_score + '</td>' +
+      '<td style="text-align:center">' + (k.goals   || 0) + '</td>' +
+      '<td style="text-align:center">' + (k.assists || 0) + '</td>' +
       '<td style="text-align:center;color:' + color + ';font-weight:700">' + resLabel + '</td>' +
     '</tr>';
   }).join('');

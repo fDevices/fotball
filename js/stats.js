@@ -1,4 +1,4 @@
-import { fetchKamper } from './supabase.js';
+import { fetchMatches } from './supabase.js';
 import { allMatches, setAllMatches } from './state.js';
 import { CACHE_KEY } from './config.js';
 import { getSettings } from './settings.js';
@@ -59,7 +59,7 @@ export async function loadStats(forceRefresh) {
   }
   document.getElementById('stats-content').innerHTML = '<div class="loading"><div class="spinner"></div>Henter statistikk...</div>';
   try {
-    var data = await fetchKamper();
+    var data = await fetchMatches();
     setAllMatches(data);
     renderStats();
   } catch(e) {
@@ -70,7 +70,7 @@ export async function loadStats(forceRefresh) {
 function getSeasons() {
   var years = [];
   allMatches.forEach(function(k) {
-    var y = k.dato.substring(0, 4);
+    var y = k.date.substring(0, 4);
     if (!years.includes(y)) years.push(y);
   });
   years.sort();
@@ -78,8 +78,8 @@ function getSeasons() {
 }
 
 export function getResult(k) {
-  if (k.kamptype === 'hjemme') return k.hjemme > k.borte ? 'wins' : k.hjemme < k.borte ? 'loss' : 'draw';
-  return k.borte > k.hjemme ? 'wins' : k.borte < k.hjemme ? 'loss' : 'draw';
+  if (k.match_type === 'home') return k.home_score > k.away_score ? 'wins' : k.home_score < k.away_score ? 'loss' : 'draw';
+  return k.away_score > k.home_score ? 'wins' : k.away_score < k.home_score ? 'loss' : 'draw';
 }
 
 export function calcWDL(matchArr) {
@@ -87,7 +87,7 @@ export function calcWDL(matchArr) {
   matchArr.forEach(function(k) {
     var r = getResult(k);
     if (r === 'wins') w++; else if (r === 'draw') d++; else l++;
-    g += k.mal || 0; a += k.assist || 0;
+    g += k.goals || 0; a += k.assists || 0;
   });
   return { w: w, d: d, l: l, g: g, a: a, n: matchArr.length };
 }
@@ -96,22 +96,22 @@ function renderMatchList(matches) {
   return matches.map(function(k) {
     var r = getResult(k);
     var resIkon = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
-    var date = new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
-    var team = k.eget_lag || '';
-    var tournament = k.turnering ? ' \xb7 ' + esc(k.turnering) : '';
-    var goalText = (k.mal || 0) > 0
-      ? ' \xb7 ' + k.mal + String.fromCodePoint(9917) + ((k.assist || 0) > 0 ? ' ' + k.assist + String.fromCodePoint(127919) : '')
+    var date = new Date(k.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' });
+    var team = k.own_team || '';
+    var tournament = k.tournament ? ' \xb7 ' + esc(k.tournament) : '';
+    var goalText = (k.goals || 0) > 0
+      ? ' \xb7 ' + k.goals + String.fromCodePoint(9917) + ((k.assists || 0) > 0 ? ' ' + k.assists + String.fromCodePoint(127919) : '')
       : '';
     return '<div class="match-item" data-action="openEditModal" data-id="' + k.id + '">' +
       '<div class="match-result ' + r + '">' + resIkon + '</div>' +
       '<div class="match-info">' +
         '<div class="match-title-row">' +
-          '<div class="match-opponent">' + esc(k.motstanderlag) + '</div>' +
+          '<div class="match-opponent">' + esc(k.opponent) + '</div>' +
           (team ? '<div class="match-team-name">\xb7 ' + esc(team) + '</div>' : '') +
         '</div>' +
         '<div class="match-meta">' + date + tournament + goalText + '</div>' +
       '</div>' +
-      '<div class="match-score">' + k.hjemme + '\u2013' + k.borte + '</div>' +
+      '<div class="match-score">' + k.home_score + '\u2013' + k.away_score + '</div>' +
       '<div class="match-edit-icon">\u270F\uFE0F</div>' +
     '</div>';
   }).join('');
@@ -142,8 +142,8 @@ export function setMatchPage(page) {
   if (!statsContent) return;
   var header = statsContent.querySelector('.match-list-header');
   if (!header) { renderStats(); return; }
-  var seasonMatches = allMatches.filter(function(k) { return k.dato.startsWith(activeSeason); });
-  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.eget_lag === activeLag; });
+  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(activeSeason); });
+  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
   var toRemove = [];
   var node = header.nextSibling;
   while (node) { toRemove.push(node); node = node.nextSibling; }
@@ -171,12 +171,12 @@ export function setOpponentSearch(val) {
 
 function renderOpponentSearchResults(container) {
   var query = opponentSearch;
-  var pool = activeLag === 'all' ? allMatches : allMatches.filter(function(k) { return k.eget_lag === activeLag; });
-  var hits = pool.filter(function(k) { return (k.motstanderlag || '').toLowerCase().includes(query); });
+  var pool = activeLag === 'all' ? allMatches : allMatches.filter(function(k) { return k.own_team === activeLag; });
+  var hits = pool.filter(function(k) { return (k.opponent || '').toLowerCase().includes(query); });
 
   var oppMap = {};
   hits.forEach(function(k) {
-    var name = k.motstanderlag || '\u2014';
+    var name = k.opponent || '\u2014';
     if (!oppMap[name]) oppMap[name] = [];
     oppMap[name].push(k);
   });
@@ -232,7 +232,7 @@ function renderFormStreak(matches) {
   var boxes = last10.map(function(k) {
     var r = getResult(k);
     var lbl = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
-    return '<div class="form-streak-box ' + r + '" title="' + esc(k.motstanderlag) + ' ' + k.hjemme + '-' + k.borte + '">' + lbl + '</div>';
+    return '<div class="form-streak-box ' + r + '" title="' + esc(k.opponent) + ' ' + k.home_score + '-' + k.away_score + '">' + lbl + '</div>';
   }).join('');
   return '<div class="stat-row-card form-streak-wrap">' +
     '<div class="stat-row-title">Form (siste ' + last10.length + ' kamper)</div>' +
@@ -241,8 +241,8 @@ function renderFormStreak(matches) {
 }
 
 function renderHomeAwaySection(matches) {
-  var homeMatches = matches.filter(function(k) { return k.kamptype === 'hjemme'; });
-  var awayMatches = matches.filter(function(k) { return k.kamptype !== 'hjemme'; });
+  var homeMatches = matches.filter(function(k) { return k.match_type === 'home'; });
+  var awayMatches = matches.filter(function(k) { return k.match_type !== 'home'; });
   if (homeMatches.length === 0 && awayMatches.length === 0) return '';
 
   function cardHTML(label, matchArr, colorClass) {
@@ -283,7 +283,7 @@ function renderHomeAwaySection(matches) {
 function renderTournamentSection(matches) {
   var tournamentMap = {};
   matches.forEach(function(k) {
-    var tn = k.turnering || '\u2014';
+    var tn = k.tournament || '\u2014';
     if (!tournamentMap[tn]) tournamentMap[tn] = [];
     tournamentMap[tn].push(k);
   });
@@ -327,7 +327,7 @@ export function renderStats() {
     return '<button class="season-pill ' + (s === activeSeason ? 'active' : '') + '" data-action="setSeason" data-season="' + s + '">' + s + '</button>';
   }).join('');
 
-  var seasonMatches = allMatches.filter(function(k) { return k.dato.startsWith(activeSeason); });
+  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(activeSeason); });
   var profileTeams = getProfile().team || [];
   if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'all')) activeLag = 'all';
   var teamPills = [{ key: 'all', label: 'Alle team' }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
@@ -335,7 +335,7 @@ export function renderStats() {
     return '<button class="season-pill ' + (activeLag === p.key ? 'active' : '') + '" data-action="setTeamFilter" data-team="' + esc(p.key) + '"> ' + esc(p.label) + '</button>';
   }).join('');
 
-  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.eget_lag === activeLag; });
+  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
   var n = matches.length;
   var teamText = activeLag === 'all' ? 'alle team' : activeLag;
   document.getElementById('stats-sub').textContent = n + ' kamper \xb7 ' + teamText;
@@ -404,7 +404,7 @@ export function renderAnalyse(matches) {
   var container = document.getElementById('stats-content');
   if (!container) return;
 
-  var asc = matches.slice().sort(function(a, b) { return a.dato < b.dato ? -1 : 1; });
+  var asc = matches.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
 
   var seasons = getSeasons();
   var profileTeams = getProfile().team || [];
@@ -477,7 +477,7 @@ export function renderAnalyse(matches) {
   var labels1 = [], winPctData = [], wins1 = 0;
   asc.forEach(function(k, i) {
     if (getResult(k) === 'wins') wins1++;
-    labels1.push(new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
+    labels1.push(new Date(k.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
     winPctData.push(Math.round((wins1 / (i + 1)) * 100));
   });
   chartInstances['winpct'] = new Chart(document.getElementById('chart-winpct'), {
@@ -488,9 +488,9 @@ export function renderAnalyse(matches) {
 
   var labels2 = [], goalData = [], assistData = [];
   asc.forEach(function(k) {
-    labels2.push(new Date(k.dato).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
-    goalData.push(k.mal || 0);
-    assistData.push(k.assist || 0);
+    labels2.push(new Date(k.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' }));
+    goalData.push(k.goals || 0);
+    assistData.push(k.assists || 0);
   });
   chartInstances['goals'] = new Chart(document.getElementById('chart-goals'), {
     type: 'line',
@@ -500,10 +500,10 @@ export function renderAnalyse(matches) {
 
   var tournMap = {};
   matches.forEach(function(k) {
-    var tn = k.turnering || '\u2014';
+    var tn = k.tournament || '\u2014';
     if (!tournMap[tn]) tournMap[tn] = { g: 0, a: 0 };
-    tournMap[tn].g += k.mal || 0;
-    tournMap[tn].a += k.assist || 0;
+    tournMap[tn].g += k.goals   || 0;
+    tournMap[tn].a += k.assists || 0;
   });
   var tournKeys = Object.keys(tournMap).sort(function(a, b) { return tournMap[b].g - tournMap[a].g; });
   var barHeight = Math.max(120, tournKeys.length * 44);

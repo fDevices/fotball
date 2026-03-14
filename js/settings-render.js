@@ -1,4 +1,5 @@
 import { getSettings, saveSettings, buildSeasonLabel } from './settings.js';
+import { CACHE_KEY } from './config.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { updateLogBadge } from './navigation.js';
@@ -78,14 +79,14 @@ function getAllSeasonsLocal() {
   // Import allMatches at call time to avoid circular dep
   var allMatches = [];
   try {
-    var cached = sessionStorage.getItem('athlytics_kamper');
+    var cached = sessionStorage.getItem(CACHE_KEY);
     if (cached) allMatches = JSON.parse(cached);
   } catch(e) {}
   var s = getSettings();
   var ekstra = s.extraSeasons || [];
   var fromMatches = [];
   allMatches.forEach(function(k) {
-    var aar = k.dato ? k.dato.substring(0, 4) : null;
+    var aar = k.date ? k.date.substring(0, 4) : null;
     if (aar && !fromMatches.includes(aar)) fromMatches.push(aar);
   });
   var sett = [];

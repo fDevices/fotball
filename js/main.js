@@ -4,7 +4,7 @@ import { switchTab, updateLogBadge } from './navigation.js';
 import { setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
 import { loadStats, renderStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
-import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
+import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch_action, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { exportCSV, exportPDF } from './export.js';
 import { renderSettings, setSport, setSeasonFormat, setActiveSeason, addSeason } from './settings-render.js';
 import { showToast } from './toast.js';
@@ -42,7 +42,7 @@ const ACTIONS = {
   modalAdjust:                   (e) => { var el = e.target.closest('[data-type]'); modalAdjust(el.dataset.type, Number(el.dataset.delta)); },
   setModalMatchType:             (e) => setModalMatchType(e.target.closest('[data-match-type]').dataset.matchType),
   saveEditedMatch:               () => saveEditedMatch(),
-  deleteMatch:                   () => deleteMatch(),
+  deleteMatch:                   () => deleteMatch_action(),
   cancelDeleteMatch:             () => cancelDeleteMatch(),
   confirmDeleteMatch:            () => confirmDeleteMatch(),
   switchStatsView:               (e) => switchStatsView(e.target.closest('[data-view]').dataset.view),

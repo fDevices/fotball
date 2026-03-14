@@ -1,5 +1,5 @@
 import { PROFIL_KEY } from './config.js';
-import { fetchProfil, upsertProfil } from './supabase.js';
+import { fetchProfile, upsertProfile } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { esc } from './utils.js';
@@ -25,53 +25,53 @@ export function saveProfile_local(profil) {
 
 export async function fetchProfileFromSupabase() {
   try {
-    var row = await fetchProfil();
+    var row = await fetchProfile();
     if (row) {
       var p = {
-        name: row.name || '',
-        club: row.club || '',
-        posisjon: row.posisjon || '',
-        team: row.team || [],
-        favoriteTeam: row.favorite_team || '',
-        tournaments: row.tournaments || [],
-        favoriteTournament: row.favorite_tournament || '',
-        avatar: row.avatar_url || ''
+        name:                row.name                || '',
+        club:                row.club                || '',
+        posisjon:            row.posisjon            || '',
+        team:                row.team                || [],
+        favoriteTeam:        row.favorite_team       || '',
+        tournaments:         row.tournaments         || [],
+        favoriteTournament:  row.favorite_tournament || '',
+        avatar:              row.avatar_url          || ''
       };
       saveProfile_local(p);
       return p;
     }
-  } catch(e) {}
+  } catch(e) { console.warn('fetchProfileFromSupabase error:', e); }
   return getProfile();
 }
 
 export async function saveProfileToSupabase(profil) {
   try {
-    await upsertProfil({
-      id: 'default',
-      name: profil.name,
-      club: profil.club,
-      posisjon: profil.posisjon,
-      team: profil.team,
-      favorite_team: profil.favoriteTeam || '',
-      tournaments: profil.tournaments || [],
-      favorite_tournament: profil.favoriteTournament || '',
-      avatar_url: profil.avatar || '',
-      oppdatert: new Date().toISOString()
+    await upsertProfile({
+      id:                   'default',
+      name:                 profil.name,
+      club:                 profil.club,
+      posisjon:             profil.posisjon,
+      team:                 profil.team,
+      favorite_team:        profil.favoriteTeam        || '',
+      tournaments:          profil.tournaments          || [],
+      favorite_tournament:  profil.favoriteTournament  || '',
+      avatar_url:           profil.avatar              || '',
+      updated_at:           new Date().toISOString()
     });
-  } catch(e) { console.log('Supabase profil error:', e); }
+  } catch(e) { console.warn('saveProfileToSupabase error:', e); }
 }
 
 export async function saveProfile() {
   var existing = getProfile();
   var profil = {
-    name: document.getElementById('profil-name').value.trim(),
-    club: document.getElementById('profil-club').value.trim(),
-    posisjon: document.getElementById('profil-posisjon').value.trim(),
-    team: existing.team || [],
-    favoriteTeam: existing.favoriteTeam || '',
-    tournaments: existing.tournaments || [],
-    favoriteTournament: existing.favoriteTournament || '',
-    avatar: existing.avatar || ''
+    name:                document.getElementById('profil-name').value.trim(),
+    club:                document.getElementById('profil-club').value.trim(),
+    posisjon:            document.getElementById('profil-posisjon').value.trim(),
+    team:                existing.team                || [],
+    favoriteTeam:        existing.favoriteTeam        || '',
+    tournaments:         existing.tournaments         || [],
+    favoriteTournament:  existing.favoriteTournament  || '',
+    avatar:              existing.avatar              || ''
   };
   saveProfile_local(profil);
   await saveProfileToSupabase(profil);
@@ -85,8 +85,8 @@ export async function saveProfile() {
 }
 
 export function loadProfileData(profil) {
-  document.getElementById('profil-name').value = profil.name || '';
-  document.getElementById('profil-club').value = profil.club || '';
+  document.getElementById('profil-name').value    = profil.name     || '';
+  document.getElementById('profil-club').value    = profil.club     || '';
   document.getElementById('profil-posisjon').value = profil.posisjon || '';
   var nameEl = document.getElementById('avatar-name');
   var clubEl = document.getElementById('avatar-club');
@@ -125,9 +125,9 @@ export function uploadImage(input) {
 }
 
 export function showAvatarImage(src) {
-  var img = document.getElementById('avatar-img');
+  var img  = document.getElementById('avatar-img');
   var emoji = document.getElementById('avatar-emoji');
-  var hint = document.getElementById('avatar-upload-hint');
+  var hint  = document.getElementById('avatar-upload-hint');
   if (src) {
     img.src = src;
     img.style.display = 'block';

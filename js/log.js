@@ -1,25 +1,25 @@
-import { insertKamp } from './supabase.js';
+import { insertMatch } from './supabase.js';
 import { allMatches, setAllMatches, invalidateMatchCache } from './state.js';
 import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDropdown } from './teams.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 
-var goals = 0, assist = 0, home = 0, away = 0, matchType = 'hjemme';
+var goals = 0, assist = 0, home = 0, away = 0, matchType = 'home';
 
 export function getMatchType() { return matchType; }
 
 export function setMatchType(type) {
   matchType = type;
-  document.getElementById('btn-home-toggle').classList.toggle('active', type === 'hjemme');
+  document.getElementById('btn-home-toggle').classList.toggle('active', type === 'home');
   document.getElementById('btn-away-toggle').classList.toggle('active', type === 'away');
-  document.getElementById('label-home').classList.toggle('highlight', type === 'hjemme');
+  document.getElementById('label-home').classList.toggle('highlight', type === 'home');
   document.getElementById('label-away').classList.toggle('highlight', type === 'away');
   updateResult();
 }
 
 export function updateResult() {
   var el = document.getElementById('result-display');
-  var r = matchType === 'hjemme'
+  var r = matchType === 'home'
     ? (home > away ? 'wins' : home < away ? 'loss' : 'draw')
     : (away > home ? 'wins' : away < home ? 'loss' : 'draw');
   var labels = { wins: t('res_win'), draw: t('res_uavgjort'), loss: t('res_tap') };
@@ -28,7 +28,7 @@ export function updateResult() {
 }
 
 export function adjust(type, delta) {
-  var ownScore = matchType === 'hjemme' ? home : away;
+  var ownScore = matchType === 'home' ? home : away;
   if (type === 'goals') {
     goals = Math.min(ownScore, Math.max(0, goals + delta));
     assist = Math.min(assist, ownScore - goals);
@@ -41,7 +41,7 @@ export function adjust(type, delta) {
   }
   if (type === 'home') {
     home = Math.max(0, home + delta);
-    if (matchType === 'hjemme') {
+    if (matchType === 'home') {
       goals = Math.min(goals, home);
       assist = Math.min(assist, home - goals);
       document.getElementById('goals-display').textContent = goals;
@@ -67,7 +67,7 @@ export async function saveMatch() {
   var date = document.getElementById('date').value;
   var opponent = document.getElementById('opponent').value.trim();
   var team = getSelectedTeam();
-  var turnering = getSelectedTournament();
+  var tournament = getSelectedTournament();
   if (!date || !opponent || !team) {
     showToast(t('toast_fyll_inn'), 'error');
     return;
@@ -75,9 +75,16 @@ export async function saveMatch() {
   var btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'Lagrer...';
   try {
-    var res = await insertKamp({
-      dato: date, motstanderlag: opponent, eget_lag: team,
-      turnering: turnering, hjemme: home, borte: away, mal: goals, assist: assist, kamptype: matchType
+    var res = await insertMatch({
+      date:       date,
+      opponent:   opponent,
+      own_team:   team,
+      tournament: tournament,
+      home_score: home,
+      away_score: away,
+      goals:      goals,
+      assists:    assist,
+      match_type: matchType
     });
     if (res.ok) {
       var newMatches = await res.json();
@@ -106,7 +113,7 @@ export function resetForm() {
   ['goals','assist','home','away'].forEach(function(id) {
     document.getElementById(id + '-display').textContent = '0';
   });
-  setMatchType('hjemme');
+  setMatchType('home');
   updateResult();
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
   renderTeamDropdown();

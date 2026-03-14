@@ -538,6 +538,63 @@ Kall `applyTheme(sport)` fra `setSport()` i `settings-render.js`.
 
 ---
 
+## Selvvurdering etter kamp (planlagt feature)
+
+### Konsept
+Etter at en kamp er lagret kan spilleren vurdere egen prestasjon på 5 kategorier. Funksjonen er **valgfri** og vises bak en "expand"-knapp/toggle som dukker opp etter lagring – ikke som del av selve logg-skjemaet. Kun for kamper, ikke trening.
+
+**Premium-feature** – gated bak `isPremium()` på samme måte som analyse-grafer.
+
+### Kategorier (JS-identifikatorer og UI-labels)
+
+| JS-felt | UI-label (NO) | UI-label (EN) |
+|---|---|---|
+| `rating_effort` | Innsats | Effort |
+| `rating_focus` | Fokus | Focus |
+| `rating_technique` | Teknikk | Technique |
+| `rating_team_play` | Lagspill | Teamwork |
+| `rating_impact` | Påvirkning | Impact |
+
+### Skala (1–5, samme tekst for alle kategorier)
+| Verdi | NO | EN |
+|---|---|---|
+| 1 | Veldig dårlig | Very poor |
+| 2 | Under mitt nivå | Below my level |
+| 3 | Greit | Okay |
+| 4 | Bra | Good |
+| 5 | Veldig bra | Very good |
+
+### Refleksjonsfelter (fritekst, valgfrie)
+- `reflection_good` – "Hva gikk bra?" / "What went well?"
+- `reflection_improve` – "Hva vil jeg forbedre?" / "What do I want to improve?"
+
+### Framing
+Vis ikke som "objektiv vurdering" – bruk framing: **"Hvordan vurderer du deg selv i dag?"** Verdien ligger i gjentatte mønstre over tid, ikke enkeltscorer.
+
+### DB-implikasjoner
+7 nye nullable kolonner på `matches`-tabellen (alle kan være NULL for eksisterende kamper):
+```
+rating_effort      SMALLINT (1–5)
+rating_focus       SMALLINT (1–5)
+rating_technique   SMALLINT (1–5)
+rating_team_play   SMALLINT (1–5)
+rating_impact      SMALLINT (1–5)
+reflection_good    TEXT
+reflection_improve TEXT
+```
+Legges inn som del av **Fase 1.7**-migreringen (naturlig tidspunkt siden tabellene recreates uansett).
+
+### Statistikk-utnyttelse (Fase 3)
+Trendvisning per kategori (gjennomsnitt over sesong), utvikling per kamp, evt. korrelasjon med seier/tap. Implementeres i stats-tab som del av Fase 3 – ikke Fase 2.
+
+### UI-pattern
+1. Kamp lagres → toast "Kamp lagret ✓"
+2. Under/ved siden av toasten (eller inline i skjemaet som ekspanderer): knapp "⭐ Vurder deg selv" (premium-merket)
+3. Klikk → expand-seksjon med 5 sliders/stjerner + 2 tekstfelter
+4. "Lagre vurdering"-knapp → `PATCH`/`updateKamp()` med ratings-feltene
+
+---
+
 ## Roadmap
 
 > Ferdigstilte faser ligger i `CHANGELOG.md`.
@@ -568,10 +625,12 @@ Kall `applyTheme(sport)` fra `setSport()` i `settings-render.js`.
 - [ ] Konsolider sesonglogikk til én autoritativ funksjon
 - [ ] Konsolider cache-lesing bak `state.js`-grensen (fjern direkte sessionStorage-oppslag i stats.js, export.js, settings-render.js)
 - [ ] Fiks `supabase.js` feilhåndtering: `res.ok`-sjekk og `throw` i alle funksjoner
+- [ ] Legg til selvvurdering-kolonner på `matches`-tabellen: `rating_effort`, `rating_focus`, `rating_technique`, `rating_team_play`, `rating_impact` (SMALLINT nullable), `reflection_good`, `reflection_improve` (TEXT nullable)
 
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
 - [ ] Forberedelse: `THEMES`-objekt, `sport_icon` + stat-labels i TEKST
+- [ ] Selvvurdering-statistikk i stats-tab: gjennomsnitt per kategori, trendvisning per sesong, evt. korrelasjon med seier/tap
 
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon
@@ -585,7 +644,7 @@ Kall `applyTheme(sport)` fra `setSport()` i `settings-render.js`.
 | Nivå | Innhold | Pris |
 |------|---------|------|
 | Gratis | 1 lag, 1 sesong, basis statistikk, form-streak | kr 0 |
-| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF | ~kr 49/mnd |
+| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF, selvvurdering etter kamp | ~kr 49/mnd |
 | Club | Flere brukere, deling, lagadmin | ~kr 199/mnd |
 
 **Uavklart:** Per turnering-statistikk (gratis eller Pro?), multi-sport (Pro-tillegg?), PDF alene vs CSV+PDF samlet
