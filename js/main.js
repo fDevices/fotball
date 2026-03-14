@@ -79,9 +79,7 @@ function setupDateToggle() {
   btn.addEventListener('click', function(e) {
     e.stopPropagation();
     var isOpen = input.classList.toggle('open');
-    if (isOpen && input.showPicker) {
-      try { input.showPicker(); } catch(err) {}
-    }
+    if (isOpen) input.focus();
   });
   input.addEventListener('change', function() {
     updateDateLabel(input.value);
