@@ -73,7 +73,7 @@ export async function saveMatch() {
     return;
   }
   var btn = document.getElementById('submit-btn');
-  btn.disabled = true; btn.textContent = 'Lagrer...';
+  btn.disabled = true; btn.textContent = t('saving');
   try {
     var res = await insertKamp({
       date:       date,

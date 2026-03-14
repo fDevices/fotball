@@ -122,7 +122,7 @@ export function setActiveSeason(sesong) {
 export function addSeason() {
   var input = document.getElementById('settings-ny-sesong');
   var val = input.value.trim().replace(/[^0-9]/g, '');
-  if (!val || val.length < 4) { showToast(t('toast_ugyldig_aar'), 'error'); return; }
+  if (!val || val.length !== 4 || !/^\d{4}$/.test(val)) { showToast(t('toast_ugyldig_aar'), 'error'); return; }
   var s = getSettings();
   if (!s.extraSeasons) s.extraSeasons = [];
   if (s.extraSeasons.includes(val)) { showToast(t('toast_season_exists'), 'error'); return; }

@@ -5,7 +5,7 @@ const TEKST = {
     tab_log:'Logg', tab_stats:'Statistikk', tab_profile:'Profil', tab_settings:'Settings',
     date:'Dato', opponentTeam:'Motstanderlag', own_team:'Eget team / tropp',
     turnering:'Turnering / serie', goals:'Mål', assist:'Assist',
-    hjemmekamp:'🏠 Hjemmekamp', bortekamp:'✈️ Bortekamp', save_match:'Lagre kamp',
+    hjemmekamp:'🏠 Hjemmekamp', bortekamp:'✈️ Bortekamp', save_match:'Lagre kamp', saving:'Lagrer...',
     home_label:'Hjemmelag', away_label:'Bortelag',
     match_type_label:'Hjemme eller away?', result_label:'Resultat',
     ph_opponent:'F.eks. Brann IL', ph_tournament:'F.eks. Kretscup, seriespill...',
@@ -42,7 +42,7 @@ const TEKST = {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
     date:'Date', opponentTeam:'Opponent', own_team:'My team / squad',
     turnering:'Tournament / league', goals:'Goals', assist:'Assists',
-    hjemmekamp:'🏠 Home', bortekamp:'✈️ Away', save_match:'Save match',
+    hjemmekamp:'🏠 Home', bortekamp:'✈️ Away', save_match:'Save match', saving:'Saving...',
     home_label:'Home', away_label:'Away',
     match_type_label:'Home or away?', result_label:'Result',
     ph_opponent:'E.g. Arsenal FC', ph_tournament:'E.g. Cup, league...',
@@ -108,17 +108,11 @@ export function updateFlags() {
 }
 
 export function toggleLangPicker(btn) {
-  document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
   var wrap = btn ? btn.closest('.lang-picker-wrap') : null;
   var dd = wrap ? wrap.querySelector('.lang-picker-dropdown') : document.querySelector('.lang-picker-dropdown');
-  if (dd) dd.classList.toggle('open');
-  setTimeout(function() {
-    document.addEventListener('click', function closePicker(e) {
-      if (!e.target.closest('.lang-flag-btn') && !e.target.closest('.lang-picker-dropdown')) {
-        document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
-      }
-    }, { once: true });
-  }, 50);
+  var isOpen = dd && dd.classList.contains('open');
+  document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
+  if (!isOpen && dd) dd.classList.add('open');
 }
 
 export function updateAllText() {

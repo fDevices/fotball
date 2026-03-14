@@ -60,7 +60,7 @@ export function saveNewTeamFromDropdown() {
   var name = input.value.trim();
   if (!name) return;
   var profil = getProfile();
-  if (!profil.team.includes(name)) {
+  if (!profil.team.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) {
     profil.team.push(name);
     saveProfile_local(profil);
     saveProfileToSupabase(profil);
@@ -75,7 +75,7 @@ export function addTeamFromProfile() {
   var name = input.value.trim();
   if (!name) return;
   var profil = getProfile();
-  if (profil.team.includes(name)) { showToast('Laget finnes allerede', 'error'); return; }
+  if (profil.team.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) { showToast('Laget finnes allerede', 'error'); return; }
   profil.team.push(name);
   saveProfile_local(profil);
   saveProfileToSupabase(profil);
@@ -184,7 +184,7 @@ export function saveNewTournamentFromDropdown() {
   if (!name) return;
   var profil = getProfile();
   if (!profil.tournaments) profil.tournaments = [];
-  if (!profil.tournaments.includes(name)) {
+  if (!profil.tournaments.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) {
     profil.tournaments.push(name);
     saveProfile_local(profil);
     saveProfileToSupabase(profil);
@@ -202,7 +202,7 @@ export function addTournament() {
   if (!name) return;
   var profil = getProfile();
   if (!profil.tournaments) profil.tournaments = [];
-  if (profil.tournaments.includes(name)) { showToast('Turneringen finnes allerede', 'error'); return; }
+  if (profil.tournaments.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) { showToast('Turneringen finnes allerede', 'error'); return; }
   profil.tournaments.push(name);
   saveProfile_local(profil);
   saveProfileToSupabase(profil);

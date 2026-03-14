@@ -157,6 +157,13 @@ document.addEventListener('athlytics:destroyCharts', function() {
 
 // ── Bootstrap ──────────────────────────────────────────────────────────────
 
+// Global outside-click handler for lang picker (runs once, not per toggle)
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.lang-picker-wrap')) {
+    document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
+  }
+});
+
 // Expose uploadImage globally for avatar onchange handler
 window._uploadImage = uploadImage;
 
