@@ -2,7 +2,7 @@ import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, u
 import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
-import { loadStats, renderStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
+import { loadStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { exportCSV, exportPDF } from './export.js';
@@ -178,6 +178,7 @@ window.addEventListener('load', async function() {
     if (p.favoriteTournament && p.tournaments && p.tournaments.includes(p.favoriteTournament)) selectTournament(p.favoriteTournament);
     renderTournamentDropdown();
     renderProfileTournamentList();
+    renderProfileTeamList();
     updateLogBadge();
     updateFlags();
     updateAllText();

@@ -78,9 +78,11 @@ export function addTeamFromProfile() {
   if (profil.team.includes(name)) { showToast('Laget finnes allerede', 'error'); return; }
   profil.team.push(name);
   saveProfile_local(profil);
+  saveProfileToSupabase(profil);
   input.value = '';
   renderProfileTeamList();
   renderTeamDropdown();
+  showToast('\u2713 Lag lagt til', 'success');
 }
 
 export function deleteTeam(name) {
