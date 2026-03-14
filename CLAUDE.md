@@ -54,9 +54,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Ingen autentisering (Supabase Auth ikke implementert) | 🔴 Kritisk | Fase 4 – `auth.js` er reservert plass i modulstrukturen |
 | `innerHTML`-kall escaper ikke alltid brukerdata | 🔴 Kritisk | Sanitiser input FØR lansering til andre brukere |
 | Supabase anon key er hardkodet i `js/config.js` | 🟠 Høy | Flytt til miljøvariabel via Vercel ved auth-implementasjon |
-| `supabase.js` sjekker ikke `res.ok` – HTTP-feil (401/500 osv.) håndteres ikke | 🟠 Høy | Legg til `if (!res.ok) throw new Error(...)` i alle fetch-funksjoner |
-| `upsertProfil()` og `upsertSettings()` ignorerer respons – silent failure ved lagring | 🟠 Høy | Sjekk `res.ok`, kast feil ved HTTP-feil |
-| **Supabase-tabeller og localStorage-nøkler byttes til engelsk** – `kamper`→`matches`, `profiler`→`profiles`, alle kolonner | 🔴 Kritisk | **Planlagt migrering:** drop og recreate tabeller med engelske navn; oppdater alle referanser i `supabase.js`, `profile.js`, `log.js`, `modal.js`, `stats.js`, `export.js`, `config.js` (CACHE_KEY). Purge testdata og importer på nytt. |
+| `supabase.js` feilhåndtering – `res.ok` + `console.warn` lagt til, men ikke full `throw` | 🟢 Lav | Forbedres ved auth i Fase 4 |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
@@ -438,10 +436,9 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 
 ### match_type-verdier
 
-**Nåværende kode (før DB-migrering):** `matchType` bruker `'hjemme'` og `'away'`.
-**Etter DB-migrering:** `match_type` bruker `'home'` og `'away'` overalt.
+`match_type` bruker `'home'` og `'away'` overalt – migrering fullført i Fase 1.7.
 
-> ⚠️ Ikke bland disse. Sjekk alltid hvilken fase koden er i. Etter migrering: aldri bruk `'hjemme'`, `'borte'` eller `'home'` fra gammel kode.
+> ⚠️ Bruk aldri `'hjemme'` eller `'borte'` – disse er utdaterte.
 
 ### CSS-klasser for resultat
 `.result-auto` bruker klassene **'wins'**, **'draw'**, **'loss'** – disse må matche nøyaktig med verdiene `getResult()` returnerer.
@@ -616,16 +613,6 @@ Trendvisning per kategori (gjennomsnitt over sesong), utvikling per kamp, evt. k
 ### Fase 1.6 – UX-polish (backlog)
 - [ ] Bytt `confirm()`-dialog ved sletting med custom in-app modal
 - [ ] Profil: `tournaments`/`team` fra Supabase synkes ikke ved `saveProfile()` – kan miste data
-
-### Fase 1.7 – DB-migrering og kodekonsolidering (planlagt)
-- [ ] Drop og recreate `kamper`→`matches` og `profiler`→`profiles` med engelske kolonnenavn
-- [ ] Oppdater `supabase.js`, `profile.js`, `log.js`, `modal.js`, `stats.js`, `export.js`, `config.js` (CACHE_KEY)
-- [ ] Oppdater alle `match_type`-verdier fra `'hjemme'` til `'home'`
-- [ ] Purge testdata og reimporter med nytt skjema
-- [ ] Konsolider sesonglogikk til én autoritativ funksjon
-- [ ] Konsolider cache-lesing bak `state.js`-grensen (fjern direkte sessionStorage-oppslag i stats.js, export.js, settings-render.js)
-- [ ] Fiks `supabase.js` feilhåndtering: `res.ok`-sjekk og `throw` i alle funksjoner
-- [ ] Legg til selvvurdering-kolonner på `matches`-tabellen: `rating_effort`, `rating_focus`, `rating_technique`, `rating_team_play`, `rating_impact` (SMALLINT nullable), `reflection_good`, `reflection_improve` (TEXT nullable)
 
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
