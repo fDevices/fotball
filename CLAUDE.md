@@ -484,7 +484,7 @@ I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-co
 - Turnering-dropdown i logg og redigeringsmodal – ny turnering opprettes inline
 - Profil: mine lag-liste og mine turneringer med ☆ favoritt og slett
 - Settings-tab: sport, sesongformat, aktiv sesong
-- **Eksport** – CSV-nedlasting og PDF-rapport (merket ⭐ Premium i UI)
+- **SVG-ikonsystem** – alle ikoner i `/icons/`-mappen, fargestyrt via CSS `mask-image` (tab-bar) og `currentColor` (match-type). Flaggikoner som `<img>`. Bytt ikon ved å erstatte SVG-fil.
 - Fullt i18n-system (norsk/engelsk) med flagg-velger på alle tabs
 - Toast-notifikasjoner
 - Google Fonts med preconnect + font-display swap
@@ -517,6 +517,41 @@ export function t(key) { ... }
 ---
 
 ## Plattform-beslutninger
+
+### Ikonsystem (implementert)
+
+SVG-ikoner ligger i `/icons/`-mappen i reporoten. Ikonene brukes via CSS `mask-image` slik at fargen styres med `background-color: currentColor` — ikke hardkodet i SVG-filen.
+
+**Filer:**
+```
+icons/
+  tab-log.svg          – fotball (tab-bar: logg)
+  tab-stats.svg        – søylediagram + linje (tab-bar: statistikk)
+  tab-profile.svg      – personsilhuett (tab-bar: profil)
+  tab-settings.svg     – tannhjul (tab-bar: innstillinger)
+  match-home.svg       – hus (hjemmekamp-knapp)
+  match-away.svg       – fly (bortekamp-knapp)
+  result-win.svg       – pokal (seier)
+  result-draw.svg      – sirkel med strek (uavgjort)
+  result-loss.svg      – utropstegn (tap)
+  flag-no.svg          – norsk flagg (språkvelger)
+  flag-en.svg          – britisk flagg (språkvelger)
+```
+
+**CSS-mønster for tab-ikoner (mask-image):**
+```css
+.tab-svg-icon { -webkit-mask-image: url('/icons/tab-log.svg'); mask-image: url('/icons/tab-log.svg'); background-color: var(--muted); }
+.tab-btn.active .tab-svg-icon { background-color: var(--lime); }
+```
+
+**CSS-mønster for match-ikoner:**
+```css
+.match-svg-icon { -webkit-mask-image: url('/icons/match-home.svg'); mask-image: url('/icons/match-home.svg'); background-color: currentColor; }
+```
+
+**Flaggikoner** brukes som vanlig `<img>` (ikke mask) siden de trenger ekte farger.
+
+For å bytte ut et ikon: erstatt SVG-filen i `/icons/` — ingen kodeendringer nødvendig.
 
 ### Portrait-lås (implementert)
 Appen er portrait-only. Landscape viser en overlay: "Roter telefonen til stående modus".
