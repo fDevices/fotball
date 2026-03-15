@@ -28,7 +28,10 @@ const TEKST = {
     ph_new_season:'Legg til sesong (f.eks. 2027)',
     format_aar:'📅 År (2025)', format_season:'🗓️ Sesong (2025–2026)',
     sport_fotball:'⚽ Fotball', sport_ori:'🧭 Orientering', sport_ski:'⛷️ Ski', snart:'snart',
-    modal_rediger:'Rediger kamp', save_changes:'Lagre endringer', delete_btn:'🗑 Slett',
+    modal_rediger:'Rediger kamp', save_changes:'Lagre endringer', delete_btn:'🗑 Slett', this_match:'denne kampen',
+    toast_team_added:'✓ Lag lagt til', toast_tournament_added:'✓ Turnering lagt til',
+    toast_tournament_exists:'Turneringen finnes allerede',
+    tournament_reset:'Nullstill turnering', tournament_new:'Ny turnering...',
     toast_profile_saved:'✓ Profil saved', toast_lag_finnes:'Laget finnes allerede',
     toast_fyll_inn:'Fyll inn date, opponent og velg team', toast_match_saved:'⚽ Kamp saved!',
     toast_nettverksfeil:'Nettverksfeil – prøv igjen', toast_sport_updated:'Sport oppdatert',
@@ -37,6 +40,20 @@ const TEKST = {
     toast_match_updated:'✓ Kamp oppdatert', toast_feil_lagring:'Feil ved lagring',
     toast_match_deleted:'🗑 Kamp slettet', toast_delete_error:'Feil ved sletting',
     toast_nettverksfeil_kort:'Nettverksfeil',
+    loading_stats:'Henter statistikk...', load_error:'Klarte ikke laste data',
+    no_matches_season:'Ingen kamper denne sesongen', no_matches_yet:'Ingen kamper enda', no_matches_card:'Ingen kamper',
+    stat_wins:'Seier', stat_draws:'Uavgjort', stat_losses:'Tap', stat_goals:'Mål', stat_assists:'Assist',
+    win_short:'S', draw_short:'U', loss_short:'T',
+    match_dist:'Kampfordeling', avg_per_match:'Gjennomsnitt per kamp',
+    goals_per_match:'Mål per kamp', assist_per_match:'Assist per kamp', ga_per_match:'G+A per kamp',
+    home_vs_away:'Hjemme vs Borte', stat_home:'🏠 Hjemme', stat_away:'✈️ Borte',
+    per_tournament:'Per turnering', matches_short:'kamper', all_teams_subtitle:'alle team',
+    opponent_search_ph:'Søk motstander...', no_match_vs:'Ingen kamper mot', opponent_search_title:'Motstandersøk',
+    page_prev:'← Forrige', page_next:'Neste →', page_of:'av',
+    form_title:'Form', loading_charts:'Laster grafer...',
+    chart_win_pct:'Kumulativ seiersprosent', chart_goals_assists:'Mål \u0026 assist per kamp', chart_goals_tourn:'Mål per turnering',
+    pro_feature:'Pro-funksjon', pro_upgrade_text:'Oppgrader til Pro for å se avanserte grafer og analyse', pro_unlock_btn:'Lås opp Pro ⭐',
+    profile_prompt_title:'Velkommen! Sett opp profilen din', profile_prompt_desc:'Legg til navn og klubb så blir statistikk og eksport personlig. Tar 30 sekunder.', profile_prompt_skip:'Hopp over',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -65,7 +82,10 @@ const TEKST = {
     ph_new_season:'Add season (e.g. 2027)',
     format_aar:'📅 Year (2025)', format_season:'🗓️ Season (2025–2026)',
     sport_fotball:'⚽ Football', sport_ori:'🧭 Orienteering', sport_ski:'⛷️ Skiing', snart:'soon',
-    modal_rediger:'Edit match', save_changes:'Save changes', delete_btn:'🗑 Delete',
+    modal_rediger:'Edit match', save_changes:'Save changes', delete_btn:'🗑 Delete', this_match:'this match',
+    toast_team_added:'✓ Team added', toast_tournament_added:'✓ Tournament added',
+    toast_tournament_exists:'Tournament already exists',
+    tournament_reset:'Reset tournament', tournament_new:'New tournament...',
     toast_profile_saved:'✓ Profile saved', toast_lag_finnes:'Team already exists',
     toast_fyll_inn:'Fill in date, opponent and select team', toast_match_saved:'⚽ Match saved!',
     toast_nettverksfeil:'Network error – try again', toast_sport_updated:'Sport updated',
@@ -74,6 +94,20 @@ const TEKST = {
     toast_match_updated:'✓ Match updated', toast_feil_lagring:'Error saving',
     toast_match_deleted:'🗑 Match deleted', toast_delete_error:'Error deleting',
     toast_nettverksfeil_kort:'Network error',
+    loading_stats:'Loading stats...', load_error:'Failed to load data',
+    no_matches_season:'No matches this season', no_matches_yet:'No matches yet', no_matches_card:'No matches',
+    stat_wins:'Wins', stat_draws:'Draws', stat_losses:'Losses', stat_goals:'Goals', stat_assists:'Assists',
+    win_short:'W', draw_short:'D', loss_short:'L',
+    match_dist:'Match distribution', avg_per_match:'Average per match',
+    goals_per_match:'Goals per match', assist_per_match:'Assists per match', ga_per_match:'G+A per match',
+    home_vs_away:'Home vs Away', stat_home:'🏠 Home', stat_away:'✈️ Away',
+    per_tournament:'By tournament', matches_short:'matches', all_teams_subtitle:'all teams',
+    opponent_search_ph:'Search opponent...', no_match_vs:'No matches vs', opponent_search_title:'Opponent search',
+    page_prev:'← Previous', page_next:'Next →', page_of:'of',
+    form_title:'Form', loading_charts:'Loading charts...',
+    chart_win_pct:'Cumulative win %', chart_goals_assists:'Goals \u0026 assists per match', chart_goals_tourn:'Goals by tournament',
+    pro_feature:'Pro feature', pro_upgrade_text:'Upgrade to Pro for advanced charts and analysis', pro_unlock_btn:'Unlock Pro ⭐',
+    profile_prompt_title:'Welcome! Set up your profile', profile_prompt_desc:'Add your name and club so your stats and exports are personalised. Takes 30 seconds.', profile_prompt_skip:'Skip for now',
   }
 };
 
@@ -162,6 +196,12 @@ export function updateAllText() {
 
   var profileSub = document.getElementById('profil-sub');
   if (profileSub) profileSub.textContent = getSettings().lang === 'en' ? 'Settings and teams' : 'Innstillinger og team';
+  var promptTitle = document.getElementById('profile-prompt-title');
+  if (promptTitle) promptTitle.textContent = t('profile_prompt_title');
+  var promptDesc = document.getElementById('profile-prompt-desc');
+  if (promptDesc) promptDesc.textContent = t('profile_prompt_desc');
+  var promptSkip = document.getElementById('profile-prompt-skip');
+  if (promptSkip) promptSkip.textContent = t('profile_prompt_skip');
   var settingsSub = document.getElementById('settings-sub');
   if (settingsSub) settingsSub.textContent = getSettings().lang === 'en' ? 'Customize Athlytics Sport' : 'Tilpass Athlytics Sport';
   if (document.getElementById('screen-settings') &&

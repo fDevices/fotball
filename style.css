@@ -282,6 +282,22 @@
   .modal-save-btn:active { background: var(--lime-bright); }
 
   /* ── PROFIL ── */
+
+  /* Soft prompt banner */
+  .profile-prompt { margin: 0 16px 16px; background: linear-gradient(135deg,rgba(168,224,99,0.12),rgba(168,224,99,0.06)); border: 1px solid rgba(168,224,99,0.3); border-radius: 16px; padding: 16px 16px 14px; overflow: hidden; }
+  .profile-prompt.hidden { display: none; }
+  .profile-prompt-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+  .profile-prompt-icon { font-size: 26px; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+  .profile-prompt-text h3 { font-family: 'Barlow Condensed',sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--lime); margin-bottom: 4px; }
+  .profile-prompt-text p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .profile-prompt-actions { display: flex; justify-content: flex-end; }
+  .profile-prompt-btn-skip { background: none; color: var(--muted); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 7px 14px; font-family: 'Barlow',sans-serif; font-size: 13px; cursor: pointer; }
+
+  /* Tab badge dot */
+  .tab-profile-badge { display: none; position: absolute; top: -1px; right: -2px; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; border: 1.5px solid var(--grass); }
+  .tab-profile-badge.visible { display: block; }
+  .tab-icon { position: relative; }
+
   .profil-body { padding: 0 24px; }
 
   /* Avatar */

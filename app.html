@@ -194,6 +194,20 @@
     <h1>Min<span> profil</span></h1>
     <p class="header-sub" id="profil-sub">Innstillinger og team</p>
   </div>
+  <!-- Soft prompt banner (hidden once name is filled in) -->
+  <div class="profile-prompt" id="profile-prompt">
+    <div class="profile-prompt-top">
+      <div class="profile-prompt-icon">👋</div>
+      <div class="profile-prompt-text">
+        <h3 id="profile-prompt-title">Welcome! Set up your profile</h3>
+        <p id="profile-prompt-desc">Add your name and club so your stats and exports are personalised. Takes 30 seconds.</p>
+      </div>
+    </div>
+    <div class="profile-prompt-actions">
+      <button class="profile-prompt-btn-skip" data-action="dismissProfilePrompt" id="profile-prompt-skip">Skip for now</button>
+    </div>
+  </div>
+
   <div class="profil-body">
 
     <!-- Avatar preview -->
@@ -322,7 +336,7 @@
     <span class="tab-label">Statistikk</span>
   </button>
   <button class="tab-btn" id="tab-profil" data-action="switchTab" data-tab="profil">
-    <span class="tab-icon"><span class="tab-svg-icon tab-icon-profile"></span></span>
+    <span class="tab-icon"><span class="tab-svg-icon tab-icon-profile"></span><span class="tab-profile-badge" id="tab-profile-badge"></span></span>
     <span class="tab-label">Profil</span>
   </button>
   <button class="tab-btn" id="tab-settings" data-action="switchTab" data-tab="settings">

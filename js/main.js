@@ -1,4 +1,4 @@
-import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, renderProfileTournamentList, renderProfileTeamList } from './profile.js';
+import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, renderProfileTournamentList, renderProfileTeamList, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
 import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
@@ -58,6 +58,7 @@ const ACTIONS = {
   setSeasonFormat:               (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setSeasonFormat(el.dataset.format); },
   setActiveSeason:               (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setActiveSeason(el.dataset.season); },
   showProToast:                  () => showToast('Coming soon \u2013 Stripe i Fase 4 \u{1F680}', 'success'),
+  dismissProfilePrompt:          () => dismissProfilePrompt(),
 };
 
 function updateDateLabel(val) {
@@ -179,6 +180,7 @@ window.addEventListener('load', async function() {
 
     var p = await fetchProfileFromSupabase();
     loadProfileData(p);
+    updateProfilePrompt();
     renderTeamDropdown();
     renderLogSub();
     if (p.favoriteTeam && p.team.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);

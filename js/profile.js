@@ -7,6 +7,31 @@ import { getSettings } from './settings.js';
 
 var _profileCache = null;
 
+var _promptDismissed = false;
+
+export function isProfileComplete() {
+  return !!(getProfile().name && getProfile().name.trim());
+}
+
+export function updateProfilePrompt() {
+  var banner = document.getElementById('profile-prompt');
+  var badge = document.getElementById('tab-profile-badge');
+  var complete = isProfileComplete();
+  if (banner) {
+    if (complete || _promptDismissed) banner.classList.add('hidden');
+    else banner.classList.remove('hidden');
+  }
+  if (badge) {
+    if (complete || _promptDismissed) badge.classList.remove('visible');
+    else badge.classList.add('visible');
+  }
+}
+
+export function dismissProfilePrompt() {
+  _promptDismissed = true;
+  updateProfilePrompt();
+}
+
 export function getProfile() {
   if (_profileCache) return _profileCache;
   try {
@@ -86,6 +111,7 @@ export async function saveProfile() {
   el.classList.add('show');
   setTimeout(function() { el.classList.remove('show'); }, 2000);
   showToast(t('toast_profile_saved'), 'success');
+  updateProfilePrompt();
 }
 
 export function loadProfileData(profil) {
@@ -101,6 +127,7 @@ export function loadProfileData(profil) {
   showAvatarImage(profil.avatar || '');
   renderProfileTeamList();
   renderProfileTournamentList();
+  updateProfilePrompt();
 }
 
 export function updateAvatar() {
