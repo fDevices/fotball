@@ -181,8 +181,8 @@
 <!-- ══════════════════════════════════ PROFIL ══════════════════════════════════ -->
 <div class="screen" id="screen-profil">
   <div class="header">
-    <div class="header-top-row">
-      <div class="header-badge">👤 Profil</div>
+    <div class="header-title-row">
+      <h1 id="profil-title">Min<span> profil</span></h1>
       <div class="lang-picker-wrap">
         <button class="lang-flag-btn" id="lang-flag-btn-profil" data-action="toggleLangPicker" title="Change language"></button>
         <div class="lang-picker-dropdown" id="lang-picker-dropdown-profil">
@@ -191,7 +191,6 @@
         </div>
       </div>
     </div>
-    <h1>Min<span> profil</span></h1>
     <p class="header-sub" id="profil-sub">Innstillinger og team</p>
   </div>
   <!-- Soft prompt banner (hidden once name is filled in) -->
@@ -217,9 +216,11 @@
         <span id="avatar-emoji">⚽</span>
       </div>
       <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="window._uploadImage(this)">
-      <div class="avatar-upload-hint" id="avatar-upload-hint">Trykk for å laste opp bilde</div>
-      <div class="avatar-name" id="avatar-name">–</div>
-      <div class="avatar-club" id="avatar-club">–</div>
+      <div class="avatar-info">
+        <div class="avatar-name" id="avatar-name"></div>
+        <div class="avatar-club" id="avatar-club"></div>
+        <div class="avatar-upload-hint" id="avatar-upload-hint">Trykk for å laste opp bilde</div>
+      </div>
     </div>
 
     <!-- Info fields -->

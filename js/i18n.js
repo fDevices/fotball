@@ -14,7 +14,7 @@ const TEKST = {
     res_win:'🏆 Seier', res_uavgjort:'🤝 Uavgjort', res_tap:'💪 Tap',
     alle_lag:'Alle team', match_history:'Kamphistorikk', no_matches:'Ingen matches denne the_season',
     snitt:'snitt/kamp', h_short:'H', b_short:'B',
-    profile_sub:'Innstillinger og team', avatar_upload:'Trykk for å laste opp bilde',
+    profile_title:'Min profil', profile_sub:'Innstillinger og team', avatar_upload:'Trykk for å laste opp bilde',
     spillerinfo:'Spillerinfo', name:'Navn', club:'Klubb', posisjon:'Posisjon',
     ph_navn:'Fullt name', ph_klubb:'F.eks. Stabæk', ph_posisjon:'F.eks. Midtbane',
     mine_lag:'Mine team / tropper', ph_add_team:'Legg til team...', add_item:'Legg til',
@@ -68,7 +68,7 @@ const TEKST = {
     res_win:'🏆 Win', res_uavgjort:'🤝 Draw', res_tap:'💪 Loss',
     alle_lag:'All teams', match_history:'Match history', no_matches:'No matches this season',
     snitt:'avg/match', h_short:'H', b_short:'A',
-    profile_sub:'Settings and teams', avatar_upload:'Tap to upload photo',
+    profile_title:'My profile', profile_sub:'Settings and teams', avatar_upload:'Tap to upload photo',
     spillerinfo:'Player info', name:'Name', club:'Club', posisjon:'Position',
     ph_navn:'Full name', ph_klubb:'E.g. Arsenal', ph_posisjon:'E.g. Midfielder',
     mine_lag:'My teams / squads', ph_add_team:'Add team...', add_item:'Add',
@@ -194,8 +194,13 @@ export function updateAllText() {
 
   document.dispatchEvent(new CustomEvent('athlytics:updateAllText'));
 
+  var profileTitle = document.getElementById('profil-title');
+  if (profileTitle) {
+    var titleParts = t('profile_title').split(' ');
+    profileTitle.innerHTML = titleParts[0] + (titleParts.length > 1 ? '<span> ' + titleParts.slice(1).join(' ') + '</span>' : '');
+  }
   var profileSub = document.getElementById('profil-sub');
-  if (profileSub) profileSub.textContent = getSettings().lang === 'en' ? 'Settings and teams' : 'Innstillinger og team';
+  if (profileSub) profileSub.textContent = t('profile_sub');
   var promptTitle = document.getElementById('profile-prompt-title');
   if (promptTitle) promptTitle.textContent = t('profile_prompt_title');
   var promptDesc = document.getElementById('profile-prompt-desc');
