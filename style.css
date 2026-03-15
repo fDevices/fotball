@@ -206,8 +206,8 @@
   .tab-svg-icon[src*="tab-profile"]  { -webkit-mask-image: url('/icons/tab-profile.svg');  mask-image: url('/icons/tab-profile.svg'); }
   .tab-svg-icon[src*="tab-settings"] { -webkit-mask-image: url('/icons/tab-settings.svg'); mask-image: url('/icons/tab-settings.svg'); }
   .tab-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; }
-  .tab-btn.active .tab-svg-icon { background-color: var(--lime); transform: scale(1.1); }
-  .tab-btn.active .tab-label { color: var(--lime); }
+  .tab-btn.active .tab-svg-icon { background-color: var(--lime-bright); transform: scale(1.1); }
+  .tab-btn.active .tab-label { color: var(--lime-bright); }
   .match-svg-icon { width: 18px; height: 18px; display: inline-block; vertical-align: middle; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: currentColor; }
   .match-svg-icon[src*="match-home"] { -webkit-mask-image: url('/icons/match-home.svg'); mask-image: url('/icons/match-home.svg'); }
   .match-svg-icon[src*="match-away"] { -webkit-mask-image: url('/icons/match-away.svg'); mask-image: url('/icons/match-away.svg'); }
