@@ -201,10 +201,10 @@
   .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; padding: 0 8px; transition: all 0.15s; }
   .tab-icon { display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s; }
   .tab-svg-icon { width: 26px; height: 26px; display: block; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: var(--muted); transition: background-color 0.2s, transform 0.2s; }
-  .tab-svg-icon[src*="tab-log"]      { -webkit-mask-image: url('/icons/tab-log.svg');      mask-image: url('/icons/tab-log.svg'); }
-  .tab-svg-icon[src*="tab-stats"]    { -webkit-mask-image: url('/icons/tab-stats.svg');    mask-image: url('/icons/tab-stats.svg'); }
-  .tab-svg-icon[src*="tab-profile"]  { -webkit-mask-image: url('/icons/tab-profile.svg');  mask-image: url('/icons/tab-profile.svg'); }
-  .tab-svg-icon[src*="tab-settings"] { -webkit-mask-image: url('/icons/tab-settings.svg'); mask-image: url('/icons/tab-settings.svg'); }
+  .tab-icon-log      { -webkit-mask-image: url('/icons/tab-log.svg');      mask-image: url('/icons/tab-log.svg'); }
+  .tab-icon-stats    { -webkit-mask-image: url('/icons/tab-stats.svg');    mask-image: url('/icons/tab-stats.svg'); }
+  .tab-icon-profile  { -webkit-mask-image: url('/icons/tab-profile.svg');  mask-image: url('/icons/tab-profile.svg'); }
+  .tab-icon-settings { -webkit-mask-image: url('/icons/tab-settings.svg'); mask-image: url('/icons/tab-settings.svg'); }
   .tab-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); transition: color 0.2s; }
   .tab-btn.active .tab-svg-icon { background-color: var(--lime-bright); transform: scale(1.1); }
   .tab-btn.active .tab-label { color: var(--lime-bright); }
