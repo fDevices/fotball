@@ -39,8 +39,9 @@
 
   /* ── HEADER ── */
   .header { padding: 24px 24px 20px; position: relative; }
-  .header-top-row { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 6px; }
+  .header-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .header-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .lang-picker-corner { position: absolute; top: 20px; right: 24px; }
   .lang-picker-wrap { position: relative; }
   .lang-flag-btn { background: none; border: none; font-size: 22px; cursor: pointer; z-index: 10; padding: 4px; border-radius: 8px; transition: transform 0.15s; }
   .lang-flag-btn:hover { transform: scale(1.15); }
