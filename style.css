@@ -39,11 +39,12 @@
 
   /* ── HEADER ── */
   .header { padding: 24px 24px 20px; position: relative; }
-  .header-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .header-top-row { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 6px; }
+  .header-title-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
   .lang-picker-wrap { position: relative; }
   .lang-flag-btn { background: none; border: none; font-size: 22px; cursor: pointer; z-index: 10; padding: 4px; border-radius: 8px; transition: transform 0.15s; }
   .lang-flag-btn:hover { transform: scale(1.15); }
-  .header-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); background: rgba(168,224,99,0.1); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+  .header-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); background: rgba(168,224,99,0.1); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; }
   h1 { font-family: 'Barlow Condensed',sans-serif; font-size: 42px; font-weight: 900; line-height: 1; text-transform: uppercase; }
   h1 span { color: var(--lime); }
   .header-sub { font-size: 14px; color: var(--muted); margin-top: 6px; font-weight: 300; }

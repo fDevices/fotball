@@ -11,9 +11,9 @@ export function getProfile() {
   if (_profileCache) return _profileCache;
   try {
     _profileCache = JSON.parse(localStorage.getItem(PROFIL_KEY)) ||
-      { name: '', club: '', posisjon: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
+      { name: '', club: '', position: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   } catch(e) {
-    _profileCache = { name: '', club: '', posisjon: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
+    _profileCache = { name: '', club: '', position: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   }
   return _profileCache;
 }
@@ -34,7 +34,7 @@ export async function fetchProfileFromSupabase() {
       var p = {
         name: row.name || '',
         club: row.club || '',
-        posisjon: row.posisjon || '',
+        position: row.position || '',
         team: row.team || [],
         favoriteTeam: row.favorite_team || '',
         tournaments: row.tournaments || [],
@@ -54,7 +54,7 @@ export async function saveProfileToSupabase(profil) {
       id: 'default',
       name: profil.name,
       club: profil.club,
-      posisjon: profil.posisjon,
+      position: profil.position,
       team: profil.team,
       favorite_team: profil.favoriteTeam || '',
       tournaments: profil.tournaments || [],
@@ -62,7 +62,7 @@ export async function saveProfileToSupabase(profil) {
       avatar_url: profil.avatar || '',
       updated_at: new Date().toISOString()
     });
-  } catch(e) { console.log('Supabase profil error:', e); }
+  } catch(e) { console.warn('saveProfileToSupabase failed:', e); }
 }
 
 export async function saveProfile() {
@@ -70,7 +70,7 @@ export async function saveProfile() {
   var profil = {
     name: document.getElementById('profil-name').value.trim(),
     club: document.getElementById('profil-club').value.trim(),
-    posisjon: document.getElementById('profil-posisjon').value.trim(),
+    position: document.getElementById('profil-posisjon').value.trim(),
     team: remote.team || [],
     favoriteTeam: remote.favoriteTeam || '',
     tournaments: remote.tournaments || [],
@@ -91,7 +91,7 @@ export async function saveProfile() {
 export function loadProfileData(profil) {
   document.getElementById('profil-name').value = profil.name || '';
   document.getElementById('profil-club').value = profil.club || '';
-  document.getElementById('profil-posisjon').value = profil.posisjon || '';
+  document.getElementById('profil-posisjon').value = profil.position || '';
   var nameEl = document.getElementById('avatar-name');
   var clubEl = document.getElementById('avatar-club');
   nameEl.textContent = profil.name || '';
@@ -151,7 +151,8 @@ export function renderLogSub() {
   var greeting = isEn ? 'Hi' : 'Hei';
   var ready = isEn ? 'Ready to log match 🟢' : 'Klar til å logge kamp 🟢';
   var sub = profil.name ? (greeting + ', ' + profil.name.split(' ')[0] + '! 🟢') : ready;
-  document.getElementById('log-sub').textContent = sub;
+  var el = document.getElementById('log-sub');
+  if (el) el.textContent = sub;
 }
 
 export function renderProfileTeamList() {
