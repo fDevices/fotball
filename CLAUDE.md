@@ -39,11 +39,11 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | RLS på Supabase er "Allow all" på begge tabeller | 🔴 Kritisk | Implementer riktig RLS-policy per bruker ved auth |
 | Ingen autentisering (Supabase Auth ikke implementert) | 🔴 Kritisk | Fase 4 – `auth.js` er reservert plass i modulstrukturen |
-| `innerHTML`-kall escaper ikke alltid brukerdata | 🔴 Kritisk | Sanitiser input FØR lansering til andre brukere |
+| `innerHTML`-kall escaper ikke alltid brukerdata | ✅ Ferdig | Full audit gjennomført – all brukerdata (opponent, team, tournament, profil.name/club, søk) escapes med `esc()` konsekvent i alle filer. |
 | Supabase anon key er hardkodet i `js/config.js` | 🟠 Høy | Flytt til miljøvariabel via Vercel ved auth-implementasjon |
-| `supabase.js` sjekker ikke `res.ok` – HTTP-feil (401/500 osv.) håndteres ikke | 🟠 Høy | Legg til `if (!res.ok) throw new Error(...)` i alle fetch-funksjoner |
-| `upsertProfil()` og `upsertSettings()` ignorerer respons – silent failure ved lagring | 🟠 Høy | Sjekk `res.ok`, kast feil ved HTTP-feil |
-| **Supabase-tabeller og localStorage-nøkler er migrert til engelsk** – `matches`, `profiles`, engelske kolonner | ✅ Ferdig | Gjennomført. `supabase.js`, `profile.js`, `log.js`, `modal.js`, `stats.js`, `export.js`, `config.js` bruker engelske navn. |
+| `supabase.js` sjekker ikke `res.ok` – HTTP-feil (401/500 osv.) håndteres ikke | ✅ Ferdig | Alle fetch-funksjoner kaster ved `!res.ok`. `insertKamp`/`updateKamp`/`deleteKamp` returnerer `res` til caller som sjekker `res.ok` og viser toast. |
+| `upsertProfil()` og `upsertSettings()` ignorerer respons – silent failure ved lagring | ✅ Ferdig | Begge kaster ved `!res.ok`. |
+| **Supabase-tabeller og localStorage-nøkler er migrert til engelsk** – `matches`, `profiles`, engelske kolonner | ✅ Ferdig | Gjennomført. `supabase.js`, `profile.js`, `log.js`, `modal.js`, `stats.js`, `export.js`, `config.js` bruker engelske navn. `settings.js` brukte `k.dato` i `getAllSeasons()` – nå fikset til `k.date`. |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
@@ -82,8 +82,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `setAllMatches()` validerer ikke input – null eller ikke-array forurenser cache | 🟡 Medium | Legg til `if (!Array.isArray(matches)) throw new Error(...)` |
-| `try/catch` i `setAllMatches()` og `invalidateMatchCache()` svelger feil helt stille | 🟡 Medium | Bytt til `console.warn(...)` så cache-problemer er synlige |
+| `setAllMatches()` validerer ikke input – null eller ikke-array forurenser cache | ✅ Ferdig | Validerer med `Array.isArray`, returnerer tidlig med `console.warn`. |
+| `try/catch` i `setAllMatches()` og `invalidateMatchCache()` svelger feil helt stille | ✅ Ferdig | Begge bruker `console.warn(...)` ved feil. |
 | `allMatches` er muterbar eksportert variabel – state-kontrakten er svak | 🟢 Lav | Gjør variabel privat, eksponer `getAllMatches()` og `setAllMatches()` som API |
 | `invalidateMatchCache()` tømmer kun sessionStorage, ikke in-memory state | 🟢 Lav | Avklar kontrakt: er funksjonen kun cache-invalidering eller full state-reset? |
 
@@ -91,9 +91,9 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `saveSettings(s)` validerer ikke input – ugyldig `lang`, `seasonFormat`, ikke-array `extraSeasons` lagres ukritisk | 🟠 Høy | Normaliser og valider enum-felter og array-felter før lagring |
-| `saveSettingsToSupabase()` svelger alle feil stille | 🟠 Høy | Legg til `console.warn(...)` eller re-throw, slik at lagringsfeil er sporbare |
-| Duplisert sesonglogikk: `getAllSeasons(allMatches)` i `settings.js` og `getAllSeasonsLocal()` i `settings-render.js` | 🟠 Høy | Samle i én autoritativ funksjon; `settings-render.js` leser fra den, ikke fra sessionStorage direkte |
+| `saveSettings(s)` validerer ikke input – ugyldig `lang`, `seasonFormat`, ikke-array `extraSeasons` lagres ukritisk | ✅ Ferdig | Normaliserer alle enum-felter mot tillatte verdier og sikrer `extraSeasons` er array før lagring. |
+| `saveSettingsToSupabase()` svelger alle feil stille | ✅ Ferdig | Bruker `console.warn(...)` ved feil. |
+| Duplisert sesonglogikk: `getAllSeasons(allMatches)` i `settings.js` og `getAllSeasonsLocal()` i `settings-render.js` | ✅ Ferdig | Se settings-render.js-seksjonen nedenfor. |
 | `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | 🟠 Høy | Parametriser bruker-ID; byttes ut med `auth.users.id` i Fase 4 |
 | `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | 🟡 Medium | Sorter på baseår som tall før label bygges |
 | `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | 🟡 Medium | Rename til `requestRenderSettings()` eller flytt ansvaret tydelig |
@@ -106,8 +106,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | `TEKST`-objektet inneholder blandet norsk/engelsk i verdiene (`'Eget team / tropp'`, `'Kamp saved!'`, `'Fullt name'` osv.) | 🟠 Høy | Rydd opp og velg konsekvent språk per nøkkel i både `no`- og `en`-grenene |
 | `updateAllText()` bruker hardkodet språkgren for `profil-sub` og `settings-sub` i stedet for `t('profile_sub')` / `t('settings_sub')` | 🟠 Høy | Bytt til `t()`-oppslag – nøklene finnes allerede i `TEKST` |
 | `toggleLangPicker()` registrerer ny `document`-click-listener ved hvert kall – mulig opphopning | ✅ Ferdig | Erstattet med én global outside-click-listener i `main.js` |
-| `setLang()` lukker kun `#lang-picker-dropdown` – ikke alle tabs sine dropdowns | 🟡 Medium | Bytt til `querySelectorAll('.lang-picker-dropdown').forEach(el => el.classList.remove('open'))` |
-| `toggleLangPicker(btn)` bruker `btn.parentElement.querySelector()` – skjør DOM-avhengighet | 🟡 Medium | Bruk `btn.closest('.lang-picker-wrap').querySelector('.lang-picker-dropdown')` |
+| `setLang()` lukker kun `#lang-picker-dropdown` – ikke alle tabs sine dropdowns | ✅ Ferdig | Bruker `querySelectorAll('.lang-picker-dropdown').forEach(...)`. |
+| `toggleLangPicker(btn)` bruker `btn.parentElement.querySelector()` – skjør DOM-avhengighet | ✅ Ferdig | Bruker `btn.closest('.lang-picker-wrap')`. |
 | `updateAllText()` bruker `innerHTML` der bare tekst/emoji settes | 🟡 Medium | Bytt til `textContent` der markup ikke trengs – konsekvent defensiv praksis |
 | DOM-kontrakter i `updateAllText()` antar ID-er som ikke alltid finnes i HTML (`btn-save-profil` osv.) | 🟡 Medium | Synkroniser ID-er mellom `index.html` og `i18n.js`; manglende ID er stille feil |
 
@@ -115,10 +115,10 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Supabase-mapping i `profile.js` – løses av DB-migreringen til engelske kolonnenavn | 🔴 Kritisk | Fjernes når migrering er gjennomført; `fetchProfileFromSupabase()` og `saveProfileToSupabase()` trenger ikke lenger oversette feltnavn |
-| `fetchProfileFromSupabase()` svelger alle feil stille | 🟠 Høy | Legg til `console.warn(...)` – stille fallback til lokal cache er OK som UX, ikke som diagnostikk |
-| `saveProfile()` kan overskrive nyere remote-data med stale lokal cache (team/tournaments) | 🟠 Høy | Hent fersk profil fra remote før merge, eller merge eksplisitt mot siste kjente state |
-| `saveProfile_local()` mangler defensiv kopi og normalisering | 🟠 Høy | Normaliser `team`/`tournaments` til `[]` ved manglende/feil type; lagre kopi ikke referanse |
+| Supabase-mapping i `profile.js` – løses av DB-migreringen til engelske kolonnenavn | ✅ Ferdig | `posisjon` → `position` i JS-objektet og Supabase-mapping. `row.position` leses korrekt. `console.log` → `console.warn` i `saveProfileToSupabase`. |
+| `fetchProfileFromSupabase()` svelger alle feil stille | ✅ Ferdig | Bruker `console.warn(...)` ved feil, faller tilbake til lokal cache. |
+| `saveProfile()` kan overskrive nyere remote-data med stale lokal cache (team/tournaments) | ✅ Ferdig | Henter fersk remote-profil før merge; `team`/`tournaments`/`favoriteTeam` hentes fra remote. |
+| `saveProfile_local()` mangler defensiv kopi og normalisering | ✅ Ferdig | Normaliserer `team`/`tournaments` til `[]` og lagrer kopi. |
 | `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Akseptabelt i MVP; flytt til Supabase Storage ved auth-migrering |
 | `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | 🟡 Medium | Flytt "Trykk for å laste opp bilde", "Hi", "Klar til å logge kamp" m.fl. inn i `TEKST` |
 | `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | 🟡 Medium | Flytt list-rendering til `teams.js`; `profile.js` skal ikke vite hvordan laglistene tegnes |
@@ -128,10 +128,10 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `addTeamFromProfile()` synker ikke til Supabase – lokal-only lagring | 🟠 Høy | Legg til `saveProfileToSupabase(profil)` etter `saveProfile_local(profil)` |
+| `addTeamFromProfile()` synker ikke til Supabase – lokal-only lagring | ✅ Ferdig | Kaller `saveProfileToSupabase(profil)` etter `saveProfile_local(profil)`. |
 | Lag/turnering-deduplisering er case-sensitiv – `Oppsal` og `oppsal` behandles som ulike | ✅ Ferdig | Sammenligner med `.toLowerCase()` alle 4 steder |
-| Mange DOM-funksjoner mangler guard clauses (`toggleTeamDropdown`, `closeLagDropdown`, `selectTeam` m.fl.) | 🟠 Høy | Legg til null-sjekk på alle `getElementById()`-kall før `.classList`-operasjoner |
-| Hardkodede tekster uten `t()`: "Nytt team…", "Nullstill turnering", "Laget finnes allerede" m.fl. | 🟠 Høy | Flytt inn i `TEKST`-objektet i `i18n.js` |
+| Mange DOM-funksjoner mangler guard clauses (`toggleTeamDropdown`, `closeLagDropdown`, `selectTeam` m.fl.) | ✅ Ferdig | Null-sjekk lagt til i alle `getElementById()`-kall i `toggleTeamDropdown`, `closeLagDropdown`, `selectTeam`, `renderTeamDropdown`, `toggleNewTeamInput`, `toggleNewTournamentInput`. |
+| Hardkodede tekster uten `t()`: "Nytt team…", "Nullstill turnering", "Laget finnes allerede" m.fl. | ✅ Ferdig | Nye nøkler lagt til i `i18n.js`: `toast_team_added`, `toast_tournament_added`, `toast_tournament_exists`, `tournament_reset`, `tournament_new`. Alle toast-meldinger og dropdown-labels bruker nå `t()`. |
 | `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | 🟡 Medium | Reset alle interne state-variabler, ikke bare DOM-klasser |
 | `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | 🟡 Medium | Valider `selectedTeam` mot `profil.team` ved rendering; nullstill hvis ikke lenger gyldig |
 | `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | 🟡 Medium | Avklar om favorittmarkering skal endre aktivt valg; dokumenter eller separer |
@@ -144,7 +144,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | 🟡 Medium | Bruk `setAllMatches([newMatch, ...allMatches])` – ingen direkte mutasjon av delt state |
 | `saveMatch()` har hardkodet 'Lagrer...' og `'Feil: ' + err.message` – ikke i18n | ✅ Ferdig | Bruker nå `t('saving')` med norsk/engelsk oversettelse |
-| `saveMatch()` antar at feilrespons alltid er JSON med `err.message` – kan krasje ved tom body | 🟡 Medium | Wrap JSON-parsing i try/catch, gi meningsfull fallback-feilmelding |
+| `saveMatch()` antar at feilrespons alltid er JSON med `err.message` – kan krasje ved tom body | ✅ Ferdig | Fjernet JSON-parsing av feilrespons; bruker nå `t('toast_feil_lagring')` direkte. |
 | `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | 🟢 Lav | Dokumenter som bevisst valg, eller legg til eksplisitt reset |
 | `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | 🟢 Lav | Null-sjekk på `getElementById`-kall |
 
@@ -152,12 +152,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `saveEditedMatch()` mangler minimumsvalidering – kan lagre tom/ufullstendig kamp | 🟠 Høy | Valider dato, motstander og eget lag før API-kall – samme nivå som `saveMatch()` |
-| `saveEditedMatch()` muterer `allMatches[idx]` direkte med `Object.assign()` | 🟡 Medium | Lag ny arraykopi: `setAllMatches(allMatches.map(m => m.id === id ? updated : m))` |
-| ID-sammenligning inkonsistent: `String(m.id)` i `openEditModal()`, men `k.id ===` i `saveEditedMatch()` | 🟡 Medium | Bruk `String()`-normalisering konsekvent begge steder |
-| `closeModal()` tømmer ikke `mHome`, `mAway`, `mGoals`, `mAssists`, `mMatchType` eller inputfelter | 🟡 Medium | Reset all intern modal-state ved lukking |
+| `saveEditedMatch()` mangler minimumsvalidering – kan lagre tom/ufullstendig kamp | ✅ Ferdig | Validerer `date`, `opponent`, `own_team` før API-kall; viser `toast_fyll_inn` ved feil. |
+| `saveEditedMatch()` muterer `allMatches[idx]` direkte med `Object.assign()` | ✅ Ferdig | Bruker `setAllMatches(allMatches.map(...))` – ingen direkte mutasjon. |
+| ID-sammenligning inkonsistent: `String(m.id)` i `openEditModal()`, men `k.id ===` i `saveEditedMatch()` | ✅ Ferdig | `String(m.id)` brukes konsekvent i begge funksjoner. |
+| `closeModal()` tømmer ikke `mHome`, `mAway`, `mGoals`, `mAssists`, `mMatchType` eller inputfelter | ✅ Ferdig | Resetter all intern state og input-felter ved lukking. |
 | `saveEditedMatch()` og `confirmDeleteMatch()` kaller `renderStats()` direkte – tett kobling | 🟢 Lav | Vurder domene-event `athlytics:matchesChanged` for løsere kobling |
-| Modal-tittel settes til `k.motstanderlag` – hardkodet fallback 'Rediger kamp' uten `t()` | 🟢 Lav | Bruk `t('modal_rediger')` som fallback |
+| Modal-tittel settes til `k.motstanderlag` – hardkodet fallback 'Rediger kamp' uten `t()` | ✅ Ferdig | Bruker `t('modal_rediger')` som fallback. `'Lagrer...'` og `'denne kampen'` bruker nå også `t()`. |
 
 > **Kritisk invariant:** `modalAdjust()` og `adjust()` **må** alltid ha identisk clamp-logikk. Endre aldri én uten den andre.
 
@@ -172,13 +172,13 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `setMatchPage()` ignorerer aktiv `opponentSearch` – paginering gir feil liste ved søk | 🟠 Høy | Sjekk `opponentSearch`-state i `setMatchPage()` og rut til søke-render ved behov |
+| `setMatchPage()` ignorerer aktiv `opponentSearch` – paginering gir feil liste ved søk | ✅ Ferdig | Ruter til `renderOpponentSearchResults()` hvis `opponentSearch` er aktiv. |
 | Sesongmodell er uavhengig av `settings.js` – bruker bare årstall fra `dato`, ikke `seasonFormat` | 🟠 Høy | Bruk `getAllSeasons()` fra `settings.js` som autoritativ kilde; støtt `2025–2026`-format |
-| `loadStats()` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | 🟠 Høy | Les via `getAllMatches()` / `setAllMatches()` fra `state.js`; fjern direkte CACHE_KEY-oppslag |
-| Svært mange hardkodede norske strenger i stats-UI (20+) | 🟠 Høy | Systematisk gjennomgang og flytt til `TEKST` i `i18n.js` |
-| `activeSeason` initialiseres hardkodet til `'2025'` | 🟡 Medium | Init fra `getSettings().activeSeason` eller første tilgjengelige sesong |
-| `renderStats()` mangler guard clauses på sentrale DOM-oppslag | 🟡 Medium | Null-sjekk på `season-selector`, `stats-content`, `stats-sub` m.fl. |
-| Datoformatering låst til `'no-NO'` uavhengig av språkinnstilling | 🟡 Medium | Les aktivt språk fra `getSettings().lang` og formater deretter |
+| `loadStats()` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | ✅ Ferdig | Sjekker `allMatches.length > 0` (in-memory) før fetch; fjernet direkte `sessionStorage`-lesing og `CACHE_KEY`-import. |
+| Svært mange hardkodede norske strenger i stats-UI (20+) | ✅ Ferdig | Systematisk gjennomgang fullført – 30+ nøkler lagt til i `i18n.js`, alle strenger bruker `t()`. |
+| `activeSeason` initialiseres hardkodet til `'2025'` | ✅ Ferdig | Initialiseres fra `getSettings().activeSeason` med fallback til inneværende år. |
+| `renderStats()` mangler guard clauses på sentrale DOM-oppslag | ✅ Ferdig | Null-sjekk lagt til på `stats-content` og `stats-sub`. |
+| Datoformatering låst til `'no-NO'` uavhengig av språkinnstilling | ✅ Ferdig | `fmtDate()` helper bruker `getSettings().lang` for å velge `en-GB` eller `no-NO`. |
 | `stats.js` har blitt for stor – eier data, filtre, paging, søk, overview, analyse og charts | 🟡 Medium | Planlegg videre splitt: `stats-overview.js`, `stats-analyse.js`, `stats-search.js` (Fase 3) |
 | `innerHTML` med store HTML-strenger dominerer – økt risiko for glemte escapes | 🟡 Medium | Verifiser at all brukerdata escapes med `esc()`; vurder DOM API for kritiske seksjoner |
 
@@ -186,7 +186,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `export.js` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | 🟠 Høy | Les via `getAllMatches()` fra `state.js` |
+| `export.js` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | ✅ Ferdig | `getMatchesForExport()` bruker `allMatches` fra `state.js` direkte; fjernet sessionStorage-fallback og `CACHE_KEY`-import. |
 | Sesongfiltrering tar bare `baseYear` fra `activeSeason` – ikke kompatibelt med `2025–2026`-format | 🟠 Høy | Bruk samme sesonglogikk som `settings.js`/`getAllSeasons()` |
 | Hardkodede norske strenger i CSV-kolonner, PDF-labels og toast-meldinger | 🟠 Høy | Flytt til `TEKST` i `i18n.js`; eksport bør reflektere aktivt språk |
 | `showToast('Henter data...', 'success')` – feil signaltype for en pågående operasjon | 🟡 Medium | Bytt til `'info'` eller `'loading'`-type |
@@ -203,8 +203,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `getAllSeasonsLocal()` dupliserer `getAllSeasons()` fra `settings.js` og leser `sessionStorage` direkte | 🟠 Høy | Slett `getAllSeasonsLocal()`; bruk `getAllSeasons(allMatches)` fra `settings.js` med data fra `state.js` |
-| Hardkodet cache-nøkkel `'athlytics_kamper'` – ikke importert fra `config.js` | 🟡 Medium | Importer `CACHE_KEY` fra `config.js` |
+| `getAllSeasonsLocal()` dupliserte `getAllSeasons()` fra `settings.js` og leste `sessionStorage` direkte | ✅ Ferdig | Slettet `getAllSeasonsLocal()`; bruker nå `getAllSeasons(allMatches)` fra `settings.js` med `allMatches` fra `state.js`. |
+| Hardkodet cache-nøkkel `'athlytics_kamper'` – ikke importert fra `config.js` | ✅ Ferdig | Løst som del av `getAllSeasonsLocal()`-slettingen – `CACHE_KEY`-importen er ikke lenger nødvendig i `settings-render.js`. |
 | `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | 🟡 Medium | Legg til `t('none')` eller tilsvarende nøkkel i `TEKST` |
 | `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | 🟡 Medium | Nullstill eller oppdater `activeSeason` når format endres |
 | `setSport()` har ingen validering av gyldige sportverdier | 🟡 Medium | Valider mot en tillatt-liste; definer som konstant for gjenbruk i Fase 3 |
@@ -224,7 +224,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `esc()` brukes ikke konsekvent i hele appen – funksjonen er god, forbruket er ikke | 🟠 Høy | Systematisk gjennomgang av alle `innerHTML`-tilordninger; manglende `esc()` er kjent kritisk gjeld |
+| `esc()` brukes ikke konsekvent i hele appen – funksjonen er god, forbruket er ikke | ✅ Ferdig | Full audit gjennomført – all brukerdata escapes konsekvent i alle filer. |
 | `isPremium()` returnerer alltid `true` – er en dev-toggle, ikke en domenefunksjon | 🟡 Medium | Rename til `isDevPremium()` eller kommenter tydelig at dette er midlertidig til Fase 4 |
 
 ---
@@ -645,6 +645,7 @@ Importert 08.03.2026 via SQL. 51 kamper fra 2025-sesongen:
 - [ ] Stripe-integrasjon
 - [ ] `isPremium()` kobles til Stripe-abonnement
 - [ ] Auth (Supabase Auth) + riktig RLS-policy + `auth.js`-modul
+- [ ] **First login flow:** After a user authenticates for the first time (empty profile row), redirect to the Profile tab with a soft prompt encouraging them to fill in name, club, and position. Include a "Skip for now" option so users can proceed without filling anything in. Show a persistent incomplete-badge on the Profile tab icon until at least a name is entered. Returning users (profile already populated) go directly to the Log tab as normal.
 
 ---
 
