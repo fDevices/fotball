@@ -197,7 +197,7 @@
   .toast.error   { border-color: var(--danger); color: var(--danger); }
 
   /* ── TAB BAR ── */
-  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-start; padding-top: 10px; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-start; padding-top: 16px; padding-bottom: env(safe-area-inset-bottom, 0px); }
   .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; padding: 0 8px; transition: all 0.15s; }
   .tab-icon { display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s; }
   .tab-svg-icon { width: 26px; height: 26px; display: block; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: var(--muted); transition: background-color 0.2s, transform 0.2s; }
