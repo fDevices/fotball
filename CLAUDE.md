@@ -181,6 +181,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Datoformatering låst til `'no-NO'` uavhengig av språkinnstilling | ✅ Ferdig | `fmtDate()` helper bruker `getSettings().lang` for å velge `en-GB` eller `no-NO`. |
 | `stats.js` har blitt for stor – eier data, filtre, paging, søk, overview, analyse og charts | 🟡 Medium | Planlegg videre splitt: `stats-overview.js`, `stats-analyse.js`, `stats-search.js` (Fase 3) |
 | `innerHTML` med store HTML-strenger dominerer – økt risiko for glemte escapes | 🟡 Medium | Verifiser at all brukerdata escapes med `esc()`; vurder DOM API for kritiske seksjoner |
+| **Bug:** Lag-filter med kortnavn (f.eks. «Flamme») viser ingen turneringspiller | 🟠 Høy | `setTeamFilter` filtrerer på `k.own_team === activeLag`, men kampdata bruker fullt lagnavn (f.eks. «Oppsal Flamme») – mismatch gir 0 `teamMatches`, dermed ≤1 unik turnering og skjult rad. Løsning: Sjekk om profil-lagnavn er et suffiks av `own_team` (f.eks. `k.own_team.endsWith(activeLag)`) eller normaliser lagnavnet ved lagring. |
 
 ### export.js
 
