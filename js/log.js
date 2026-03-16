@@ -97,8 +97,7 @@ export async function saveMatch() {
       showToast(t('toast_match_saved'), 'success');
       resetForm();
     } else {
-      var err = await res.json();
-      showToast('Feil: ' + (err.message || 'ukjent'), 'error');
+      showToast(t('toast_feil_lagring'), 'error');
     }
   } catch(e) {
     showToast(t('toast_nettverksfeil'), 'error');

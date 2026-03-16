@@ -28,7 +28,7 @@ export function openEditModal(id) {
   document.getElementById('modal-away').textContent   = mAway;
   document.getElementById('modal-goals').textContent  = mGoals;
   document.getElementById('modal-assist').textContent = mAssists;
-  document.getElementById('modal-title').textContent  = k.opponent || 'Rediger kamp';
+  document.getElementById('modal-title').textContent  = k.opponent || t('modal_rediger');
   setModalMatchType(mMatchType);
 
   document.getElementById('modal-backdrop').classList.add('open');
@@ -41,6 +41,11 @@ export function closeModal() {
   document.getElementById('modal-sheet').classList.remove('open');
   document.body.style.overflow = '';
   modalMatchId = null;
+  mHome = 0; mAway = 0; mGoals = 0; mAssists = 0; mMatchType = 'home';
+  var dato = document.getElementById('modal-dato');
+  var motstander = document.getElementById('modal-motstander');
+  if (dato) dato.value = '';
+  if (motstander) motstander.value = '';
   ['modal-team-dropdown', 'modal-tournament-dropdown'].forEach(function(id) {
     var dd = document.getElementById(id);
     if (dd) dd.classList.remove('open');
@@ -97,14 +102,17 @@ export async function saveEditedMatch() {
     assists:    mAssists,
     match_type: mMatchType
   };
+  if (!body.date || !body.opponent || !body.own_team) {
+    showToast(t('toast_fyll_inn'), 'error'); return;
+  }
   var btn = document.querySelector('.modal-save-btn');
-  btn.textContent = 'Lagrer...'; btn.disabled = true;
+  btn.textContent = t('saving'); btn.disabled = true;
   try {
     var res = await updateKamp(modalMatchId, body);
     if (res.ok) {
-      var idx = allMatches.findIndex(function(k) { return k.id === modalMatchId; });
-      if (idx !== -1) allMatches[idx] = Object.assign({}, allMatches[idx], body);
-      setAllMatches(allMatches);
+      setAllMatches(allMatches.map(function(m) {
+        return String(m.id) === String(modalMatchId) ? Object.assign({}, m, body) : m;
+      }));
       closeModal();
       renderStats();
       showToast(t('toast_match_updated'), 'success');
@@ -118,7 +126,7 @@ export async function saveEditedMatch() {
 export function deleteMatch() {
   if (!modalMatchId) return;
   var k = allMatches.find(function(m) { return String(m.id) === String(modalMatchId); });
-  var oppName = k ? (k.opponent || 'denne kampen') : 'denne kampen';
+  var oppName = k ? (k.opponent || t('this_match')) : t('this_match');
   document.getElementById('delete-confirm-name').textContent = oppName;
   document.getElementById('delete-confirm-backdrop').classList.add('open');
   document.getElementById('delete-confirm-dialog').classList.add('open');

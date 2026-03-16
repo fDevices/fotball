@@ -4,6 +4,39 @@
 
 ---
 
+## Teknisk gjeld – opprydding (økt 3, 2026-03-15) ✅
+
+### Bugfikser
+- **settings.js** – `getAllSeasons()` brukte `k.dato` i stedet for `k.date` → sesongvelger viste aldri reelle år
+- **stats.js** – `setMatchPage()` ignorerte aktiv `opponentSearch` → paginering ga feil resultatliste ved søk
+- **stats.js** – `activeSeason` initialisert fra `getSettings().activeSeason` i stedet for hardkodet `'2025'`
+- **modal.js** – `saveEditedMatch()` muterte `allMatches` direkte; erstattet med `setAllMatches(allMatches.map(...))`
+- **modal.js** – `saveEditedMatch()` manglet validering; validerer nå `date`, `opponent`, `own_team` før API-kall
+- **modal.js** – ID-sammenligning normalisert til `String(m.id)` konsekvent i alle funksjoner
+- **profile.js** – `posisjon` → `position` i JS-objekt og Supabase-mapping; `row.posisjon` leste et ikke-eksisterende felt
+
+### Kode-kvalitet
+- **supabase.js** – alle fetch-funksjoner kaster ved `!res.ok`; `upsertProfil`/`upsertSettings` varsler med `console.warn`
+- **settings.js** – `saveSettings()` validerer og normaliserer alle enum-felter og `extraSeasons`-array før lagring
+- **settings-render.js** – slettet `getAllSeasonsLocal()`; bruker `getAllSeasons(allMatches)` fra `settings.js` via `state.js`
+- **state.js** – `setAllMatches()` validerer input og varsler med `console.warn`; begge catch-blokker er synlige
+- **stats.js** – fjernet direkte `sessionStorage`-lesing; bruker `allMatches` fra `state.js` som eneste cache-grense
+- **export.js** – fjernet direkte `sessionStorage`-lesing og `CACHE_KEY`-import
+- **log.js** – fjernet usikker `res.json()` på feilrespons; bruker `t('toast_feil_lagring')` direkte
+- **modal.js** – `closeModal()` resetter nå all intern state (`mHome/mAway/mGoals/mAssists/mMatchType`) og inputfelter
+- **teams.js** – guard clauses lagt til i alle DOM-funksjoner (`toggleTeamDropdown`, `closeLagDropdown`, `selectTeam` m.fl.)
+- **profile.js** – `saveProfileToSupabase()` bruker `console.warn` i stedet for `console.log`
+
+### i18n
+- **stats.js** – fullstendig i18n-pass: 30+ nøkler lagt til i `i18n.js`; alle hardkodede norske strenger erstattet med `t()`
+- **stats.js** – datoformatering bruker nå `getSettings().lang` (`en-GB` / `no-NO`) via `fmtDate()` helper
+- **stats.js** – W/D/L-forkortelser oversettes (S/U/T på norsk, W/D/L på engelsk) i alle visninger
+- **teams.js** – `t()` importert; alle toast-meldinger og dropdown-labels bruker `t()`
+- **modal.js** – hardkodede strenger (`'Lagrer...'`, `'Rediger kamp'`, `'denne kampen'`) erstattet med `t()`
+- **i18n.js** – nye nøkler: `toast_team_added`, `toast_tournament_added`, `toast_tournament_exists`, `tournament_reset`, `tournament_new`, `this_match`, og 30 stats-relaterte nøkler
+
+---
+
 ## Fase 2 – Analyse (grafer, Premium) ✅
 
 - Chart.js CDN i `<head>` (defer)

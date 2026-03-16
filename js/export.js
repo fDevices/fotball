@@ -1,6 +1,5 @@
 import { allMatches } from './state.js';
 import { fetchKamper } from './supabase.js';
-import { CACHE_KEY } from './config.js';
 import { getSettings } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
@@ -8,11 +7,7 @@ import { esc } from './utils.js';
 import { getResult } from './stats.js';
 
 async function getMatchesForExport() {
-  if (allMatches && allMatches.length > 0) return allMatches;
-  try {
-    var cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) return JSON.parse(cached);
-  } catch(e) {}
+  if (allMatches.length > 0) return allMatches;
   try {
     return await fetchKamper();
   } catch(e) { return []; }

@@ -1,6 +1,7 @@
 import { getProfile, saveProfile_local, saveProfileToSupabase, renderProfileTeamList, renderProfileTournamentList } from './profile.js';
 import { showToast } from './toast.js';
 import { esc } from './utils.js';
+import { t } from './i18n.js';
 
 // ── Log-screen team dropdown ─────────────────────────────────────────────────
 
@@ -12,24 +13,32 @@ export function getSelectedTeam() { return selectedTeam; }
 
 export function toggleTeamDropdown() {
   teamDropdownOpen = !teamDropdownOpen;
-  document.getElementById('team-dropdown').classList.toggle('open', teamDropdownOpen);
-  document.getElementById('team-selected').classList.toggle('open', teamDropdownOpen);
-  document.getElementById('team-chevron').classList.toggle('open', teamDropdownOpen);
+  var dd = document.getElementById('team-dropdown');
+  var sel = document.getElementById('team-selected');
+  var chev = document.getElementById('team-chevron');
+  if (dd) dd.classList.toggle('open', teamDropdownOpen);
+  if (sel) sel.classList.toggle('open', teamDropdownOpen);
+  if (chev) chev.classList.toggle('open', teamDropdownOpen);
   if (teamDropdownOpen) renderTeamDropdown();
 }
 
 function closeLagDropdown() {
   teamDropdownOpen = false;
   showNewTeamInput = false;
-  document.getElementById('team-dropdown').classList.remove('open');
-  document.getElementById('team-selected').classList.remove('open');
-  document.getElementById('team-chevron').classList.remove('open');
-  document.getElementById('team-new-row').classList.remove('visible');
+  var dd = document.getElementById('team-dropdown');
+  var sel = document.getElementById('team-selected');
+  var chev = document.getElementById('team-chevron');
+  var nr = document.getElementById('team-new-row');
+  if (dd) dd.classList.remove('open');
+  if (sel) sel.classList.remove('open');
+  if (chev) chev.classList.remove('open');
+  if (nr) nr.classList.remove('visible');
 }
 
 export function renderTeamDropdown() {
   var profil = getProfile();
   var list = document.getElementById('team-options-list');
+  if (!list) return;
   var html = '';
   profil.team.forEach(function(name) {
     html += '<div class="team-option ' + (selectedTeam === name ? 'selected' : '') + '" data-action="selectTeam" data-name="' + esc(name) + '">' +
@@ -37,22 +46,22 @@ export function renderTeamDropdown() {
       (selectedTeam === name ? ' <span style="color:var(--lime)">\u2713</span>' : '') +
     '</div>';
   });
-  html += '<div class="team-option team-option-add" data-action="toggleNewTeamInput"><span>\uff0b</span> Nytt team...</div>';
+  html += '<div class="team-option team-option-add" data-action="toggleNewTeamInput">' + t('nytt_lag') + '</div>';
   list.innerHTML = html;
 }
 
 export function selectTeam(name) {
   selectedTeam = name;
   var txt = document.getElementById('team-selected-text');
-  txt.textContent = name;
-  txt.classList.remove('placeholder');
+  if (txt) { txt.textContent = name; txt.classList.remove('placeholder'); }
   closeLagDropdown();
 }
 
 export function toggleNewTeamInput() {
   showNewTeamInput = !showNewTeamInput;
-  document.getElementById('team-new-row').classList.toggle('visible', showNewTeamInput);
-  if (showNewTeamInput) setTimeout(function() { document.getElementById('team-new-input').focus(); }, 50);
+  var nr = document.getElementById('team-new-row');
+  if (nr) nr.classList.toggle('visible', showNewTeamInput);
+  if (showNewTeamInput) setTimeout(function() { var inp = document.getElementById('team-new-input'); if (inp) inp.focus(); }, 50);
 }
 
 export function saveNewTeamFromDropdown() {
@@ -75,14 +84,14 @@ export function addTeamFromProfile() {
   var name = input.value.trim();
   if (!name) return;
   var profil = getProfile();
-  if (profil.team.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) { showToast('Laget finnes allerede', 'error'); return; }
+  if (profil.team.some(function(tm) { return tm.toLowerCase() === name.toLowerCase(); })) { showToast(t('toast_lag_finnes'), 'error'); return; }
   profil.team.push(name);
   saveProfile_local(profil);
   saveProfileToSupabase(profil);
   input.value = '';
   renderProfileTeamList();
   renderTeamDropdown();
-  showToast('\u2713 Lag lagt til', 'success');
+  showToast(t('toast_team_added'), 'success');
 }
 
 export function deleteTeam(name) {
@@ -148,7 +157,7 @@ export function renderTournamentDropdown() {
   if (selectedTournament) {
     var resetDiv = document.createElement('div');
     resetDiv.className = 'team-option team-option-reset';
-    resetDiv.innerHTML = '<span style="color:var(--muted)">\u2715</span> Nullstill turnering';
+    resetDiv.innerHTML = '<span style="color:var(--muted)">\u2715</span> ' + t('tournament_reset');
     resetDiv.dataset.action = 'selectTournament';
     resetDiv.dataset.name = '';
     list.appendChild(resetDiv);
@@ -167,15 +176,16 @@ export function renderTournamentDropdown() {
   });
   var addDiv = document.createElement('div');
   addDiv.className = 'team-option team-option-add';
-  addDiv.innerHTML = '<span>\uff0b</span> Ny turnering...';
+  addDiv.innerHTML = '<span>\uff0b</span> ' + t('tournament_new');
   addDiv.dataset.action = 'toggleNewTournamentInput';
   list.appendChild(addDiv);
 }
 
 export function toggleNewTournamentInput() {
   showNewTournamentInput = !showNewTournamentInput;
-  document.getElementById('tournament-new-row').classList.toggle('visible', showNewTournamentInput);
-  if (showNewTournamentInput) setTimeout(function() { document.getElementById('tournament-new-input').focus(); }, 50);
+  var nr = document.getElementById('tournament-new-row');
+  if (nr) nr.classList.toggle('visible', showNewTournamentInput);
+  if (showNewTournamentInput) setTimeout(function() { var inp = document.getElementById('tournament-new-input'); if (inp) inp.focus(); }, 50);
 }
 
 export function saveNewTournamentFromDropdown() {
@@ -202,14 +212,14 @@ export function addTournament() {
   if (!name) return;
   var profil = getProfile();
   if (!profil.tournaments) profil.tournaments = [];
-  if (profil.tournaments.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) { showToast('Turneringen finnes allerede', 'error'); return; }
+  if (profil.tournaments.some(function(tn) { return tn.toLowerCase() === name.toLowerCase(); })) { showToast(t('toast_tournament_exists'), 'error'); return; }
   profil.tournaments.push(name);
   saveProfile_local(profil);
   saveProfileToSupabase(profil);
   if (input) input.value = '';
   renderProfileTournamentList();
   renderTournamentDropdown();
-  showToast('\u2713 Turnering lagt til', 'success');
+  showToast(t('toast_tournament_added'), 'success');
 }
 
 export function deleteTournament(name) {
@@ -262,7 +272,7 @@ export function selectModalTeam(name) {
   modalSelectedTeam = name;
   document.getElementById('modal-own-team').value = name;
   var txt = document.getElementById('modal-own-team-text');
-  if (txt) { txt.textContent = name || 'Velg team...'; txt.classList.toggle('placeholder', !name); }
+  if (txt) { txt.textContent = name || t('select_team'); txt.classList.toggle('placeholder', !name); }
   var dd = document.getElementById('modal-team-dropdown');
   if (dd) dd.classList.remove('open');
   var chev = document.getElementById('modal-team-chevron');
@@ -299,7 +309,7 @@ export function selectModalTournament(name) {
   modalSelectedTournament = name;
   document.getElementById('modal-tournament').value = name;
   var txt = document.getElementById('modal-tournament-text');
-  if (txt) { txt.textContent = name || 'Velg turnering...'; txt.classList.toggle('placeholder', !name); }
+  if (txt) { txt.textContent = name || t('select_tournament'); txt.classList.toggle('placeholder', !name); }
   var dd = document.getElementById('modal-tournament-dropdown');
   if (dd) dd.classList.remove('open');
   var chev = document.getElementById('modal-tournament-chevron');

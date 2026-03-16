@@ -1,5 +1,5 @@
-import { getSettings, saveSettings, buildSeasonLabel } from './settings.js';
-import { CACHE_KEY } from './config.js';
+import { getSettings, saveSettings, getAllSeasons } from './settings.js';
+import { allMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { updateLogBadge } from './navigation.js';
@@ -57,7 +57,7 @@ export function renderSettings() {
 
 export function renderActiveSeasonPills() {
   var s = getSettings();
-  var seasons = getAllSeasonsLocal();
+  var seasons = getAllSeasons(allMatches);
   var el = document.getElementById('settings-aktiv-sesong-options');
   if (!el) return;
   el.innerHTML = '';
@@ -75,27 +75,6 @@ export function renderActiveSeasonPills() {
   });
 }
 
-function getAllSeasonsLocal() {
-  // Import allMatches at call time to avoid circular dep
-  var allMatches = [];
-  try {
-    var cached = sessionStorage.getItem(CACHE_KEY);
-    if (cached) allMatches = JSON.parse(cached);
-  } catch(e) {}
-  var s = getSettings();
-  var ekstra = s.extraSeasons || [];
-  var fromMatches = [];
-  allMatches.forEach(function(k) {
-    var aar = k.date ? k.date.substring(0, 4) : null;
-    if (aar && !fromMatches.includes(aar)) fromMatches.push(aar);
-  });
-  var sett = [];
-  fromMatches.concat(ekstra).forEach(function(aar) {
-    var label = buildSeasonLabel(aar, s.seasonFormat);
-    if (!sett.includes(label)) sett.push(label);
-  });
-  return sett.sort();
-}
 
 export function setSport(sport) {
   var s = getSettings(); s.sport = sport;

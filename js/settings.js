@@ -15,9 +15,15 @@ export function getSettings() {
 }
 
 export function saveSettings(s) {
-  _settingsCache = s;
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(s));
-  saveSettingsToSupabase(s);
+  var safe = Object.assign({}, defaultSettings(), s);
+  if (!['no', 'en'].includes(safe.lang)) safe.lang = 'no';
+  if (!['aar', 'sesong'].includes(safe.seasonFormat)) safe.seasonFormat = 'aar';
+  if (!['fotball', 'orientering', 'ski'].includes(safe.sport)) safe.sport = 'fotball';
+  if (!Array.isArray(safe.extraSeasons)) safe.extraSeasons = [];
+  if (typeof safe.activeSeason !== 'string') safe.activeSeason = '';
+  _settingsCache = safe;
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify(safe));
+  saveSettingsToSupabase(safe);
 }
 
 async function saveSettingsToSupabase(s) {
@@ -45,7 +51,7 @@ export function getAllSeasons(allMatches) {
   var fromMatches = [];
   if (allMatches) {
     allMatches.forEach(function(k) {
-      var aar = k.dato ? k.dato.substring(0, 4) : null;
+      var aar = k.date ? k.date.substring(0, 4) : null;
       if (aar && !fromMatches.includes(aar)) fromMatches.push(aar);
     });
   }
