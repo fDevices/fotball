@@ -4,6 +4,28 @@
 
 ---
 
+## Teknisk gjeld – opprydding (økt 4, 2026-03-16) ✅
+
+### Ikoner – SVG-theming på logg-tab
+- **app.html** – kalender, hjemme og borte erstattet emoji-ikoner med SVG via `<span>` + mask-image (samme mønster som tab-ikoner)
+- **style.css** – eksplisitte `background-color`-regler for aktiv/inaktiv tilstand på `.match-type-mini-btn` og `.toggle-btn`; `color: var(--muted)` på `.date-toggle-btn`
+- **icons/date-toggle.svg** – ny kalender-SVG lagt til
+
+### i18n – resterende hardkodede strenger
+- **app.html** – `id="btn-save-profil"` lagt til på profil-lagreknapp slik at i18n finner den
+- **i18n.js** – `settings-sub` bruker nå `t('settings_sub')` i stedet for hardkodet ternary
+- **i18n.js** / **main.js** – `updateDateLabel()` bruker `t('today')` og respekterer `getSettings().lang` for datoformatering; ny nøkkel `today` lagt til i TEKST
+
+### export.js – fullstendig i18n-pass
+- CSV-kolonneoverskrifter reflekterer nå aktivt språk
+- PDF-labels (sesong, kamper, seier/uavgjort/tap, mål, assist, tabellhoder, footer) bruker `t()`
+- W/D/L-forkortelser i PDF bruker `win_short`/`draw_short`/`loss_short` (S/U/T vs W/D/L)
+- Datoformatering i PDF bruker `settings.lang` (`en-GB` / `no-NO`)
+- `showToast('Henter data...')` byttet fra `'success'` til `'info'`-type
+- 8 nye `export_*`-nøkler lagt til i TEKST (no + en)
+
+---
+
 ## Teknisk gjeld – opprydding (økt 3, 2026-03-15) ✅
 
 ### Bugfikser
