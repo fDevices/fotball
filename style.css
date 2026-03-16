@@ -213,6 +213,7 @@
   .match-svg-icon { width: 18px; height: 18px; display: inline-block; vertical-align: middle; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: currentColor; }
   .match-svg-icon[src*="match-home"] { -webkit-mask-image: url('/icons/match-home.svg'); mask-image: url('/icons/match-home.svg'); }
   .match-svg-icon[src*="match-away"] { -webkit-mask-image: url('/icons/match-away.svg'); mask-image: url('/icons/match-away.svg'); }
+  .match-svg-icon[src*="date-toggle"] { -webkit-mask-image: url('/icons/date-toggle.svg'); mask-image: url('/icons/date-toggle.svg'); }
   .flag-svg-icon { width: 22px; height: 16px; display: inline-block; vertical-align: middle; border-radius: 2px; }
 
   /* ── STATS ── */

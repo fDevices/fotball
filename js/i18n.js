@@ -5,7 +5,7 @@ const TEKST = {
     tab_log:'Logg', tab_stats:'Statistikk', tab_profile:'Profil', tab_settings:'Settings',
     date:'Dato', opponentTeam:'Motstanderlag', own_team:'Eget team / tropp',
     turnering:'Turnering / serie', goals:'Mål', assist:'Assist',
-    hjemmekamp:'🏠 Hjemmekamp', bortekamp:'✈️ Bortekamp', save_match:'Lagre kamp', saving:'Lagrer...',
+    hjemmekamp:'Hjemmekamp', bortekamp:'Bortekamp', save_match:'Lagre kamp', saving:'Lagrer...',
     home_label:'Hjemmelag', away_label:'Bortelag',
     match_type_label:'Hjemme eller away?', result_label:'Resultat',
     ph_opponent:'F.eks. Brann IL', ph_tournament:'F.eks. Kretscup, seriespill...',
@@ -59,7 +59,7 @@ const TEKST = {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
     date:'Date', opponentTeam:'Opponent', own_team:'My team / squad',
     turnering:'Tournament / league', goals:'Goals', assist:'Assists',
-    hjemmekamp:'🏠 Home', bortekamp:'✈️ Away', save_match:'Save match', saving:'Saving...',
+    hjemmekamp:'Home', bortekamp:'Away', save_match:'Save match', saving:'Saving...',
     home_label:'Home', away_label:'Away',
     match_type_label:'Home or away?', result_label:'Result',
     ph_opponent:'E.g. Arsenal FC', ph_tournament:'E.g. Cup, league...',
@@ -176,8 +176,8 @@ export function updateAllText() {
   if (btnProfile) btnProfile.textContent = t('save_profile');
   var btnHome = document.getElementById('btn-home-toggle');
   var btnAway = document.getElementById('btn-away-toggle');
-  if (btnHome) btnHome.innerHTML = t('hjemmekamp');
-  if (btnAway) btnAway.innerHTML = t('bortekamp');
+  if (btnHome) { var spH = btnHome.querySelector('span'); if (spH) spH.textContent = t('hjemmekamp'); }
+  if (btnAway) { var spA = btnAway.querySelector('span'); if (spA) spA.textContent = t('bortekamp'); }
   var teamTxt = document.getElementById('team-selected-text');
   if (teamTxt && teamTxt.classList.contains('placeholder')) {
     teamTxt.textContent = t('select_team');
