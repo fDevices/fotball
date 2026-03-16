@@ -1,5 +1,5 @@
 import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, renderProfileTournamentList, renderProfileTeamList, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
-import { getSettings } from './settings.js';
+import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
@@ -7,7 +7,7 @@ import { loadStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, set
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { exportCSV, exportPDF } from './export.js';
-import { renderSettings, setSport, setSeasonFormat, setActiveSeason, addSeason } from './settings-render.js';
+import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
 import { showToast } from './toast.js';
 
 // ── Event delegation action map ────────────────────────────────────────────
@@ -57,6 +57,7 @@ const ACTIONS = {
   addSeason:                     () => addSeason(),
   setSport:                      (e) => { var el = e.target.closest('[data-sport]'); if (!el) return; setSport(el.dataset.sport); },
   setSeasonFormat:               (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setSeasonFormat(el.dataset.format); },
+  setDateFormat:                 (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setDateFormat(el.dataset.format); },
   setActiveSeason:               (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setActiveSeason(el.dataset.season); },
   showProToast:                  () => showToast('Coming soon \u2013 Stripe i Fase 4 \u{1F680}', 'success'),
   dismissProfilePrompt:          () => dismissProfilePrompt(),
@@ -70,8 +71,7 @@ function updateDateLabel(val) {
     el.textContent = t('today');
   } else {
     var d = new Date(val + 'T00:00:00');
-    var locale = getSettings().lang === 'en' ? 'en-GB' : 'no-NO';
-    el.textContent = d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
+    el.textContent = d.toLocaleDateString(getDateLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
   }
 }
 
@@ -190,6 +190,7 @@ window.addEventListener('load', async function() {
     renderTournamentDropdown();
     renderProfileTournamentList();
     renderProfileTeamList();
+    applyTheme(getSettings().sport);
     updateLogBadge();
     updateFlags();
     updateAllText();

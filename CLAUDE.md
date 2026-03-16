@@ -48,7 +48,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | i18n ikke komplett – hardkodede norske strenger i stats/export | ✅ Ferdig | `stats.js` og `export.js` fullstendig i18n-pass gjennomført. CSV-kolonner, PDF-labels, toasts og datoformatering bruker `t()` og respekterer aktivt språk. |
-| `applyTheme()` og `THEMES`-objekt ikke implementert ennå | 🟢 Lav | Implementeres i Fase 3 (multi-sport) |
+| `applyTheme()` og `THEMES`-objekt ikke implementert ennå | ✅ Ferdig | `THEMES`-objekt og `applyTheme()` implementert i `settings-render.js`. Kalles fra `setSport()` og bootstrap. `sport_icon`, `stat1_label`, `stat2_label` lagt til i `TEKST`. |
 
 > **Ikke legg til nye features som avhenger av brukerdata før auth og RLS er på plass.**
 
@@ -173,7 +173,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `setMatchPage()` ignorerer aktiv `opponentSearch` – paginering gir feil liste ved søk | ✅ Ferdig | Ruter til `renderOpponentSearchResults()` hvis `opponentSearch` er aktiv. |
-| Sesongmodell er uavhengig av `settings.js` – bruker bare årstall fra `dato`, ikke `seasonFormat` | 🟠 Høy | Bruk `getAllSeasons()` fra `settings.js` som autoritativ kilde; støtt `2025–2026`-format |
+| Sesongmodell er uavhengig av `settings.js` – bruker bare årstall fra `dato`, ikke `seasonFormat` | ✅ Ferdig | `getSeasons()` fjernet; bruker `getAllSeasons(allMatches)` fra `settings.js`. `getSeasonBaseYear()` helper splitter `2025–2026` til `2025` for `startsWith`-filtrering. |
 | `loadStats()` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | ✅ Ferdig | Sjekker `allMatches.length > 0` (in-memory) før fetch; fjernet direkte `sessionStorage`-lesing og `CACHE_KEY`-import. |
 | Svært mange hardkodede norske strenger i stats-UI (20+) | ✅ Ferdig | Systematisk gjennomgang fullført – 30+ nøkler lagt til i `i18n.js`, alle strenger bruker `t()`. |
 | `activeSeason` initialiseres hardkodet til `'2025'` | ✅ Ferdig | Initialiseres fra `getSettings().activeSeason` med fallback til inneværende år. |
@@ -197,7 +197,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Feature | Prioritet | Beskrivelse |
 |---|---|---|
-| Valg av datoformat (europeisk / amerikansk) | 🟡 Medium | Legg til `dateFormat: 'eu' \| 'us'` i `defaultSettings()`. EU = `DD.MM.YYYY`, US = `MM/DD/YYYY`. Render valg i settings-tab via `settings-render.js`. Bruk i `stats.js`, `export.js` og modal-dato-visning. Lagre til Supabase via eksisterende settings-sync. |
+| Valg av datoformat (europeisk / amerikansk) | ✅ Ferdig | `dateFormat: 'eu' \| 'us'` i `defaultSettings()`. `getDateLocale()` i `settings.js`. UI-seksjon i settings-tab. `stats.js` og `export.js` bruker `getDateLocale()`. `setDateFormat()` i `settings-render.js` + ACTIONS. |
 
 ### settings-render.js
 
@@ -240,12 +240,12 @@ js/
   state.js              – allMatches[], setAllMatches(), invalidateMatchCache()
   utils.js              – esc(), isPremium()
   toast.js              – showToast()
-  settings.js           – getSettings(), saveSettings(), buildSeasonLabel(), getAllSeasons()
+  settings.js           – getSettings(), saveSettings(), buildSeasonLabel(), getAllSeasons(), getDateLocale()
   i18n.js               – TEKST, t(), setLang(), updateAllText(), updateFlags(), toggleLangPicker()
   profile.js            – profil-data, cache, Supabase-sync, rendering av profil-tab
   teams.js              – alle dropdown-funksjoner for lag og turnering (logg + modal)
   navigation.js         – switchTab(), updateLogBadge()
-  settings-render.js    – renderSettings(), setSport(), setSeasonFormat(), setActiveSeason(), addSeason()
+  settings-render.js    – renderSettings(), setSport(), setSeasonFormat(), setDateFormat(), setActiveSeason(), addSeason(), applyTheme()
   log.js                – adjust(), saveMatch(), resetForm(), setMatchType(), updateResult()
   stats.js              – loadStats(), renderStats(), renderAnalyse(), calcWDL(), getResult() m.m.
   modal.js              – openEditModal(), closeModal(), modalAdjust(), saveEditedMatch(), deleteMatch()
@@ -390,12 +390,12 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 **state.js** – `allMatches[]`, `setAllMatches(matches)`, `invalidateMatchCache()`
 **utils.js** – `esc(str)`, `isPremium()`
 **toast.js** – `showToast(msg, type)`
-**settings.js** – `getSettings()`, `saveSettings(s)`, `buildSeasonLabel(aar, format)`, `getAllSeasons(allMatches)`
+**settings.js** – `getSettings()`, `saveSettings(s)`, `buildSeasonLabel(aar, format)`, `getAllSeasons(allMatches)`, `getDateLocale()`
 **i18n.js** – `t(key)`, `setLang(lang)`, `updateAllText()`, `updateFlags()`, `toggleLangPicker(btn)`
 **profile.js** – `getProfile()`, `saveProfile_local(profil)`, `fetchProfileFromSupabase()`, `saveProfileToSupabase(profil)`, `saveProfile()`, `loadProfileData(profil)`, `updateAvatar()`, `uploadImage(input)`, `showAvatarImage(src)`, `renderLogSub()`, `renderProfileTeamList()`, `renderProfileTournamentList()`
 **teams.js** – `getSelectedTeam()`, `getSelectedTournament()`, `selectTeam(name)`, `selectTournament(name)`, `toggleTeamDropdown()`, `renderTeamDropdown()`, `renderTournamentDropdown()`, `saveNewTeamFromDropdown()`, `saveNewTournamentFromDropdown()`, `toggleNewTeamInput()`, `toggleNewTournamentInput()`, `addTeamFromProfile()`, `addTournament()`, `deleteTeam(name)`, `deleteTournament(name)`, `setFavoriteTeam(name)`, `setFavoriteTournament(name)`, `selectModalTeam(name)`, `selectModalTournament(name)`, `toggleModalTeamDropdown()`, `toggleModalTournamentDropdown()`, `renderModalTeamDropdown()`, `renderModalTournamentDropdown()`, `closeAllDropdowns()`
 **navigation.js** – `switchTab(tab)`, `updateLogBadge()`
-**settings-render.js** – `renderSettings()`, `renderActiveSeasonPills()`, `setSport(sport)`, `setSeasonFormat(format)`, `setActiveSeason(sesong)`, `addSeason()`
+**settings-render.js** – `renderSettings()`, `renderActiveSeasonPills()`, `setSport(sport)`, `setSeasonFormat(format)`, `setDateFormat(format)`, `setActiveSeason(sesong)`, `addSeason()`, `applyTheme(sport)`
 **log.js** – `adjust(type, delta)`, `saveMatch()`, `resetForm()`, `setMatchType(type)`, `updateResult()`, `getMatchType()`
 **stats.js** – `loadStats(forceRefresh?)`, `renderStats()`, `renderAnalyse(matches)`, `calcWDL(matchArr)`, `getResult(k)`, `destroyCharts()`, `initChartDefaults()`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `matchPage`, `opponentSearch`, `CHART_COLORS`
 **modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
@@ -639,7 +639,7 @@ Importert 08.03.2026 via SQL. 51 kamper fra 2025-sesongen:
 
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
-- [ ] Forberedelse: `THEMES`-objekt, `sport_icon` + stat-labels i TEKST
+- [x] Forberedelse: `THEMES`-objekt, `sport_icon` + stat-labels i TEKST, `applyTheme()` i `settings-render.js`
 
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon

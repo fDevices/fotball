@@ -1,4 +1,17 @@
 import { getSettings, saveSettings, getAllSeasons } from './settings.js';
+
+const THEMES = {
+  fotball:     { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
+  orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
+  ski:         { grass: '#1a1a3a', lime: '#a0a8e0', card: '#161628' }
+};
+
+export function applyTheme(sport) {
+  var th = THEMES[sport] || THEMES.fotball;
+  Object.keys(th).forEach(function(k) {
+    document.documentElement.style.setProperty('--' + k, th[k]);
+  });
+}
 import { allMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -52,6 +65,19 @@ export function renderSettings() {
     });
   }
 
+  var dfEl = document.getElementById('settings-date-format-options');
+  if (dfEl) {
+    dfEl.innerHTML = '';
+    [{ key: 'eu', label: t('df_eu') }, { key: 'us', label: t('df_us') }].forEach(function(f) {
+      var btn = document.createElement('button');
+      btn.className = 'settings-pill' + (s.dateFormat === f.key ? ' active' : '');
+      btn.textContent = f.label;
+      btn.dataset.action = 'setDateFormat';
+      btn.dataset.format = f.key;
+      dfEl.appendChild(btn);
+    });
+  }
+
   renderActiveSeasonPills();
 }
 
@@ -79,8 +105,15 @@ export function renderActiveSeasonPills() {
 export function setSport(sport) {
   var s = getSettings(); s.sport = sport;
   saveSettings(s); renderSettings();
+  applyTheme(sport);
   updateLogBadge();
   showToast(t('toast_sport_updated'), 'success');
+}
+
+export function setDateFormat(format) {
+  var s = getSettings(); s.dateFormat = format;
+  saveSettings(s); renderSettings();
+  showToast(t('toast_date_format'), 'success');
 }
 
 export function setSeasonFormat(format) {

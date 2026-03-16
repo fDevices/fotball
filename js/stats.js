@@ -1,6 +1,6 @@
 import { fetchKamper } from './supabase.js';
 import { allMatches, setAllMatches } from './state.js';
-import { getSettings } from './settings.js';
+import { getSettings, getAllSeasons, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { t } from './i18n.js';
 import { esc } from './utils.js';
@@ -50,7 +50,7 @@ export function switchStatsView(view) {
 }
 
 function fmtDate(dateStr, opts) {
-  return new Date(dateStr).toLocaleDateString(getSettings().lang === 'en' ? 'en-GB' : 'no-NO', opts);
+  return new Date(dateStr).toLocaleDateString(getDateLocale(), opts);
 }
 
 export async function loadStats(forceRefresh) {
@@ -68,14 +68,8 @@ export async function loadStats(forceRefresh) {
   }
 }
 
-function getSeasons() {
-  var years = [];
-  allMatches.forEach(function(k) {
-    var y = k.date.substring(0, 4);
-    if (!years.includes(y)) years.push(y);
-  });
-  years.sort();
-  return years.length ? years : ['2025'];
+function getSeasonBaseYear(season) {
+  return season.split(/[–\-]/)[0].trim();
 }
 
 export function getResult(k) {
@@ -145,7 +139,7 @@ export function setMatchPage(page) {
   if (opponentSearch) { renderOpponentSearchResults(statsContent); return; }
   var header = statsContent.querySelector('.match-list-header');
   if (!header) { renderStats(); return; }
-  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(activeSeason); });
+  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(getSeasonBaseYear(activeSeason)); });
   var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
   var toRemove = [];
   var node = header.nextSibling;
@@ -320,7 +314,8 @@ function renderTournamentSection(matches) {
 export function renderStats() {
   destroyCharts();
 
-  var seasons = getSeasons();
+  var seasons = getAllSeasons(allMatches);
+  if (!seasons.length) seasons = [String(new Date().getFullYear())];
   if (!seasons.includes(activeSeason)) activeSeason = seasons[0];
 
   var filtersDiv = document.getElementById('stats-filters');
@@ -330,7 +325,7 @@ export function renderStats() {
     return '<button class="season-pill ' + (s === activeSeason ? 'active' : '') + '" data-action="setSeason" data-season="' + s + '">' + s + '</button>';
   }).join('');
 
-  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(activeSeason); });
+  var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(getSeasonBaseYear(activeSeason)); });
   var profileTeams = getProfile().team || [];
   if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'all')) activeLag = 'all';
   var teamPills = [{ key: 'all', label: t('alle_lag') }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
@@ -413,7 +408,8 @@ export function renderAnalyse(matches) {
 
   var asc = matches.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
 
-  var seasons = getSeasons();
+  var seasons = getAllSeasons(allMatches);
+  if (!seasons.length) seasons = [String(new Date().getFullYear())];
   var profileTeams = getProfile().team || [];
   var teamPills = [{ key: 'all', label: t('alle_lag') }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
 

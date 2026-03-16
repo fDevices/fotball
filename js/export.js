@@ -1,6 +1,6 @@
 import { allMatches } from './state.js';
 import { fetchKamper } from './supabase.js';
-import { getSettings } from './settings.js';
+import { getSettings, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
 import { esc } from './utils.js';
@@ -68,7 +68,7 @@ export async function exportPDF() {
   var profil = getProfile();
   var matches = result.matches;
   var season = result.season;
-  var locale = s.lang === 'en' ? 'en-GB' : 'no-NO';
+  var locale = getDateLocale();
 
   var w = 0, d = 0, l = 0, g = 0, a = 0;
   matches.forEach(function(k) {

@@ -4,7 +4,7 @@ import { upsertSettings } from './supabase.js';
 var _settingsCache = null;
 
 function defaultSettings() {
-  return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [] };
+  return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu' };
 }
 
 export function getSettings() {
@@ -21,6 +21,7 @@ export function saveSettings(s) {
   if (!['fotball', 'orientering', 'ski'].includes(safe.sport)) safe.sport = 'fotball';
   if (!Array.isArray(safe.extraSeasons)) safe.extraSeasons = [];
   if (typeof safe.activeSeason !== 'string') safe.activeSeason = '';
+  if (!['eu', 'us'].includes(safe.dateFormat)) safe.dateFormat = 'eu';
   _settingsCache = safe;
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(safe));
   saveSettingsToSupabase(safe);
@@ -43,6 +44,10 @@ export function buildSeasonLabel(aar, format) {
   if (!aar) return '';
   if (format === 'sesong') { var y = parseInt(aar); return y + '\u2013' + (y + 1); }
   return String(aar);
+}
+
+export function getDateLocale() {
+  return getSettings().dateFormat === 'us' ? 'en-US' : 'no-NO';
 }
 
 export function getAllSeasons(allMatches) {

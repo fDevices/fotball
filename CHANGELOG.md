@@ -4,6 +4,27 @@
 
 ---
 
+## Teknisk gjeld + nye features (økt 5, 2026-03-16) ✅
+
+### Bugfiks: Sesongmodell i stats.js
+- **stats.js** – Fjernet lokal `getSeasons()` som bygde rå årstallsliste direkte fra kampdatoer, uten hensyn til `seasonFormat` eller `extraSeasons`
+- Bruker nå `getAllSeasons(allMatches)` fra `settings.js` som autoritativ kilde – støtter både `2025`- og `2025–2026`-format
+- Ny hjelpefunksjon `getSeasonBaseYear(season)` splitter `'2025–2026'` til `'2025'` for `startsWith`-filtrering
+- Alle tre filterpunkter patchet: `renderStats()`, `setMatchPage()` og `renderAnalyse()`
+
+### Ny feature: Datoformat-innstilling
+- **settings.js** – `dateFormat: 'eu' | 'us'` lagt til i `defaultSettings()` og validering i `saveSettings()`; ny `getDateLocale()` eksport returnerer `'en-US'` eller `'no-NO'` basert på innstillingen
+- **i18n.js** – nye nøkler `df_title`, `df_desc`, `df_eu`, `df_us`, `toast_date_format` i norsk og engelsk
+- **settings-render.js** – datoformat-piller rendres i `renderSettings()`, ny `setDateFormat(format)` funksjon
+- **app.html** – ny settings-seksjon mellom sesongformat og aktiv sesong
+- **stats.js**, **export.js**, **main.js** – all datoformatering bruker nå `getDateLocale()` i stedet for lang-basert hardkodet locale; dato er nå uavhengig av valgt språk
+
+### Forberedelse til multi-sport (Fase 3)
+- **i18n.js** – `sport_icon`, `stat1_label`, `stat2_label` lagt til i begge språkgrener
+- **settings-render.js** – `THEMES`-objekt med fargepalett per sport (fotball/orientering/ski) og `applyTheme(sport)` eksportert; kalles fra `setSport()` og bootstrap i `main.js`
+
+---
+
 ## Teknisk gjeld – opprydding (økt 4, 2026-03-16) ✅
 
 ### Ikoner – SVG-theming på logg-tab
@@ -140,7 +161,7 @@
 - Lag-dropdown i logg (fra profil), med favorittlag
 - Turnering-dropdown i logg og redigeringsmodal – ny turnering opprettes inline
 - Profil: mine lag-liste og mine turneringer med ☆ favoritt og slett
-- Settings-tab: sport, sesongformat, aktiv sesong
+- Settings-tab: sport, sesongformat, aktiv sesong, datoformat (EU/US)
 - Eksport – CSV-nedlasting og PDF-rapport (merket ⭐ Premium i UI)
 - i18n-system (norsk/engelsk) med flagg-velger på alle tabs – infrastruktur komplett
 - Toast-notifikasjoner
