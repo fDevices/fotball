@@ -47,7 +47,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
-| i18n ikke komplett – hardkodede norske strenger i stats/export | 🟡 Medium | Fullføres i Fase 3-refaktor |
+| i18n ikke komplett – hardkodede norske strenger i stats/export | ✅ Ferdig | `stats.js` og `export.js` fullstendig i18n-pass gjennomført. CSV-kolonner, PDF-labels, toasts og datoformatering bruker `t()` og respekterer aktivt språk. |
 | `applyTheme()` og `THEMES`-objekt ikke implementert ennå | 🟢 Lav | Implementeres i Fase 3 (multi-sport) |
 
 > **Ikke legg til nye features som avhenger av brukerdata før auth og RLS er på plass.**
@@ -60,12 +60,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Fil | Alvorlighet | Løsning |
 |---|---|---|---|
-| `renderProfileTeamList()` kalles ikke i bootstrap | `main.js` | 🟠 Høy | Legg til i `window.addEventListener('load', ...)` etter `renderProfileTournamentList()` |
-| Guard clauses mangler i ACTIONS-map | `main.js` | 🟠 Høy | Hent `closest()`-element, returner tidlig hvis null, les deretter `dataset` |
-| `toggleLangPicker` sender rå `e.target` | `main.js` linje 20 | 🟡 Medium | Bytt til `e.target.closest('[data-action]')` for robust referanse |
-| `renderStats` og `renderProfileTeamList` importeres men brukes ikke direkte | `main.js` linje 1 | 🟡 Medium | Fjern ubrukte imports; `renderSettings` er OK – brukes via event |
+| `renderProfileTeamList()` kalles ikke i bootstrap | `main.js` | ✅ Ferdig | Kalt i `window.addEventListener('load', ...)` etter `renderProfileTournamentList()`. |
+| Guard clauses mangler i ACTIONS-map | `main.js` | ✅ Ferdig | Alle actions bruker `closest()`-element med tidlig retur ved null. |
+| `toggleLangPicker` sender rå `e.target` | `main.js` linje 20 | ✅ Ferdig | Bruker `e.target.closest('[data-action]')`. |
+| `renderStats` og `renderProfileTeamList` importeres men brukes ikke direkte | `main.js` linje 1 | ✅ Ferdig | `renderProfileTeamList` brukes i bootstrap; `renderStats` ikke importert. |
 | Avatar-upload bruker `onclick`/`onchange` i HTML + `window._uploadImage` | `index.html` linje 188–192, `main.js` | 🟡 Medium | Migrer til delegert `input`-lytter og `data-action`; fjern global window-eksponering |
-| Profil-save-knapp mangler ID `btn-save-profil` som i18n forventer | `index.html` linje 235 | 🟡 Medium | Legg til `id="btn-save-profil"` på knappen, eller verifiser/korriger i18n-oppslaget |
+| Profil-save-knapp mangler ID `btn-save-profil` som i18n forventer | `app.html` | ✅ Ferdig | `id="btn-save-profil"` lagt til på knappen. |
 | Bootstrap-kommentarer mangler for bevisst lazy init via events | `main.js` | 🟢 Lav | Legg til kommentarer der `renderSettings`, `loadStats` m.fl. trigges via `athlytics:`-events |
 
 > **Merk:** Guard clause-mønster for ACTIONS: `var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, ...)`
@@ -104,12 +104,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `TEKST`-objektet inneholder blandet norsk/engelsk i verdiene (`'Eget team / tropp'`, `'Kamp saved!'`, `'Fullt name'` osv.) | 🟠 Høy | Rydd opp og velg konsekvent språk per nøkkel i både `no`- og `en`-grenene |
-| `updateAllText()` bruker hardkodet språkgren for `profil-sub` og `settings-sub` i stedet for `t('profile_sub')` / `t('settings_sub')` | 🟠 Høy | Bytt til `t()`-oppslag – nøklene finnes allerede i `TEKST` |
+| `updateAllText()` bruker hardkodet språkgren for `profil-sub` og `settings-sub` i stedet for `t('profile_sub')` / `t('settings_sub')` | ✅ Ferdig | Begge bruker nå `t()`-oppslag. |
 | `toggleLangPicker()` registrerer ny `document`-click-listener ved hvert kall – mulig opphopning | ✅ Ferdig | Erstattet med én global outside-click-listener i `main.js` |
 | `setLang()` lukker kun `#lang-picker-dropdown` – ikke alle tabs sine dropdowns | ✅ Ferdig | Bruker `querySelectorAll('.lang-picker-dropdown').forEach(...)`. |
 | `toggleLangPicker(btn)` bruker `btn.parentElement.querySelector()` – skjør DOM-avhengighet | ✅ Ferdig | Bruker `btn.closest('.lang-picker-wrap')`. |
 | `updateAllText()` bruker `innerHTML` der bare tekst/emoji settes | 🟡 Medium | Bytt til `textContent` der markup ikke trengs – konsekvent defensiv praksis |
-| DOM-kontrakter i `updateAllText()` antar ID-er som ikke alltid finnes i HTML (`btn-save-profil` osv.) | 🟡 Medium | Synkroniser ID-er mellom `index.html` og `i18n.js`; manglende ID er stille feil |
+| DOM-kontrakter i `updateAllText()` antar ID-er som ikke alltid finnes i HTML (`btn-save-profil` osv.) | ✅ Ferdig | `btn-save-profil` lagt til i `app.html`; alle ID-er synkronisert. |
 
 ### profile.js
 
@@ -187,9 +187,9 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `export.js` leser `sessionStorage` direkte – undergraver `state.js` som eneste cache-grense | ✅ Ferdig | `getMatchesForExport()` bruker `allMatches` fra `state.js` direkte; fjernet sessionStorage-fallback og `CACHE_KEY`-import. |
-| Sesongfiltrering tar bare `baseYear` fra `activeSeason` – ikke kompatibelt med `2025–2026`-format | 🟠 Høy | Bruk samme sesonglogikk som `settings.js`/`getAllSeasons()` |
-| Hardkodede norske strenger i CSV-kolonner, PDF-labels og toast-meldinger | 🟠 Høy | Flytt til `TEKST` i `i18n.js`; eksport bør reflektere aktivt språk |
-| `showToast('Henter data...', 'success')` – feil signaltype for en pågående operasjon | 🟡 Medium | Bytt til `'info'` eller `'loading'`-type |
+| Sesongfiltrering tar bare `baseYear` fra `activeSeason` – ikke kompatibelt med `2025–2026`-format | ✅ Ferdig | Splitter på `–` eller `-` for å hente baseår; fungerer for begge formater. |
+| Hardkodede norske strenger i CSV-kolonner, PDF-labels og toast-meldinger | ✅ Ferdig | Fullstendig i18n-pass – alle strenger bruker `t()`; CSV og PDF reflekterer aktivt språk. |
+| `showToast('Henter data...', 'success')` – feil signaltype for en pågående operasjon | ✅ Ferdig | Byttet til `'info'`-type. |
 | PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | Dokumenter som print-HTML, ikke ekte PDF; vurder bibliotek (f.eks. jsPDF) ved Fase 4 |
 | `profil.name` / `profil.club` i PDF-header – koblet til lokal profilform, ikke eksplisitt kontrakt | 🟢 Lav | Avklar mot endelig profilmodell etter Supabase-mappingfix |
 
