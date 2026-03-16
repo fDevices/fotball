@@ -70,7 +70,7 @@
   .date-compact-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; gap: 8px; }
   .date-left { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .date-compact-label { font-family: 'Barlow Condensed',sans-serif; font-size: 18px; font-weight: 700; color: var(--white); letter-spacing: 0.03em; }
-  .date-toggle-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 4px; border-radius: 6px; line-height: 1; transition: background 0.15s; }
+  .date-toggle-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 2px 4px; border-radius: 6px; line-height: 1; transition: background 0.15s; color: var(--muted); }
   .date-toggle-btn:active { background: rgba(168,224,99,0.1); }
   .date-input-hidden { display: none; margin-top: 6px; }
   .date-input-hidden.open { display: block; }
