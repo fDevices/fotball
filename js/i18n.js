@@ -18,7 +18,7 @@ const TEKST = {
     spillerinfo:'Spillerinfo', name:'Navn', club:'Klubb', posisjon:'Posisjon',
     ph_navn:'Fullt name', ph_klubb:'F.eks. Stabæk', ph_posisjon:'F.eks. Midtbane',
     mine_lag:'Mine team / tropper', ph_add_team:'Legg til team...', add_item:'Legg til',
-    save_profile:'Lagre profil', standard_badge:'standard',
+    save_profile:'Lagre profil', standard_badge:'standard', today:'I dag',
     settings_sub:'Tilpass Athlytics Sport',
     lang_title:'🌍 Språk', lang_desc:'Velg språk for appen.',
     sport_title:'🏅 Sport', sport_desc:'Velg hvilken sport du primært tracker. Flere sporter kommer snart.',
@@ -72,7 +72,7 @@ const TEKST = {
     spillerinfo:'Player info', name:'Name', club:'Club', posisjon:'Position',
     ph_navn:'Full name', ph_klubb:'E.g. Arsenal', ph_posisjon:'E.g. Midfielder',
     mine_lag:'My teams / squads', ph_add_team:'Add team...', add_item:'Add',
-    save_profile:'Save profile', standard_badge:'default',
+    save_profile:'Save profile', standard_badge:'default', today:'Today',
     settings_sub:'Customize Athlytics Sport',
     lang_title:'🌍 Language', lang_desc:'Choose language for the app.',
     sport_title:'🏅 Sport', sport_desc:'Choose your primary sport. More sports coming soon.',
@@ -208,7 +208,7 @@ export function updateAllText() {
   var promptSkip = document.getElementById('profile-prompt-skip');
   if (promptSkip) promptSkip.textContent = t('profile_prompt_skip');
   var settingsSub = document.getElementById('settings-sub');
-  if (settingsSub) settingsSub.textContent = getSettings().lang === 'en' ? 'Customize Athlytics Sport' : 'Tilpass Athlytics Sport';
+  if (settingsSub) settingsSub.textContent = t('settings_sub');
   if (document.getElementById('screen-settings') &&
       document.getElementById('screen-settings').classList.contains('active')) {
     document.dispatchEvent(new CustomEvent('athlytics:renderSettings'));

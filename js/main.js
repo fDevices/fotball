@@ -1,7 +1,8 @@
 import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, renderProfileTournamentList, renderProfileTeamList, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
+import { getSettings } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
-import { setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
+import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
 import { loadStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
@@ -66,10 +67,11 @@ function updateDateLabel(val) {
   if (!el) return;
   var today = new Date().toISOString().split('T')[0];
   if (!val || val === today) {
-    el.textContent = 'I dag';
+    el.textContent = t('today');
   } else {
     var d = new Date(val + 'T00:00:00');
-    el.textContent = d.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+    var locale = getSettings().lang === 'en' ? 'en-GB' : 'no-NO';
+    el.textContent = d.toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'short' });
   }
 }
 
