@@ -5,6 +5,7 @@ import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
 import { esc } from './utils.js';
 import { getResult } from './stats.js';
+import { t } from './i18n.js';
 
 async function getMatchesForExport() {
   if (allMatches.length > 0) return allMatches;
@@ -21,7 +22,7 @@ function getActiveSeasonMatches(all, s) {
 
 function buildMatchResultLabel(k) {
   var r = getResult(k);
-  return r === 'wins' ? 'Seier' : r === 'draw' ? 'Uavgjort' : 'Tap';
+  return r === 'wins' ? t('stat_wins') : r === 'draw' ? t('stat_draws') : t('stat_losses');
 }
 
 function buildHomeAwayTeams(k) {
@@ -32,12 +33,14 @@ function buildHomeAwayTeams(k) {
 }
 
 export async function exportCSV() {
-  showToast('Henter data...', 'success');
+  showToast(t('export_fetching'), 'info');
   var all = await getMatchesForExport();
   var s = getSettings();
   var result = getActiveSeasonMatches(all, s);
-  if (!result.matches.length) { showToast('Ingen kamper å eksportere', 'error'); return; }
-  var lines = ['Dato,Hjemmelag,Bortelag,Turnering,Hjemme,Borte,Mal,Assist,Resultat'];
+  if (!result.matches.length) { showToast(t('export_no_matches'), 'error'); return; }
+  var header = [t('date'), t('home_label'), t('away_label'), t('export_tournament'),
+    t('export_h_score'), t('export_a_score'), t('stat_goals'), t('stat_assists'), t('result_label')].join(',');
+  var lines = [header];
   result.matches.forEach(function(k) {
     var resLabel = buildMatchResultLabel(k);
     var teams = buildHomeAwayTeams(k);
@@ -53,18 +56,19 @@ export async function exportCSV() {
   var a = document.createElement('a');
   a.href = url; a.download = 'athlytics-' + result.season + '.csv';
   a.click(); URL.revokeObjectURL(url);
-  showToast('\u{1F4CA} CSV lastet ned', 'success');
+  showToast(t('export_csv_done'), 'success');
 }
 
 export async function exportPDF() {
-  showToast('Henter data...', 'success');
+  showToast(t('export_fetching'), 'info');
   var all = await getMatchesForExport();
   var s = getSettings();
   var result = getActiveSeasonMatches(all, s);
-  if (!result.matches.length) { showToast('Ingen kamper å eksportere', 'error'); return; }
+  if (!result.matches.length) { showToast(t('export_no_matches'), 'error'); return; }
   var profil = getProfile();
   var matches = result.matches;
   var season = result.season;
+  var locale = s.lang === 'en' ? 'en-GB' : 'no-NO';
 
   var w = 0, d = 0, l = 0, g = 0, a = 0;
   matches.forEach(function(k) {
@@ -77,8 +81,8 @@ export async function exportPDF() {
   var matchRows = matches.slice().reverse().map(function(k) {
     var r = getResult(k);
     var color = r === 'wins' ? '#4caf50' : r === 'draw' ? '#f0c050' : '#e05555';
-    var resLabel = r === 'wins' ? 'S' : r === 'draw' ? 'U' : 'T';
-    var date = new Date(k.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' });
+    var resLabel = r === 'wins' ? t('win_short') : r === 'draw' ? t('draw_short') : t('loss_short');
+    var date = new Date(k.date).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' });
     var teams = buildHomeAwayTeams(k);
     return '<tr>' +
       '<td>' + date + '</td>' +
@@ -107,26 +111,35 @@ export async function exportPDF() {
     '@media print{body{margin:16px}}' +
     '</style></head><body>' +
     '<h1>Athlytics Sport' + (profil.name ? ' \u2013 ' + esc(profil.name) : '') + '</h1>' +
-    '<h2>Sesong ' + season + (profil.club ? ' \xb7 ' + esc(profil.club) : '') + '</h2>' +
+    '<h2>' + t('export_season') + ' ' + season + (profil.club ? ' \xb7 ' + esc(profil.club) : '') + '</h2>' +
     '<div class="summary">' +
-      '<div class="stat"><div class="stat-n">' + n + '</div><div class="stat-l">Kamper</div></div>' +
-      '<div class="stat"><div class="stat-n" style="color:#4caf50">' + w + '</div><div class="stat-l">Seier</div></div>' +
-      '<div class="stat"><div class="stat-n" style="color:#f0c050">' + d + '</div><div class="stat-l">Uavgjort</div></div>' +
-      '<div class="stat"><div class="stat-n" style="color:#e05555">' + l + '</div><div class="stat-l">Tap</div></div>' +
-      '<div class="stat"><div class="stat-n" style="color:#1a3a1f">' + g + '</div><div class="stat-l">M\u00e5l</div></div>' +
-      '<div class="stat"><div class="stat-n">' + a + '</div><div class="stat-l">Assist</div></div>' +
+      '<div class="stat"><div class="stat-n">' + n + '</div><div class="stat-l">' + t('export_matches') + '</div></div>' +
+      '<div class="stat"><div class="stat-n" style="color:#4caf50">' + w + '</div><div class="stat-l">' + t('stat_wins') + '</div></div>' +
+      '<div class="stat"><div class="stat-n" style="color:#f0c050">' + d + '</div><div class="stat-l">' + t('stat_draws') + '</div></div>' +
+      '<div class="stat"><div class="stat-n" style="color:#e05555">' + l + '</div><div class="stat-l">' + t('stat_losses') + '</div></div>' +
+      '<div class="stat"><div class="stat-n" style="color:#1a3a1f">' + g + '</div><div class="stat-l">' + t('stat_goals') + '</div></div>' +
+      '<div class="stat"><div class="stat-n">' + a + '</div><div class="stat-l">' + t('stat_assists') + '</div></div>' +
       '<div class="stat"><div class="stat-n">' + (g + a) + '</div><div class="stat-l">G+A</div></div>' +
     '</div>' +
-    '<table><thead><tr><th>Dato</th><th>Hjemmelag</th><th>Bortelag</th><th>Turnering</th><th style="text-align:center">Resultat</th><th style="text-align:center">M\u00e5l</th><th style="text-align:center">Ast</th><th style="text-align:center">Res</th></tr></thead>' +
+    '<table><thead><tr>' +
+      '<th>' + t('date') + '</th>' +
+      '<th>' + t('home_label') + '</th>' +
+      '<th>' + t('away_label') + '</th>' +
+      '<th>' + t('export_tournament') + '</th>' +
+      '<th style="text-align:center">' + t('result_label') + '</th>' +
+      '<th style="text-align:center">' + t('stat_goals') + '</th>' +
+      '<th style="text-align:center">' + t('export_ast') + '</th>' +
+      '<th style="text-align:center">' + t('export_res') + '</th>' +
+    '</tr></thead>' +
     '<tbody>' + matchRows + '</tbody></table>' +
-    '<div class="footer">Generert av Athlytics Sport \xb7 athlyticsport.app \xb7 ' + new Date().toLocaleDateString('no-NO') + '</div>' +
+    '<div class="footer">' + t('export_footer') + ' \xb7 athlyticsport.app \xb7 ' + new Date().toLocaleDateString(locale) + '</div>' +
     '</body></html>';
 
   var win = window.open('', '_blank');
-  if (!win) { showToast('Tillat popup for PDF', 'error'); return; }
+  if (!win) { showToast(t('export_popup_blocked'), 'error'); return; }
   win.document.write(html);
   win.document.close();
   win.focus();
   setTimeout(function() { win.print(); }, 400);
-  showToast('\u{1F4C4} PDF åpnet \u2013 trykk Skriv ut', 'success');
+  showToast(t('export_pdf_done'), 'success');
 }
