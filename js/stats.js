@@ -98,7 +98,8 @@ function renderMatchList(matches) {
     var r = getResult(k);
     var resIkon = r === 'wins' ? t('win_short') : r === 'draw' ? t('draw_short') : t('loss_short');
     var date = fmtDate(k.date, { day: '2-digit', month: 'short' });
-    var team = k.own_team || '';
+    var homeTeam = k.match_type === 'home' ? (k.own_team || '') : (k.opponent || '');
+    var awayTeam = k.match_type === 'home' ? (k.opponent || '') : (k.own_team || '');
     var tournament = k.tournament ? ' \xb7 ' + esc(k.tournament) : '';
     var goalText = (k.goals || 0) > 0
       ? ' \xb7 ' + k.goals + String.fromCodePoint(9917) + ((k.assists || 0) > 0 ? ' ' + k.assists + String.fromCodePoint(127919) : '')
@@ -107,8 +108,8 @@ function renderMatchList(matches) {
       '<div class="match-result ' + r + '">' + resIkon + '</div>' +
       '<div class="match-info">' +
         '<div class="match-title-row">' +
-          '<div class="match-opponent">' + esc(k.opponent) + '</div>' +
-          (team ? '<div class="match-team-name">\xb7 ' + esc(team) + '</div>' : '') +
+          '<div class="match-opponent">' + esc(homeTeam) + '</div>' +
+          (awayTeam ? '<div class="match-team-name">\xb7 ' + esc(awayTeam) + '</div>' : '') +
         '</div>' +
         '<div class="match-meta">' + date + tournament + goalText + '</div>' +
       '</div>' +
