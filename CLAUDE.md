@@ -198,59 +198,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Feature | Prioritet | Beskrivelse |
 |---|---|---|
 | Valg av datoformat (europeisk / amerikansk) | ✅ Ferdig | `dateFormat: 'eu' \| 'us'` i `defaultSettings()`. `getDateLocale()` i `settings.js`. UI-seksjon i settings-tab. `stats.js` og `export.js` bruker `getDateLocale()`. `setDateFormat()` i `settings-render.js` + ACTIONS. |
-| Turnerings-filter i stats-tab | 🟡 Medium | Se spec nedenfor. |
-
-#### Spec: Turnerings-filter i stats-tab
-
-**Plassering:** I `#stats-filters`, som en tredje filterrad under sesong- og lag-pillene. Vises kun i oversikt-visningen (samme som de to øvrige radene — skjules automatisk i analyse-visningen fordi `#stats-filters` er skjult der).
-
-Fordelen med å legge filteret her fremfor over søkefeltet er at det filtrerer **alle** stats på siden (W/D/L-kort, hjemme/borte-seksjon, per-turnering-seksjon og kamphistorikk) — ikke bare listen.
-
-**Piller:**
-- Alltid én «Alle»-pill (`activeTournament = 'all'`) — aktiv som standard
-- Deretter én pill per unikt turnering i `seasonMatches` (etter sesong + lag-filter er anvendt), sortert alfabetisk
-- Pill-tekst = turnerings-navn; kamper uten turnering (`k.tournament` er tom/null) samles under `t('no_tournament')`
-- Raden bruker `flex-wrap: wrap` — CSS håndterer linjebryting automatisk, ingen JS-logikk nødvendig
-
-**HTML-struktur i `#stats-filters`:**
-```html
-<div id="season-selector"></div>
-<div id="team-filter-selector"></div>
-<div id="tournament-filter-selector"></div>   ← ny rad
-```
-
-**State:**
-- Ny eksportert variabel `activeTournament = 'all'` i `stats.js` (ved siden av `activeLag`, `activeSeason`)
-- `setTournamentFilter(tournament)` — setter `activeTournament`, resetter `matchPage = 0`, kaller `renderStats()`
-- Reset `activeTournament = 'all'` i `setSeason()` og `setTeamFilter()` (koordinert filterstate — sesonger og lag-endring nullstiller turnerings-valget)
-
-**Filtering i `renderStats()`:**
-```
-seasonMatches  = allMatches filtrert på sesong
-teamMatches    = seasonMatches filtrert på activeLag
-matches        = teamMatches filtrert på activeTournament   ← ny
-```
-- `activeTournament === 'all'` → ingen ekstra filtrering
-- Matcher `(k.tournament || '') === activeTournament`; tom streng mappes til `t('no_tournament')`-pill med verdi `''`
-
-**Rendering:**
-- Pill-HTML rendres i `renderStats()` på `#tournament-filter-selector`
-- Aktiv pill får klasse `active`; `data-action="setTournamentFilter"` + `data-tournament="<verdi>"`
-- Pillen for «ingen turnering» bruker `data-tournament=""` (tom streng)
-- Skjul hele raden hvis alle kamper tilhører samme turnering (bare én unik verdi) — unødvendig støy
-
-**i18n-nøkler:**
-- `tournament_filter_all` → «Alle» / «All»
-- `no_tournament` → «Ingen turnering» / «No tournament»
-
-**ACTIONS-map (main.js):**
-```javascript
-setTournamentFilter: (e) => { var el = e.target.closest('[data-tournament]'); if (!el) return; setTournamentFilter(el.dataset.tournament); }
-```
-
-**`stats.js` eksporter som må oppdateres:**
-- Legg til `activeTournament` og `setTournamentFilter` i eksportlisten
-- Legg til `setTournamentFilter` i funksjons-oversikten i CLAUDE.md
+| Turnerings-filter i stats-tab | ✅ Ferdig | `activeTournament`, `setTournamentFilter()` i `stats.js`. Pill-rad i `#tournament-filter-selector`. Skjules ved ≤1 unik turnering. Reset ved sesong/lag-bytte. i18n: `tournament_filter_all`, `no_tournament`. |
 
 ### settings-render.js
 
@@ -450,7 +398,7 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 **navigation.js** – `switchTab(tab)`, `updateLogBadge()`
 **settings-render.js** – `renderSettings()`, `renderActiveSeasonPills()`, `setSport(sport)`, `setSeasonFormat(format)`, `setDateFormat(format)`, `setActiveSeason(sesong)`, `addSeason()`, `applyTheme(sport)`
 **log.js** – `adjust(type, delta)`, `saveMatch()`, `resetForm()`, `setMatchType(type)`, `updateResult()`, `getMatchType()`
-**stats.js** – `loadStats(forceRefresh?)`, `renderStats()`, `renderAnalyse(matches)`, `calcWDL(matchArr)`, `getResult(k)`, `destroyCharts()`, `initChartDefaults()`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `matchPage`, `opponentSearch`, `CHART_COLORS`
+**stats.js** – `loadStats(forceRefresh?)`, `renderStats()`, `renderAnalyse(matches)`, `calcWDL(matchArr)`, `getResult(k)`, `destroyCharts()`, `initChartDefaults()`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setTournamentFilter(tournament)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `activeTournament`, `matchPage`, `opponentSearch`, `CHART_COLORS`
 **modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
 **export.js** – `exportCSV()`, `exportPDF()`
 **main.js** – bootstrap, `setupEventDelegation()`, ACTIONS-map
