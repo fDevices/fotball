@@ -9,6 +9,7 @@ import { isPremium } from './utils.js';
 export var activeStatsView = 'overview';
 export var activeLag = 'all';
 export var activeSeason = getSettings().activeSeason || String(new Date().getFullYear());
+export var activeTournament = 'all';
 export var matchPage = 0;
 export var opponentSearch = '';
 
@@ -140,7 +141,8 @@ export function setMatchPage(page) {
   var header = statsContent.querySelector('.match-list-header');
   if (!header) { renderStats(); return; }
   var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(getSeasonBaseYear(activeSeason)); });
-  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+  var teamMatches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+  var matches = activeTournament === 'all' ? teamMatches : teamMatches.filter(function(k) { return (k.tournament || '') === activeTournament; });
   var toRemove = [];
   var node = header.nextSibling;
   while (node) { toRemove.push(node); node = node.nextSibling; }
@@ -151,8 +153,9 @@ export function setMatchPage(page) {
   header.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-export function setSeason(s) { activeSeason = s; activeLag = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
-export function setTeamFilter(team) { activeLag = team; matchPage = 0; opponentSearch = ''; renderStats(); }
+export function setSeason(s) { activeSeason = s; activeLag = 'all'; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
+export function setTeamFilter(team) { activeLag = team; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
+export function setTournamentFilter(tournament) { activeTournament = tournament; matchPage = 0; renderStats(); }
 
 export function setOpponentSearch(val) {
   opponentSearch = val.trim().toLowerCase();
@@ -333,7 +336,29 @@ export function renderStats() {
     return '<button class="season-pill ' + (activeLag === p.key ? 'active' : '') + '" data-action="setTeamFilter" data-team="' + esc(p.key) + '"> ' + esc(p.label) + '</button>';
   }).join('');
 
-  var matches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+  var teamMatches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+
+  // Build tournament pills from teamMatches
+  var tournamentValues = [];
+  teamMatches.forEach(function(k) { var v = k.tournament || ''; if (!tournamentValues.includes(v)) tournamentValues.push(v); });
+  tournamentValues.sort(function(a, b) { if (!a) return 1; if (!b) return -1; return a.localeCompare(b); });
+  var tournamentFilterEl = document.getElementById('tournament-filter-selector');
+  if (tournamentFilterEl) {
+    if (tournamentValues.length <= 1) {
+      tournamentFilterEl.innerHTML = '';
+      if (activeTournament !== 'all') activeTournament = 'all';
+    } else {
+      var tournamentPills = [{ key: 'all', label: t('tournament_filter_all') }].concat(tournamentValues.map(function(v) {
+        return { key: v, label: v === '' ? t('no_tournament') : v };
+      }));
+      if (!tournamentPills.some(function(p) { return p.key === activeTournament; })) activeTournament = 'all';
+      tournamentFilterEl.innerHTML = tournamentPills.map(function(p) {
+        return '<button class="season-pill ' + (activeTournament === p.key ? 'active' : '') + '" data-action="setTournamentFilter" data-tournament="' + esc(p.key) + '">' + esc(p.label) + '</button>';
+      }).join('');
+    }
+  }
+
+  var matches = activeTournament === 'all' ? teamMatches : teamMatches.filter(function(k) { return (k.tournament || '') === activeTournament; });
   var n = matches.length;
   var teamText = activeLag === 'all' ? t('all_teams_subtitle') : activeLag;
   var statsSubEl = document.getElementById('stats-sub');

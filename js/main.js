@@ -3,7 +3,7 @@ import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
-import { loadStats, switchStatsView, setSeason, setTeamFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
+import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { exportCSV, exportPDF } from './export.js';
@@ -49,6 +49,7 @@ const ACTIONS = {
   switchStatsView:               (e) => { var el = e.target.closest('[data-view]'); if (!el) return; switchStatsView(el.dataset.view); },
   setSeason:                     (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setSeason(el.dataset.season); },
   setTeamFilter:                 (e) => { var el = e.target.closest('[data-team]'); if (!el) return; setTeamFilter(el.dataset.team); },
+  setTournamentFilter:           (e) => { var el = e.target.closest('[data-tournament]'); if (!el) return; setTournamentFilter(el.dataset.tournament); },
   setMatchPage:                  (e) => { var el = e.target.closest('[data-page]'); if (!el) return; setMatchPage(Number(el.dataset.page)); },
   setOpponentSearch:             (e) => setOpponentSearch(e.target.value),
   clearOpponentSearch:           () => { var i = document.getElementById('opponent-search-input'); if (i) i.value = ''; setOpponentSearch(''); },
