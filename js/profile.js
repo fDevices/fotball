@@ -163,21 +163,17 @@ export function showAvatarImage(src) {
     img.src = src;
     img.style.display = 'block';
     emoji.style.display = 'none';
-    hint.textContent = 'Trykk for å bytte bilde';
+    hint.textContent = t('avatar_change');
   } else {
     img.style.display = 'none';
     emoji.style.display = '';
-    hint.textContent = 'Trykk for å laste opp bilde';
+    hint.textContent = t('avatar_upload');
   }
 }
 
 export function renderLogSub() {
   var profil = getProfile();
-  var s = getSettings();
-  var isEn = s.lang === 'en';
-  var greeting = isEn ? 'Hi' : 'Hei';
-  var ready = isEn ? 'Ready to log match 🟢' : 'Klar til å logge kamp 🟢';
-  var sub = profil.name ? (greeting + ', ' + profil.name.split(' ')[0] + '! 🟢') : ready;
+  var sub = profil.name ? (t('log_greeting') + ', ' + profil.name.split(' ')[0] + '! 🟢') : t('log_ready');
   var el = document.getElementById('log-sub');
   if (el) el.textContent = sub;
 }
@@ -186,7 +182,7 @@ export function renderProfileTeamList() {
   var profil = getProfile();
   var list = document.getElementById('profile-team-list');
   if (!profil.team.length) {
-    list.innerHTML = '<div class="team-list-empty">Ingen team lagt til ennå</div>';
+    list.innerHTML = '<div class="team-list-empty">' + t('no_teams_yet') + '</div>';
     return;
   }
   var favoritt = profil.favoriteTeam || '';
@@ -194,7 +190,7 @@ export function renderProfileTeamList() {
     var isFav = name === favoritt;
     return '<div class="team-list-item">' +
       '<button class="team-star ' + (isFav ? 'active' : '') + '" data-action="setFavoriteTeam" data-name="' + esc(name) + '">' + (isFav ? '&#9733;' : '&#9734;') + '</button>' +
-      '<span class="team-list-name' + (isFav ? ' favoritt' : '') + '">' + esc(name) + (isFav ? ' <span class="team-fav-badge">standard</span>' : '') + '</span>' +
+      '<span class="team-list-name' + (isFav ? ' favoritt' : '') + '">' + esc(name) + (isFav ? ' <span class="team-fav-badge">' + t('standard_badge') + '</span>' : '') + '</span>' +
       '<button class="team-list-del" data-action="deleteTeam" data-name="' + esc(name) + '">×</button>' +
     '</div>';
   }).join('');
@@ -205,7 +201,7 @@ export function renderProfileTournamentList() {
   var list = document.getElementById('profile-tournament-list');
   if (!list) return;
   if (!profil.tournaments || !profil.tournaments.length) {
-    list.innerHTML = '<div class="team-list-empty">Ingen tournaments enda</div>';
+    list.innerHTML = '<div class="team-list-empty">' + t('no_tournaments_yet') + '</div>';
     return;
   }
   var fav = profil.favoriteTournament || '';
@@ -225,7 +221,7 @@ export function renderProfileTournamentList() {
     if (isFav) {
       var badge = document.createElement('span');
       badge.className = 'team-fav-badge';
-      badge.textContent = 'standard';
+      badge.textContent = t('standard_badge');
       nameSpan.appendChild(badge);
     }
     var delBtn = document.createElement('button');

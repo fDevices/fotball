@@ -128,7 +128,7 @@ export function setActiveSeason(sesong) {
   saveSettings(s);
   renderActiveSeasonPills();
   updateLogBadge();
-  showToast(t('toast_active_season') + (s.activeSeason || 'ingen'), 'success');
+  showToast(t('toast_active_season') + (s.activeSeason || t('none')), 'success');
 }
 
 export function addSeason() {
