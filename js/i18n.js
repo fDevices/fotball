@@ -71,6 +71,12 @@ const TEKST = {
     no_teams_yet:'Ingen lag lagt til ennå',
     no_tournaments_yet:'Ingen turneringer enda',
     none:'ingen',
+    ph_new_team:'Navn på nytt team...',
+    ph_new_tournament:'Navn på turnering...',
+    stats_overview:'Oversikt',
+    stats_analyse:'Analyse',
+    tournaments_title:'🏆 Mine turneringer / serier',
+    saved:'✓ Lagret',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -142,6 +148,12 @@ const TEKST = {
     no_teams_yet:'No teams added yet',
     no_tournaments_yet:'No tournaments yet',
     none:'none',
+    ph_new_team:'Name of new team...',
+    ph_new_tournament:'Name of tournament...',
+    stats_overview:'Overview',
+    stats_analyse:'Analysis',
+    tournaments_title:'🏆 My tournaments / leagues',
+    saved:'✓ Saved',
   }
 };
 
