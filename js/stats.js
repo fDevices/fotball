@@ -27,6 +27,13 @@ export var CHART_COLORS = {
 
 var chartInstances = {};
 
+function matchesTeamFilter(k, lag) {
+  if (lag === 'all') return true;
+  var stored = (k.own_team || '').toLowerCase();
+  var filter = lag.toLowerCase();
+  return stored === filter || stored.endsWith(' ' + filter);
+}
+
 export function destroyCharts() {
   Object.values(chartInstances).forEach(function(c) { if (c) c.destroy(); });
   chartInstances = {};
@@ -141,7 +148,7 @@ export function setMatchPage(page) {
   var header = statsContent.querySelector('.match-list-header');
   if (!header) { renderStats(); return; }
   var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(getSeasonBaseYear(activeSeason)); });
-  var teamMatches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+  var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, activeLag); });
   var matches = activeTournament === 'all' ? teamMatches : teamMatches.filter(function(k) { return (k.tournament || '') === activeTournament; });
   var toRemove = [];
   var node = header.nextSibling;
@@ -171,7 +178,7 @@ export function setOpponentSearch(val) {
 
 function renderOpponentSearchResults(container) {
   var query = opponentSearch;
-  var pool = activeLag === 'all' ? allMatches : allMatches.filter(function(k) { return k.own_team === activeLag; });
+  var pool = allMatches.filter(function(k) { return matchesTeamFilter(k, activeLag); });
   var hits = pool.filter(function(k) { return (k.opponent || '').toLowerCase().includes(query); });
 
   var oppMap = {};
@@ -336,13 +343,7 @@ export function renderStats() {
     return '<button class="season-pill ' + (activeLag === p.key ? 'active' : '') + '" data-action="setTeamFilter" data-team="' + esc(p.key) + '"> ' + esc(p.label) + '</button>';
   }).join('');
 
-  var teamMatches = activeLag === 'all'
-    ? seasonMatches
-    : seasonMatches.filter(function(k) {
-        var stored = (k.own_team || '').toLowerCase();
-        var filter = activeLag.toLowerCase();
-        return stored === filter || stored.endsWith(' ' + filter);
-      });
+  var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, activeLag); });
 
   // Build tournament pills from teamMatches
   var tournamentValues = [];
