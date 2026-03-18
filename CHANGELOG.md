@@ -4,6 +4,14 @@
 
 ---
 
+## Guard clauses (økt 8, 2026-03-18) ✅
+
+### Bugfiks: Manglende null-sjekker på DOM-oppslag
+- **navigation.js** – `switchTab()` hoister begge `getElementById`-kall og returnerer tidlig hvis enten element mangler; gjenbruker variablene i `classList`-operasjoner
+- **log.js** – `setMatchType()` sjekker alle 4 toggle/label-elementer før DOM-operasjoner; `updateResult()` sjekker `result-display` før bruk — begge returnerer tidlig hvis element mangler
+
+---
+
 ## i18n-opprydding del 2 (økt 7, 2026-03-18) ✅
 
 ### Bugfiks: Hardkodede UI-strenger uten `t()` i profile.js og settings-render.js

@@ -115,7 +115,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | 🟡 Medium | Bruk `setAllMatches([newMatch, ...allMatches])` – ingen direkte mutasjon av delt state |
 | `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | 🟢 Lav | Dokumenter som bevisst valg, eller legg til eksplisitt reset |
-| `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | 🟢 Lav | Null-sjekk på `getElementById`-kall |
+| `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | ✅ Ferdig | Null-sjekk på alle 4 toggle/label-elementer i `setMatchType()`; null-sjekk på `result-display` i `updateResult()`. |
 
 ### modal.js
 
@@ -129,7 +129,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `switchTab()` mangler guard clauses – kaster hvis `screen-${tab}` eller `tab-${tab}` ikke finnes | 🟡 Medium | Null-sjekk på begge DOM-oppslag før `classList`-operasjoner |
+| `switchTab()` mangler guard clauses – kaster hvis `screen-${tab}` eller `tab-${tab}` ikke finnes | ✅ Ferdig | Hoister begge `getElementById`-kall, returnerer tidlig hvis enten er null; gjenbruker variablene i `classList`-operasjoner. |
 | `updateLogBadge()` hardkoder sport-til-ikon-mapping inline | 🟢 Lav | Flytt til `SPORT_META`-map ved Fase 3 multi-sport |
 
 ### stats.js
