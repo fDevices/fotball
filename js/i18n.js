@@ -219,6 +219,7 @@ export function updateAllText() {
   var profileTitle = document.getElementById('profil-title');
   if (profileTitle) {
     var titleParts = t('profile_title').split(' ');
+    // innerHTML is intentional: wraps second word in <span> for split-colour heading style
     profileTitle.innerHTML = titleParts[0] + (titleParts.length > 1 ? '<span> ' + titleParts.slice(1).join(' ') + '</span>' : '');
   }
   var profileSub = document.getElementById('profil-sub');
