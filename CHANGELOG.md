@@ -4,6 +4,15 @@
 
 ---
 
+## Full i18n-dekning (økt 10, 2026-03-18) ✅
+
+### Bugfiks: Gjenværende hardkodede norske strenger i Logg, Stats og Profil-tab
+- **i18n.js** – 6 nye nøkler lagt til i begge språkgrener: `ph_new_team`, `ph_new_tournament`, `stats_overview`, `stats_analyse`, `tournaments_title`, `saved`
+- **app.html** – `id`-attributter lagt til på 8 elementer (`team-new-save-btn`, `tournament-new-save-btn`, `profil-card-spillerinfo`, `profil-label-name`, `profil-label-club`, `profil-label-posisjon`, `profil-card-tournaments`, `profil-card-teams`); Analyse-knapp-tekst pakket i `<span id="stats-analyse-text">` for å bevare ⭐-ikonet
+- **i18n.js `updateAllText()`** – 12 nye elementer koblet til `t()` med guard clauses: datoetikett (`I dag` → `Today`), dropdown-lagreknapper (`Legg til` → `Add`), stats-toggle (`Oversikt`/`Analyse` → `Overview`/`Analysis`), profilkorttitler og feltlabeler (`Spillerinfo`, `Navn`, `Klubb`, `Posisjon`, `Mine turneringer / serier`, `Mine team / tropper`), lagret-indikator (`✓ Lagret` → `✓ Saved`); `ph`-kart utvidet med `team-new-input`, `tournament-new-input`, `profile-team-input`
+
+---
+
 ## Settings tab i18n (økt 9, 2026-03-18) ✅
 
 ### Bugfiks: Hardkodede tekster i innstillinger-fanen ble ikke oppdatert ved språkskifte
