@@ -4,6 +4,14 @@
 
 ---
 
+## Settings tab i18n (økt 9, 2026-03-18) ✅
+
+### Bugfiks: Hardkodede tekster i innstillinger-fanen ble ikke oppdatert ved språkskifte
+- **app.html** – Lagt til `id`-attributter på 8 seksjonstitler/beskrivelser (`st-sport-title/desc`, `st-sf-title/desc`, `st-df-title/desc`, `st-as-title/desc`) og "Legg til"-knappen; fjernet ubrukte `data-i18n`-attributter
+- **settings-render.js** – `renderSettings()` oppdaterer nå alle 9 statiske elementer via `t()`; sporttitler (`⚽ Fotball` → `t('sport_fotball')`), sesongformat-piller (`t('format_aar')`, `t('format_season')`), og `(snart)` → `t('snart')` bruker nå oversettelsesnøkler
+
+---
+
 ## Guard clauses (økt 8, 2026-03-18) ✅
 
 ### Bugfiks: Manglende null-sjekker på DOM-oppslag
