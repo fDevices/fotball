@@ -95,8 +95,7 @@ export async function saveMatch() {
     if (res.ok) {
       var newMatches = await res.json();
       if (newMatches && newMatches[0]) {
-        allMatches.unshift(newMatches[0]);
-        setAllMatches(allMatches);
+        setAllMatches([newMatches[0]].concat(allMatches));
       } else {
         invalidateMatchCache();
       }

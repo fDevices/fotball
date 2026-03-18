@@ -65,7 +65,7 @@ export function getAllSeasons(allMatches) {
     var label = buildSeasonLabel(aar, s.seasonFormat);
     if (!sett.includes(label)) sett.push(label);
   });
-  return sett.sort();
+  return sett.sort(function(a, b) { return parseInt(a) - parseInt(b); });
 }
 
 export function renderSettings() {

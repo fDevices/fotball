@@ -342,4 +342,8 @@ export function closeAllDropdowns() {
   if (tch) tch.classList.remove('open');
   var tnr = document.getElementById('team-new-row');
   if (tnr) tnr.classList.remove('visible');
+  showNewTeamInput = false;
+  var tournNr = document.getElementById('tournament-new-row');
+  if (tournNr) tournNr.classList.remove('visible');
+  showNewTournamentInput = false;
 }

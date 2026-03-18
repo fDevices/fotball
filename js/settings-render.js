@@ -136,6 +136,8 @@ export function setDateFormat(format) {
 
 export function setSeasonFormat(format) {
   var s = getSettings(); s.seasonFormat = format;
+  var validSeasons = getAllSeasons(allMatches);
+  if (s.activeSeason && !validSeasons.includes(s.activeSeason)) s.activeSeason = '';
   saveSettings(s); renderSettings();
   updateLogBadge();
 }
