@@ -79,7 +79,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | 🟠 Høy | Parametriser bruker-ID; byttes ut med `auth.users.id` i Fase 4 |
-| `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | 🟡 Medium | Sorter på baseår som tall før label bygges |
+| `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | ✅ Ferdig | Sorterer på `parseInt(a) - parseInt(b)` – baseår som tall. |
 | `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | 🟡 Medium | Rename til `requestRenderSettings()` eller flytt ansvaret tydelig |
 | `defaultSettings()` er ikke eksportert, men dokumentasjonen sier den skal være det | 🟡 Medium | Eksporter funksjonen eller oppdater dokumentasjonen |
 
@@ -103,7 +103,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | 🟡 Medium | Reset alle interne state-variabler, ikke bare DOM-klasser |
+| `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | ✅ Ferdig | Resetter begge booleans og skjuler `tournament-new-row` i tillegg til `team-new-row`. |
 | `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | 🟡 Medium | Valider `selectedTeam` mot `profil.team` ved rendering; nullstill hvis ikke lenger gyldig |
 | `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | 🟡 Medium | Avklar om favorittmarkering skal endre aktivt valg; dokumenter eller separer |
 | Inkonsistent render-strategi: `renderTeamDropdown()` bruker HTML-streng, `renderTournamentDropdown()` bruker DOM API | 🟢 Lav | Velg én konsekvent strategi |
@@ -113,7 +113,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | 🟡 Medium | Bruk `setAllMatches([newMatch, ...allMatches])` – ingen direkte mutasjon av delt state |
+| `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | ✅ Ferdig | Bruker `setAllMatches([newMatch].concat(allMatches))` – ingen direkte mutasjon av delt state. |
 | `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | 🟢 Lav | Dokumenter som bevisst valg, eller legg til eksplisitt reset |
 | `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | ✅ Ferdig | Null-sjekk på alle 4 toggle/label-elementer i `setMatchType()`; null-sjekk på `result-display` i `updateResult()`. |
 
@@ -151,7 +151,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | ✅ Ferdig | Erstattet med `t('none')` – ny `none`-nøkkel i `TEKST` (`'ingen'` / `'none'`). |
-| `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | 🟡 Medium | Nullstill eller oppdater `activeSeason` når format endres |
+| `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | ✅ Ferdig | Sjekker mot `getAllSeasons()` etter formatbytte; nullstiller `activeSeason` hvis ikke lenger gyldig. |
 | `setSport()` har ingen validering av gyldige sportverdier | 🟡 Medium | Valider mot en tillatt-liste; definer som konstant for gjenbruk i Fase 3 |
 | `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |
 
