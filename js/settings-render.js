@@ -24,6 +24,24 @@ export function renderSettings() {
   if (el) el.textContent = t('lang_title');
   var el2 = document.getElementById('st-lang-desc');
   if (el2) el2.textContent = t('lang_desc');
+  var stSportTitle = document.getElementById('st-sport-title');
+  if (stSportTitle) stSportTitle.textContent = t('sport_title');
+  var stSportDesc = document.getElementById('st-sport-desc');
+  if (stSportDesc) stSportDesc.textContent = t('sport_desc');
+  var stSfTitle = document.getElementById('st-sf-title');
+  if (stSfTitle) stSfTitle.textContent = t('sf_title');
+  var stSfDesc = document.getElementById('st-sf-desc');
+  if (stSfDesc) stSfDesc.textContent = t('sf_desc');
+  var stDfTitle = document.getElementById('st-df-title');
+  if (stDfTitle) stDfTitle.textContent = t('df_title');
+  var stDfDesc = document.getElementById('st-df-desc');
+  if (stDfDesc) stDfDesc.textContent = t('df_desc');
+  var stAsTitle = document.getElementById('st-as-title');
+  if (stAsTitle) stAsTitle.textContent = t('as_title');
+  var stAsDesc = document.getElementById('st-as-desc');
+  if (stAsDesc) stAsDesc.textContent = t('as_desc');
+  var addSeasonBtn = document.getElementById('settings-add-season-btn');
+  if (addSeasonBtn) addSeasonBtn.textContent = '+ ' + t('add_item');
   var langEl = document.getElementById('settings-lang-options');
   if (langEl) {
     langEl.innerHTML = '';
@@ -40,10 +58,10 @@ export function renderSettings() {
   var sportEl = document.getElementById('settings-sport-options');
   if (sportEl) {
     sportEl.innerHTML = '';
-    [{ key: 'fotball', label: '\u26BD Fotball', soon: false }, { key: 'orientering', label: '\u{1F9ED} Orientering', soon: true }, { key: 'ski', label: '\u26F7\uFE0F Ski', soon: true }].forEach(function(sp) {
+    [{ key: 'fotball', label: t('sport_fotball'), soon: false }, { key: 'orientering', label: t('sport_ori'), soon: true }, { key: 'ski', label: t('sport_ski'), soon: true }].forEach(function(sp) {
       var btn = document.createElement('button');
       btn.className = 'settings-pill' + (sp.soon ? ' soon' : '') + (s.sport === sp.key ? ' active' : '');
-      btn.innerHTML = sp.label + (sp.soon ? ' <span style="font-size:10px">(snart)</span>' : '');
+      btn.innerHTML = sp.label + (sp.soon ? ' <span style="font-size:10px">(' + t('snart') + ')</span>' : '');
       if (!sp.soon) {
         btn.dataset.action = 'setSport';
         btn.dataset.sport = sp.key;
@@ -55,7 +73,7 @@ export function renderSettings() {
   var sfEl = document.getElementById('settings-sesong-options');
   if (sfEl) {
     sfEl.innerHTML = '';
-    [{ key: 'aar', label: '\u{1F4C5} \u00c5r (2025)' }, { key: 'sesong', label: '\u{1F5D3}\uFE0F Sesong (2025\u20132026)' }].forEach(function(f) {
+    [{ key: 'aar', label: t('format_aar') }, { key: 'sesong', label: t('format_season') }].forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'settings-pill' + (s.seasonFormat === f.key ? ' active' : '');
       btn.textContent = f.label;
