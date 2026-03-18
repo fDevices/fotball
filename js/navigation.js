@@ -13,11 +13,14 @@ export function updateLogBadge() {
 }
 
 export function switchTab(tab) {
+  var screen = document.getElementById('screen-' + tab);
+  var tabBtn = document.getElementById('tab-' + tab);
+  if (!screen || !tabBtn) return;
   document.dispatchEvent(new CustomEvent('athlytics:destroyCharts'));
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
-  document.getElementById('screen-' + tab).classList.add('active');
-  document.getElementById('tab-' + tab).classList.add('active');
+  screen.classList.add('active');
+  tabBtn.classList.add('active');
   if (tab === 'stats') document.dispatchEvent(new CustomEvent('athlytics:loadStats'));
   if (tab === 'settings') document.dispatchEvent(new CustomEvent('athlytics:renderSettings'));
 }
