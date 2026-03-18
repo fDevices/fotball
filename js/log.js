@@ -10,15 +10,21 @@ export function getMatchType() { return matchType; }
 
 export function setMatchType(type) {
   matchType = type;
-  document.getElementById('btn-home-toggle').classList.toggle('active', type === 'home');
-  document.getElementById('btn-away-toggle').classList.toggle('active', type === 'away');
-  document.getElementById('label-home').classList.toggle('highlight', type === 'home');
-  document.getElementById('label-away').classList.toggle('highlight', type === 'away');
+  var btnHome = document.getElementById('btn-home-toggle');
+  var btnAway = document.getElementById('btn-away-toggle');
+  var lblHome = document.getElementById('label-home');
+  var lblAway = document.getElementById('label-away');
+  if (!btnHome || !btnAway || !lblHome || !lblAway) return;
+  btnHome.classList.toggle('active', type === 'home');
+  btnAway.classList.toggle('active', type === 'away');
+  lblHome.classList.toggle('highlight', type === 'home');
+  lblAway.classList.toggle('highlight', type === 'away');
   updateResult();
 }
 
 export function updateResult() {
   var el = document.getElementById('result-display');
+  if (!el) return;
   var r = matchType === 'home'
     ? (home > away ? 'wins' : home < away ? 'loss' : 'draw')
     : (away > home ? 'wins' : away < home ? 'loss' : 'draw');
