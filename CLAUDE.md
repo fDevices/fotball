@@ -95,7 +95,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Akseptabelt i MVP; flytt til Supabase Storage ved auth-migrering |
-| `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | 🟡 Medium | Flytt "Trykk for å laste opp bilde", "Hi", "Klar til å logge kamp" m.fl. inn i `TEKST` |
+| `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | ✅ Ferdig | Alle hardkodede strenger erstattet med `t()`; 6 nye nøkler lagt til i `TEKST`; døde variabler fjernet fra `renderLogSub()`. |
 | `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | 🟡 Medium | Flytt list-rendering til `teams.js`; `profile.js` skal ikke vite hvordan laglistene tegnes |
 | `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | 🟢 Lav | Velg én konsekvent strategi |
 
@@ -150,7 +150,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | 🟡 Medium | Legg til `t('none')` eller tilsvarende nøkkel i `TEKST` |
+| `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | ✅ Ferdig | Erstattet med `t('none')` – ny `none`-nøkkel i `TEKST` (`'ingen'` / `'none'`). |
 | `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | 🟡 Medium | Nullstill eller oppdater `activeSeason` når format endres |
 | `setSport()` har ingen validering av gyldige sportverdier | 🟡 Medium | Valider mot en tillatt-liste; definer som konstant for gjenbruk i Fase 3 |
 | `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |

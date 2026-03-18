@@ -4,6 +4,16 @@
 
 ---
 
+## i18n-opprydding del 2 (økt 7, 2026-03-18) ✅
+
+### Bugfiks: Hardkodede UI-strenger uten `t()` i profile.js og settings-render.js
+- **i18n.js** – 6 nye nøkler lagt til i begge språkgrener: `avatar_change`, `log_greeting`, `log_ready`, `no_teams_yet`, `no_tournaments_yet`, `none`
+- **profile.js** – `showAvatarImage()`, `renderLogSub()`, `renderProfileTeamList()`, `renderProfileTournamentList()` bruker nå `t()` for alle UI-strenger; `renderProfileTeamList()` og `renderProfileTournamentList()` bruker `t('standard_badge')` for favorittmerking (nøkkel eksisterte allerede)
+- **profile.js** – Fjernet døde variabler `s`, `isEn`, `greeting`, `ready` fra `renderLogSub()` etter overgang til `t()`
+- **settings-render.js** – `setActiveSeason()` bruker nå `t('none')` i stedet for hardkodet `'ingen'`
+
+---
+
 ## i18n-opprydding (økt 6, 2026-03-18) ✅
 
 ### Bugfiks: Blandede språkverdier i norsk TEKST-gren
