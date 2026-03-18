@@ -210,12 +210,37 @@ export function updateAllText() {
   var ph = {
     'opponent': 'ph_opponent',
     'profil-name': 'ph_navn', 'profil-club': 'ph_klubb', 'profil-posisjon': 'ph_posisjon',
-    'profile-new-tournament': 'ph_add_team', 'settings-ny-sesong': 'ph_new_season'
+    'profile-new-tournament': 'ph_add_team', 'settings-ny-sesong': 'ph_new_season',
+    'team-new-input': 'ph_new_team', 'tournament-new-input': 'ph_new_tournament'
   };
   Object.keys(ph).forEach(function(id) {
     var el = document.getElementById(id);
     if (el) el.placeholder = t(ph[id]);
   });
+  var dateLabel = document.getElementById('date-display-label');
+  if (dateLabel) dateLabel.textContent = t('today');
+  var teamNewSave = document.getElementById('team-new-save-btn');
+  if (teamNewSave) teamNewSave.textContent = t('add_item');
+  var tournamentNewSave = document.getElementById('tournament-new-save-btn');
+  if (tournamentNewSave) tournamentNewSave.textContent = t('add_item');
+  var statsOverview = document.getElementById('stats-view-btn-overview');
+  if (statsOverview) statsOverview.textContent = t('stats_overview');
+  var statsAnalyseText = document.getElementById('stats-analyse-text');
+  if (statsAnalyseText) statsAnalyseText.textContent = t('stats_analyse');
+  var spillerinfo = document.getElementById('profil-card-spillerinfo');
+  if (spillerinfo) spillerinfo.textContent = t('spillerinfo');
+  var labelName = document.getElementById('profil-label-name');
+  if (labelName) labelName.textContent = t('name');
+  var labelClub = document.getElementById('profil-label-club');
+  if (labelClub) labelClub.textContent = t('club');
+  var labelPosisjon = document.getElementById('profil-label-posisjon');
+  if (labelPosisjon) labelPosisjon.textContent = t('posisjon');
+  var tournamentsTitle = document.getElementById('profil-card-tournaments');
+  if (tournamentsTitle) tournamentsTitle.textContent = t('tournaments_title');
+  var teamsTitle = document.getElementById('profil-card-teams');
+  if (teamsTitle) teamsTitle.textContent = t('mine_lag');
+  var profilSaved = document.getElementById('profil-saved');
+  if (profilSaved) profilSaved.textContent = t('saved');
   var btnSave = document.getElementById('submit-btn');
   if (btnSave) btnSave.textContent = t('save_match');
   var btnProfile = document.getElementById('btn-save-profil');
