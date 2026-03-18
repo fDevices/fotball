@@ -4,6 +4,18 @@
 
 ---
 
+## i18n-opprydding (økt 6, 2026-03-18) ✅
+
+### Bugfiks: Blandede språkverdier i norsk TEKST-gren
+- **i18n.js** – 7 nøkler i `no`-grenen rettet: `tab_settings`, `no_matches`, `ph_navn`, `no_seasons`, `toast_profile_saved`, `toast_fyll_inn`, `toast_match_saved` (blanding av engelsk og norsk, f.eks. `'Kamp saved!'` → `'Kamp lagret!'`)
+- `en`-grenen var allerede korrekt – ingen endringer der
+
+### Kodekommentar: bevisst `innerHTML` i `updateAllText()`
+- **i18n.js** – Lagt til inline-kommentar over `profileTitle.innerHTML` som forklarer at `innerHTML` er bevisst (wrapper andre ord i `<span>` for todelt overskriftsfarge)
+- Auditert: alle øvrige DOM-oppdateringer i `updateAllText()` bruker allerede `textContent`
+
+---
+
 ## Teknisk gjeld + nye features (økt 5, 2026-03-16) ✅
 
 ### Bugfiks: Sesongmodell i stats.js
