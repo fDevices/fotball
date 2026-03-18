@@ -4,6 +4,19 @@
 
 ---
 
+## Teknisk gjeld – fire feilrettinger + Claude-instruksjon (økt 11, 2026-03-18) ✅
+
+### Teknisk gjeld lukket
+- **settings.js** – `getAllSeasons()` sorterer nå på baseår som heltall (`parseInt`) i stedet for leksikografisk string-sortering
+- **settings-render.js** – `setSeasonFormat()` nullstiller `activeSeason` hvis den ikke lenger finnes blant gyldige sesonger etter formatbytte
+- **teams.js** – `closeAllDropdowns()` resetter `showNewTeamInput`/`showNewTournamentInput` og skjuler `tournament-new-row` i tillegg til `team-new-row`
+- **log.js** – `saveMatch()` muterer ikke lenger `allMatches` direkte; bruker `setAllMatches([newMatch].concat(allMatches))`
+
+### Prosjektprosess
+- **CLAUDE.md** – Lagt til instruksjon om å oppdatere `CLAUDE.md` og `CHANGELOG.md` etter hver oppgave, committe og pushe til `main`
+
+---
+
 ## Full i18n-dekning (økt 10, 2026-03-18) ✅
 
 ### Bugfiks: Gjenværende hardkodede norske strenger i Logg, Stats og Profil-tab

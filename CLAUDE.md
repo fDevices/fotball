@@ -10,6 +10,7 @@
 - Prosjektet er nå splittet i moduler: `index.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
 - Arbeidsfiler: `/home/claude/` → output: `/mnt/user-data/outputs/`
 - **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`).
+- **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, commit begge filer, og push til `main`. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
 
 ---
 
