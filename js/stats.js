@@ -336,7 +336,13 @@ export function renderStats() {
     return '<button class="season-pill ' + (activeLag === p.key ? 'active' : '') + '" data-action="setTeamFilter" data-team="' + esc(p.key) + '"> ' + esc(p.label) + '</button>';
   }).join('');
 
-  var teamMatches = activeLag === 'all' ? seasonMatches : seasonMatches.filter(function(k) { return k.own_team === activeLag; });
+  var teamMatches = activeLag === 'all'
+    ? seasonMatches
+    : seasonMatches.filter(function(k) {
+        var stored = (k.own_team || '').toLowerCase();
+        var filter = activeLag.toLowerCase();
+        return stored === filter || stored.endsWith(' ' + filter);
+      });
 
   // Build tournament pills from teamMatches
   var tournamentValues = [];
