@@ -440,3 +440,95 @@
   .settings-spacer { height: 24px; }
   .team-filter-row { margin-bottom: 12px; }
   .modal-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Assessment sheet & inline modal ──────────────────────────────────── */
+.assessment-rows { padding: 0; position: relative; }
+.assessment-heading {
+  font-family: var(--font-condensed);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--lime);
+  margin-bottom: 14px;
+  letter-spacing: 0.04em;
+}
+.assessment-row {
+  margin-bottom: 12px;
+}
+.assessment-cat-label {
+  font-family: var(--font-condensed);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.assessment-num-btns {
+  display: flex;
+  gap: 6px;
+}
+.assessment-num-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid rgba(168,224,99,0.15);
+  color: var(--muted);
+  font-family: var(--font-condensed);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.assessment-num-btn.active {
+  background: var(--lime);
+  color: var(--grass);
+  border-color: var(--lime);
+}
+.assessment-rating-hint {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  min-height: 14px;
+}
+.assessment-textarea-wrap { margin-bottom: 10px; }
+.assessment-textarea-label {
+  display: block;
+  font-family: var(--font-condensed);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+.assessment-textarea {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid rgba(168,224,99,0.15);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  resize: none;
+  min-height: 72px;
+  box-sizing: border-box;
+}
+.assessment-textarea:focus {
+  outline: none;
+  border-color: rgba(168,224,99,0.4);
+}
+.assessment-lock-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26,58,31,0.85);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+  backdrop-filter: blur(4px);
+}
+/* Assessment sheet uses same modal-sheet / modal-backdrop pattern */
+#assessment-body { padding: 16px 16px 0; overflow-y: auto; }
