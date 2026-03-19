@@ -1,13 +1,18 @@
 # Selvvurdering etter kamp — Design Spec
 
 **Date:** 2026-03-19
-**Status:** Approved
+**Status:** Approved (v3 — post second spec-review)
 
 ---
 
 ## Overview
 
-After saving a match, the player can optionally rate their own performance across 5 categories using a 1–5 number-button scale, plus two free-text reflection fields. The feature is Premium-gated, optional, and available in both the Log tab (via slide-up sheet after saving) and the Stats edit modal (as a bottom section).
+After saving a match, the player can optionally rate their own performance across 5 categories using a 1–5 number-button scale, plus two free-text reflection fields. Premium-gated, optional. Available in two contexts:
+
+1. **Log tab** — slide-up sheet (`#assessment-sheet`) after saving a match
+2. **Edit modal** — inline section rendered inside `#modal-body`
+
+These are separate DOM containers. `assessment.js` manages shared state (`_ratings`, `_matchId`) and rendering logic for both contexts.
 
 ---
 
@@ -15,31 +20,38 @@ After saving a match, the player can optionally rate their own performance acros
 
 ### New file
 
-**`js/assessment.js`** — owns all assessment state and rendering:
-- `openAssessmentSheet(matchId, existingRatings?)` — sets state, renders, opens sheet
-- `closeAssessmentSheet()` — closes sheet, resets state
-- `setRating(category, value)` — toggles: tapping the active value deselects (sets to 0)
-- `saveAssessment()` — calls `updateKamp()`, invalidates cache, closes sheet
-- `renderAssessmentSheet()` — renders 5 category rows + 2 text fields into sheet body
+**`js/assessment.js`**:
+
+| Function | Purpose |
+|---|---|
+| `openAssessmentSheet(matchId)` | Resets state, sets `_matchId`, renders into `#assessment-body`, opens `#assessment-sheet` |
+| `closeAssessmentSheet()` | Closes sheet, fully resets `_matchId` + `_ratings` |
+| `loadMatchIntoAssessment(match)` | Pre-populates `_ratings` from `match.rating_*` fields; called by `modal.js` before rendering |
+| `renderAssessmentSheet()` | Renders 5 category rows + 2 textareas into `#assessment-body` (sheet context) |
+| `renderModalAssessmentSection()` | Renders 5 category rows + 2 textareas into `#modal-assessment-body` (modal inline context) |
+| `setRating(category, value)` | Toggles `_ratings[category]`; 0 = unset; re-renders the relevant row in whichever container called it |
+| `saveAssessment()` | Reads `_ratings` + sheet textarea values → `updateKamp()` → success toast + `closeAssessmentSheet()`; on failure: error toast, sheet stays open |
+| `getAssessmentPayload()` | Returns `{ rating_effort, rating_focus, rating_technique, rating_team_play, rating_impact, reflection_good, reflection_improve }` with `0 → null`; reads reflection from modal textareas. Called by `saveEditedMatch()`. |
 
 ### Modified files
 
 | File | Change |
 |---|---|
-| `app.html` | New assessment sheet element: backdrop + slide-up panel (mirrors edit modal pattern) |
-| `js/log.js` | After successful `saveMatch()` — dispatch `athlytics:showAssessment` with `{ matchId }` |
-| `js/modal.js` | Assessment section at bottom of edit modal; pre-populate from match object; include rating fields in `saveEditedMatch()` PATCH |
-| `js/i18n.js` | 17 new TEKST keys (see i18n section below) |
-| `js/main.js` | Wire `athlytics:showAssessment` listener; add assessment actions to ACTIONS map |
+| `app.html` | New `#assessment-backdrop` + `#assessment-sheet` (slide-up, mirrors edit modal); new `#modal-assessment-body` div inside `#modal-body` after goals/assist divider |
+| `js/log.js` | After successful `saveMatch()` → dispatch `athlytics:showAssessment` with `{ matchId: newMatches[0].id }` |
+| `js/modal.js` | `openEditModal(id)`: calls `loadMatchIntoAssessment(match)` then `renderModalAssessmentSection()`; `saveEditedMatch()`: calls `getAssessmentPayload()` and merges into PATCH body |
+| `js/navigation.js` | `switchTab()` calls `closeAssessmentSheet()` |
+| `js/i18n.js` | 17 new TEKST keys |
+| `js/main.js` | Wire `athlytics:showAssessment` listener; add 3 ACTIONS entries; import from `assessment.js` |
 | `CLAUDE.md` | Update matches data contract with 7 new nullable columns |
 
-`js/supabase.js` — no change. `updateKamp(id, body)` already handles arbitrary fields.
+`js/supabase.js` — confirmed: `insertKamp` uses `Prefer: return=representation` and `log.js` already reads `newMatches[0]` (line 96–98 of log.js). `newMatches[0].id` is available immediately after save.
 
 ---
 
 ## Data Model
 
-7 new nullable columns on the `matches` Supabase table (all `NULL` for existing rows):
+7 new nullable columns on `matches` (all `NULL` for existing rows). To be added in Fase 1.7 migration:
 
 ```
 rating_effort      SMALLINT (1–5)
@@ -51,18 +63,14 @@ reflection_good    TEXT
 reflection_improve TEXT
 ```
 
-To be added as part of the Fase 1.7 migration.
-
 ### In-memory state (`assessment.js`)
 
 ```js
 var _matchId = null;
 var _ratings = { effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
-var _reflectionGood = '';
-var _reflectionImprove = '';
 ```
 
-Value `0` means unset. All fields optional. "Lagre vurdering" saves whatever is set, including a fully empty assessment.
+`0` = unset. `closeAssessmentSheet()` always resets both `_matchId` and `_ratings` to initial values regardless of context. Reflection text is never mirrored to state — always read from textarea DOM at save time.
 
 ---
 
@@ -70,60 +78,85 @@ Value `0` means unset. All fields optional. "Lagre vurdering" saves whatever is 
 
 ### Log tab — after saving
 
-1. `saveMatch()` succeeds → toast "⚽ Kamp lagret!" fires as normal
-2. Form resets as normal
-3. `athlytics:showAssessment` event dispatched with `{ matchId }`
-4. `main.js` listener calls `openAssessmentSheet(matchId)`
-5. If `!isPremium()` → sheet opens with blurred ratings + "Lås opp Pro ⭐" (same pattern as analyse-grafer)
-6. Sheet slides up over the log form
-7. "Lagre vurdering" → saves + closes; "Hopp over →" → closes without saving
+1. `saveMatch()` succeeds → `insertKamp()` returns inserted row with `id` (`Prefer: return=representation`)
+2. Toast "⚽ Kamp lagret!" fires; form resets — both happen as now
+3. `athlytics:showAssessment` dispatched: `{ detail: { matchId: newMatches[0].id } }`
+4. `main.js` listener calls `openAssessmentSheet(matchId)` — empty state, renders sheet
+5. If `!isPremium()` → sheet opens with ratings blurred/disabled + premium lock overlay (same pattern as locked analyse-grafer). "Hopp over" still works.
+6. "Lagre vurdering" → `saveAssessment()`: reads `_ratings` + `#assess-reflection-good` / `#assess-reflection-improve` textarea values → `updateKamp()` → on success: toast `assess_saved` + close; on failure: toast `toast_nettverksfeil_kort`, sheet stays open
+7. "Hopp over" or backdrop tap → `closeAssessmentSheet()`, no save
 
 ### Edit modal — stats tab
 
-- Assessment section at the bottom of the existing edit modal, below goals/assist, separated by a divider
-- If ratings already exist → number buttons pre-highlighted, text fields pre-filled
-- If no ratings yet → empty state with `assess_heading`
-- `saveEditedMatch()` always includes all rating fields in the PATCH (`null` for unset)
+1. `openEditModal(id)` fetches match from `allMatches`
+2. Calls `loadMatchIntoAssessment(match)` — pre-populates `_ratings` from `match.rating_*`
+3. Calls `renderModalAssessmentSection()` — renders into `#modal-assessment-body`, textareas pre-filled from `match.reflection_good` / `match.reflection_improve`
+4. User edits match data and/or assessment ratings
+5. `saveEditedMatch()` calls `getAssessmentPayload()` which reads `_ratings` (0→null) + `#modal-assess-reflection-good` / `#modal-assess-reflection-improve` values → merged into PATCH body
+6. Pre-populated values are saved as-is if user doesn't touch the section — no data loss
 
-### Assessment sheet HTML structure
+### Tab switch
 
+`switchTab()` calls `closeAssessmentSheet()` → full state reset, sheet closes if open.
+
+---
+
+## HTML Structure
+
+### Standalone sheet (new in `app.html`)
+
+```html
+<div class="modal-backdrop" id="assessment-backdrop" data-action="closeAssessmentSheet"></div>
+<div class="modal-sheet" id="assessment-sheet">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <div class="modal-title" id="assess-title"></div>
+    <button class="modal-close-btn" data-action="closeAssessmentSheet">&times;</button>
+  </div>
+  <div class="assessment-body" id="assessment-body"></div>
+  <div class="modal-actions">
+    <button class="modal-del-btn" data-action="closeAssessmentSheet" id="assess-skip-btn"></button>
+    <button class="modal-save-btn" data-action="saveAssessment" id="assess-save-btn"></button>
+  </div>
+</div>
 ```
-#assessment-backdrop      ← dimmed overlay, tap to dismiss
-#assessment-sheet         ← slide-up panel (same CSS as #modal-sheet)
-  .modal-handle
-  .modal-header           ← t('assess_btn') + close ×
-  .assessment-body
-    p.assess-framing      ← t('assess_heading')
-    [5 category rows]     ← label + 5 number buttons (1–5)
-    [selected label]      ← muted text below row, e.g. "Bra" when 4 is active
-    textarea              ← t('assess_good') placeholder
-    textarea              ← t('assess_improve') placeholder
-  .modal-actions
-    button.skip           ← t('assess_skip')
-    button.save           ← t('assess_save')
+
+### Inline section in edit modal (new in `app.html`, inside `#modal-body`)
+
+```html
+<div class="modal-divider"></div>
+<div id="modal-assessment-body"></div>
 ```
+
+### DOM ID strategy — no collisions
+
+Rating buttons carry only `data-category` + `data-value` (no IDs). Textarea IDs:
+
+| Context | Reflection good | Reflection improve |
+|---|---|---|
+| Sheet | `assess-reflection-good` | `assess-reflection-improve` |
+| Modal | `modal-assess-reflection-good` | `modal-assess-reflection-improve` |
+
+Both textareas: `maxlength="500"`.
 
 ---
 
 ## Rating UI
 
-**Number buttons (1–5)** — one row per category. Each button is a fixed-width tap target. Tapping the active value deselects it (back to 0). A muted label below the row shows the text for the currently selected value (e.g. tapping 4 shows "Bra").
+Number buttons 1–5 per category row. `data-action="setRating"`, `data-category`, `data-value`. Tapping active button deselects (→ 0). Muted label below each row shows `t('rating_N')` for selected value; clears when deselected.
 
-Categories and JS identifiers:
-
-| JS field | Key | NO | EN |
-|---|---|---|---|
-| `rating_effort` | `cat_effort` | Innsats | Effort |
-| `rating_focus` | `cat_focus` | Fokus | Focus |
-| `rating_technique` | `cat_technique` | Teknikk | Technique |
-| `rating_team_play` | `cat_team_play` | Lagspill | Teamwork |
-| `rating_impact` | `cat_impact` | Påvirkning | Impact |
+ACTIONS delegation (mirrors existing `adjust` pattern):
+```js
+setRating: (e) => {
+  var el = e.target.closest('[data-category]');
+  if (!el) return;
+  setRating(el.dataset.category, Number(el.dataset.value));
+}
+```
 
 ---
 
-## i18n Keys
-
-17 new keys added to both `no` and `en` branches in `i18n.js`:
+## i18n Keys (17 new — full values)
 
 ### Category labels
 | Key | NO | EN |
@@ -158,38 +191,34 @@ Categories and JS identifiers:
 
 ## Premium Gate
 
-If `!isPremium()`:
-- Assessment sheet opens but ratings are blurred/disabled
-- Shows `pro_feature` label + `pro_upgrade_text` + `pro_unlock_btn` (existing keys)
-- Same visual treatment as the locked analyse-grafer section
-- "Hopp over" still dismisses normally
+If `!isPremium()`: sheet opens, ratings blurred/disabled, premium lock overlay shown (existing `pro_feature`, `pro_upgrade_text`, `pro_unlock_btn` keys). "Hopp over" dismisses normally. Note: `isPremium()` is currently hardcoded `true` — the locked path exists for Fase 4.
 
 ---
 
-## Event Contract
-
-New cross-module event (breaks `log.js` → `assessment.js` dependency):
-
-```
-athlytics:showAssessment  — { detail: { matchId: string } }
-```
-
-Dispatched by `log.js` after `saveMatch()` succeeds. Handled by `main.js`, which calls `openAssessmentSheet(matchId)`.
-
----
-
-## ACTIONS map entries (main.js)
+## ACTIONS map (`main.js`)
 
 ```js
-closeAssessmentSheet:  () => closeAssessmentSheet(),
-saveAssessment:        () => saveAssessment(),
-setRating:             (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value)); },
+closeAssessmentSheet: () => closeAssessmentSheet(),
+saveAssessment:       () => saveAssessment(),
+setRating:            (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value)); },
 ```
+
+---
+
+## Error Handling
+
+| Scenario | Behaviour |
+|---|---|
+| `saveAssessment()` Supabase/network error | Toast `toast_nettverksfeil_kort`; sheet stays open for retry |
+| `saveAssessment()` success | Toast `assess_saved`; sheet closes; state reset |
+| Tab switch while sheet open | Sheet closes silently; state reset; no save |
+| Edit modal save error | Existing `saveEditedMatch()` error handling applies |
 
 ---
 
 ## Out of Scope (Fase 3)
 
 - Trend visualisation per category in Stats tab
-- Average per season, correlation with W/D/L
-- These use the same DB columns — no schema changes needed in Fase 3
+- Average ratings per season
+- Correlation with W/D/L
+- No schema changes needed in Fase 3 — same 7 columns used
