@@ -148,7 +148,7 @@ export async function confirmDeleteMatch() {
   try {
     var res = await deleteKamp(modalMatchId);
     if (res.ok) {
-      var updated = getAllMatches().filter(function(k) { return k.id !== modalMatchId; });
+      var updated = getAllMatches().filter(function(k) { return String(k.id) !== String(modalMatchId); });
       setAllMatches(updated);
       closeModal();
       renderStats();
