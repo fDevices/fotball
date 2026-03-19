@@ -101,6 +101,9 @@ export async function saveMatch() {
       }
       showToast(t('toast_match_saved'), 'success');
       resetForm();
+      if (newMatches && newMatches[0] && newMatches[0].id) {
+        document.dispatchEvent(new CustomEvent('athlytics:showAssessment', { detail: { matchId: newMatches[0].id } }));
+      }
     } else {
       showToast(t('toast_feil_lagring'), 'error');
     }
