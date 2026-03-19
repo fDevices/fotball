@@ -1,4 +1,5 @@
 import { updateKamp } from './supabase.js';
+import { invalidateMatchCache } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { isDevPremium } from './utils.js';
@@ -211,6 +212,7 @@ export async function saveAssessment() {
   try {
     var res = await updateKamp(_matchId, payload);
     if (res.ok) {
+      invalidateMatchCache(); // force re-fetch on next stats load so assessment data is fresh
       closeAssessmentSheet();
       showToast(t('assess_saved'), 'success');
     } else {
