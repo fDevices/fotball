@@ -4,6 +4,13 @@
 
 ---
 
+## Lag-filter kortnavn-fiks (økt 12, 2026-03-19) ✅
+
+### Bugfiks: Lag-filter matchet ikke lag lagret med fullt navn
+- **stats.js** – `matchesTeamFilter()` bruker nå suffix-match: `stored === filter || stored.endsWith(' ' + filter)` med toLowerCase — "Flamme" matcher "Oppsal Flamme" uten falske treff (f.eks. "sal" matcher ikke "Oppsal")
+
+---
+
 ## Teknisk gjeld – fire feilrettinger + Claude-instruksjon (økt 11, 2026-03-18) ✅
 
 ### Teknisk gjeld lukket
