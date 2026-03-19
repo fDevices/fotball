@@ -1,4 +1,5 @@
 import { getSettings, saveSettings, getAllSeasons } from './settings.js';
+import { getAllMatches } from './state.js';
 
 const ALLOWED_SPORTS = ['fotball', 'orientering', 'ski'];
 
@@ -139,7 +140,7 @@ export function setDateFormat(format) {
 
 export function setSeasonFormat(format) {
   var s = getSettings(); s.seasonFormat = format;
-  var validSeasons = getAllSeasons(allMatches);
+  var validSeasons = getAllSeasons(getAllMatches());
   if (s.activeSeason && !validSeasons.includes(s.activeSeason)) s.activeSeason = '';
   saveSettings(s); renderSettings();
   updateLogBadge();
