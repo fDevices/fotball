@@ -97,8 +97,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Akseptabelt i MVP; flytt til Supabase Storage ved auth-migrering |
 | `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | ✅ Ferdig | Alle hardkodede strenger erstattet med `t()`; 6 nye nøkler lagt til i `TEKST`; døde variabler fjernet fra `renderLogSub()`. |
-| `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | 🟡 Medium | Flytt list-rendering til `teams.js`; `profile.js` skal ikke vite hvordan laglistene tegnes |
-| `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | 🟢 Lav | Velg én konsekvent strategi |
+| `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | ✅ Ferdig | Begge funksjoner flyttet til `teams.js`; `profile.js` dispatcher `athlytics:renderProfileLists`-event; `main.js` lytter og kaller begge. |
+| `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | ✅ Ferdig | Begge bruker nå DOM API — standardisert ved flytting til `teams.js`. |
 
 ### teams.js
 

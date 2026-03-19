@@ -2,7 +2,6 @@ import { PROFIL_KEY } from './config.js';
 import { fetchProfil, upsertProfil } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
-import { esc } from './utils.js';
 import { getSettings } from './settings.js';
 
 var _profileCache = null;
@@ -105,7 +104,7 @@ export async function saveProfile() {
   saveProfile_local(profil);
   await saveProfileToSupabase(profil);
   updateAvatar();
-  renderProfileTeamList();
+  document.dispatchEvent(new CustomEvent('athlytics:renderProfileLists'));
   renderLogSub();
   var el = document.getElementById('profil-saved');
   el.classList.add('show');
@@ -125,8 +124,7 @@ export function loadProfileData(profil) {
   clubEl.textContent = profil.club || '';
   clubEl.style.display = profil.club ? '' : 'none';
   showAvatarImage(profil.avatar || '');
-  renderProfileTeamList();
-  renderProfileTournamentList();
+  document.dispatchEvent(new CustomEvent('athlytics:renderProfileLists'));
   updateProfilePrompt();
 }
 
@@ -178,60 +176,4 @@ export function renderLogSub() {
   if (el) el.textContent = sub;
 }
 
-export function renderProfileTeamList() {
-  var profil = getProfile();
-  var list = document.getElementById('profile-team-list');
-  if (!profil.team.length) {
-    list.innerHTML = '<div class="team-list-empty">' + t('no_teams_yet') + '</div>';
-    return;
-  }
-  var favoritt = profil.favoriteTeam || '';
-  list.innerHTML = profil.team.map(function(name) {
-    var isFav = name === favoritt;
-    return '<div class="team-list-item">' +
-      '<button class="team-star ' + (isFav ? 'active' : '') + '" data-action="setFavoriteTeam" data-name="' + esc(name) + '">' + (isFav ? '&#9733;' : '&#9734;') + '</button>' +
-      '<span class="team-list-name' + (isFav ? ' favoritt' : '') + '">' + esc(name) + (isFav ? ' <span class="team-fav-badge">' + t('standard_badge') + '</span>' : '') + '</span>' +
-      '<button class="team-list-del" data-action="deleteTeam" data-name="' + esc(name) + '">×</button>' +
-    '</div>';
-  }).join('');
-}
 
-export function renderProfileTournamentList() {
-  var profil = getProfile();
-  var list = document.getElementById('profile-tournament-list');
-  if (!list) return;
-  if (!profil.tournaments || !profil.tournaments.length) {
-    list.innerHTML = '<div class="team-list-empty">' + t('no_tournaments_yet') + '</div>';
-    return;
-  }
-  var fav = profil.favoriteTournament || '';
-  list.innerHTML = '';
-  profil.tournaments.forEach(function(name) {
-    var isFav = name === fav;
-    var div = document.createElement('div');
-    div.className = 'team-list-item';
-    var starBtn = document.createElement('button');
-    starBtn.className = 'team-star' + (isFav ? ' active' : '');
-    starBtn.textContent = isFav ? '\u2605' : '\u2606';
-    starBtn.dataset.action = 'setFavoriteTournament';
-    starBtn.dataset.name = name;
-    var nameSpan = document.createElement('span');
-    nameSpan.className = 'team-list-name' + (isFav ? ' favoritt' : '');
-    nameSpan.textContent = name;
-    if (isFav) {
-      var badge = document.createElement('span');
-      badge.className = 'team-fav-badge';
-      badge.textContent = t('standard_badge');
-      nameSpan.appendChild(badge);
-    }
-    var delBtn = document.createElement('button');
-    delBtn.className = 'team-list-del';
-    delBtn.textContent = '\xd7';
-    delBtn.dataset.action = 'deleteTournament';
-    delBtn.dataset.name = name;
-    div.appendChild(starBtn);
-    div.appendChild(nameSpan);
-    div.appendChild(delBtn);
-    list.appendChild(div);
-  });
-}

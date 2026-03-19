@@ -1,4 +1,4 @@
-import { getProfile, saveProfile_local, saveProfileToSupabase, renderProfileTeamList, renderProfileTournamentList } from './profile.js';
+import { getProfile, saveProfile_local, saveProfileToSupabase } from './profile.js';
 import { showToast } from './toast.js';
 import { esc } from './utils.js';
 import { t } from './i18n.js';
@@ -346,4 +346,86 @@ export function closeAllDropdowns() {
   var tournNr = document.getElementById('tournament-new-row');
   if (tournNr) tournNr.classList.remove('visible');
   showNewTournamentInput = false;
+}
+
+// ── Profile list rendering ───────────────────────────────────────────────────
+
+export function renderProfileTeamList() {
+  var profil = getProfile();
+  var list = document.getElementById('profile-team-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!profil.team || !profil.team.length) {
+    list.innerHTML = '<div class="team-list-empty">' + t('no_teams_yet') + '</div>';
+    return;
+  }
+  var favoritt = profil.favoriteTeam || '';
+  profil.team.forEach(function(name) {
+    var isFav = name === favoritt;
+    var div = document.createElement('div');
+    div.className = 'team-list-item';
+    var starBtn = document.createElement('button');
+    starBtn.className = 'team-star' + (isFav ? ' active' : '');
+    starBtn.textContent = isFav ? '\u2605' : '\u2606';
+    starBtn.dataset.action = 'setFavoriteTeam';
+    starBtn.dataset.name = name;
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'team-list-name' + (isFav ? ' favoritt' : '');
+    nameSpan.textContent = name;
+    if (isFav) {
+      var badge = document.createElement('span');
+      badge.className = 'team-fav-badge';
+      badge.textContent = t('standard_badge');
+      nameSpan.appendChild(badge);
+    }
+    var delBtn = document.createElement('button');
+    delBtn.className = 'team-list-del';
+    delBtn.textContent = '\xd7';
+    delBtn.dataset.action = 'deleteTeam';
+    delBtn.dataset.name = name;
+    div.appendChild(starBtn);
+    div.appendChild(nameSpan);
+    div.appendChild(delBtn);
+    list.appendChild(div);
+  });
+}
+
+export function renderProfileTournamentList() {
+  var profil = getProfile();
+  var list = document.getElementById('profile-tournament-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!profil.tournaments || !profil.tournaments.length) {
+    list.innerHTML = '<div class="team-list-empty">' + t('no_tournaments_yet') + '</div>';
+    return;
+  }
+  var fav = profil.favoriteTournament || '';
+  profil.tournaments.forEach(function(name) {
+    var isFav = name === fav;
+    var div = document.createElement('div');
+    div.className = 'team-list-item';
+    var starBtn = document.createElement('button');
+    starBtn.className = 'team-star' + (isFav ? ' active' : '');
+    starBtn.textContent = isFav ? '\u2605' : '\u2606';
+    starBtn.dataset.action = 'setFavoriteTournament';
+    starBtn.dataset.name = name;
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'team-list-name' + (isFav ? ' favoritt' : '');
+    nameSpan.textContent = name;
+    if (isFav) {
+      var badge = document.createElement('span');
+      badge.className = 'team-fav-badge';
+      badge.textContent = t('standard_badge');
+      nameSpan.appendChild(badge);
+    }
+    var delBtn = document.createElement('button');
+    delBtn.className = 'team-list-del';
+    delBtn.textContent = '\xd7';
+    delBtn.dataset.action = 'deleteTournament';
+    delBtn.dataset.name = name;
+    div.appendChild(starBtn);
+    div.appendChild(nameSpan);
+    div.appendChild(delBtn);
+    list.appendChild(div);
+  });
 }

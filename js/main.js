@@ -1,6 +1,6 @@
-import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, renderProfileTournamentList, renderProfileTeamList, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
+import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
 import { getSettings, getDateLocale } from './settings.js';
-import { renderTeamDropdown, renderTournamentDropdown, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
+import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
 import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
@@ -159,6 +159,11 @@ document.addEventListener('athlytics:destroyCharts', function() {
   destroyCharts();
 });
 
+document.addEventListener('athlytics:renderProfileLists', function() {
+  renderProfileTeamList();
+  renderProfileTournamentList();
+});
+
 // ── Bootstrap ──────────────────────────────────────────────────────────────
 
 // Global outside-click handler for lang picker (runs once, not per toggle)
@@ -189,8 +194,6 @@ window.addEventListener('load', async function() {
     if (p.favoriteTeam && p.team.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);
     if (p.favoriteTournament && p.tournaments && p.tournaments.includes(p.favoriteTournament)) selectTournament(p.favoriteTournament);
     renderTournamentDropdown();
-    renderProfileTournamentList();
-    renderProfileTeamList();
     applyTheme(getSettings().sport);
     updateLogBadge();
     updateFlags();

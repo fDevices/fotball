@@ -4,6 +4,16 @@
 
 ---
 
+## Arkitektur: profile list-rendering flyttet til teams.js (økt 14, 2026-03-19) ✅
+
+### Refaktor: renderProfileTeamList / renderProfileTournamentList
+- **teams.js** – begge render-funksjoner flyttet hit fra `profile.js`; `renderProfileTeamList` konvertert fra HTML-streng til DOM API (konsistent med tournament-versjonen)
+- **profile.js** – dispatcher `athlytics:renderProfileLists`-event i stedet for å kalle render-funksjonene direkte; `esc`-import fjernet (ikke lenger nødvendig)
+- **main.js** – lytter på `athlytics:renderProfileLists` og kaller begge funksjoner; import oppdatert; redundante bootstrap-kall fjernet
+- Sirkulær avhengighet unngått via eksisterende cross-module event-mønster
+
+---
+
 ## To tekniske gjeldsfixer (økt 13, 2026-03-19) ✅
 
 ### Bugfiks: `activeLag` hengende state i Analyse-visning
