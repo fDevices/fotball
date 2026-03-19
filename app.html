@@ -456,9 +456,26 @@
       </div>
     </div>
   </div>
+  <div class="modal-divider"></div>
+  <div id="modal-assessment-body"></div>
   <div class="modal-actions">
     <button class="modal-del-btn" data-action="deleteMatch">🗑 Slett</button>
     <button class="modal-save-btn" data-action="saveEditedMatch">Lagre endringer</button>
+  </div>
+</div>
+
+<!-- Assessment sheet (slide-up, Log tab context) -->
+<div class="modal-backdrop" id="assessment-backdrop" data-action="closeAssessmentSheet"></div>
+<div class="modal-sheet" id="assessment-sheet">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <div class="modal-title" id="assess-title"></div>
+    <button class="modal-close-btn" data-action="closeAssessmentSheet">&times;</button>
+  </div>
+  <div class="assessment-body" id="assessment-body"></div>
+  <div class="modal-actions">
+    <button class="modal-del-btn" data-action="closeAssessmentSheet" id="assess-skip-btn"></button>
+    <button class="modal-save-btn" data-action="saveAssessment" id="assess-save-btn"></button>
   </div>
 </div>
 
