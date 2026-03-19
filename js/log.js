@@ -1,5 +1,5 @@
 import { insertKamp } from './supabase.js';
-import { allMatches, setAllMatches, invalidateMatchCache } from './state.js';
+import { getAllMatches, setAllMatches, invalidateMatchCache } from './state.js';
 import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDropdown } from './teams.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -95,7 +95,7 @@ export async function saveMatch() {
     if (res.ok) {
       var newMatches = await res.json();
       if (newMatches && newMatches[0]) {
-        setAllMatches([newMatches[0]].concat(allMatches));
+        setAllMatches([newMatches[0]].concat(getAllMatches()));
       } else {
         invalidateMatchCache();
       }

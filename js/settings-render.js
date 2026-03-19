@@ -14,7 +14,7 @@ export function applyTheme(sport) {
     document.documentElement.style.setProperty('--' + k, th[k]);
   });
 }
-import { allMatches } from './state.js';
+import { getAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { updateLogBadge } from './navigation.js';
@@ -103,7 +103,7 @@ export function renderSettings() {
 
 export function renderActiveSeasonPills() {
   var s = getSettings();
-  var seasons = getAllSeasons(allMatches);
+  var seasons = getAllSeasons(getAllMatches());
   var el = document.getElementById('settings-aktiv-sesong-options');
   if (!el) return;
   el.innerHTML = '';

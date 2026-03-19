@@ -1,4 +1,4 @@
-import { allMatches, setAllMatches } from './state.js';
+import { getAllMatches, setAllMatches } from './state.js';
 import { updateKamp, deleteKamp } from './supabase.js';
 import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, renderModalTournamentDropdown } from './teams.js';
 import { t } from './i18n.js';
@@ -10,7 +10,7 @@ var modalMatchId = null;
 var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
 
 export function openEditModal(id) {
-  var k = allMatches.find(function(m) { return String(m.id) === String(id); });
+  var k = getAllMatches().find(function(m) { return String(m.id) === String(id); });
   if (!k) return;
   modalMatchId = id;
   mHome     = k.home_score || 0;
@@ -119,7 +119,7 @@ export async function saveEditedMatch() {
   try {
     var res = await updateKamp(modalMatchId, body);
     if (res.ok) {
-      setAllMatches(allMatches.map(function(m) {
+      setAllMatches(getAllMatches().map(function(m) {
         return String(m.id) === String(modalMatchId) ? Object.assign({}, m, body) : m;
       }));
       closeModal();
@@ -134,7 +134,7 @@ export async function saveEditedMatch() {
 
 export function deleteMatch() {
   if (!modalMatchId) return;
-  var k = allMatches.find(function(m) { return String(m.id) === String(modalMatchId); });
+  var k = getAllMatches().find(function(m) { return String(m.id) === String(modalMatchId); });
   var oppName = k ? (k.opponent || t('this_match')) : t('this_match');
   document.getElementById('delete-confirm-name').textContent = oppName;
   document.getElementById('delete-confirm-backdrop').classList.add('open');
@@ -148,7 +148,7 @@ export async function confirmDeleteMatch() {
   try {
     var res = await deleteKamp(modalMatchId);
     if (res.ok) {
-      var updated = allMatches.filter(function(k) { return k.id !== modalMatchId; });
+      var updated = getAllMatches().filter(function(k) { return k.id !== modalMatchId; });
       setAllMatches(updated);
       closeModal();
       renderStats();
