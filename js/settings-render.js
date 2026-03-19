@@ -15,7 +15,6 @@ export function applyTheme(sport) {
     document.documentElement.style.setProperty('--' + k, th[k]);
   });
 }
-import { getAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { updateLogBadge } from './navigation.js';
