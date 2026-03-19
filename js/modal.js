@@ -4,6 +4,7 @@ import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, render
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { renderStats } from './stats.js';
+import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload } from './assessment.js';
 
 var modalMatchId = null;
 var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
@@ -31,6 +32,13 @@ export function openEditModal(id) {
   document.getElementById('modal-title').textContent  = k.opponent || t('modal_rediger');
   setModalMatchType(mMatchType);
 
+  loadMatchIntoAssessment(k);
+  renderModalAssessmentSection();
+  // Pre-fill reflection textareas from saved match data
+  var taGood    = document.getElementById('modal-assess-reflection-good');
+  var taImprove = document.getElementById('modal-assess-reflection-improve');
+  if (taGood)    taGood.value    = k.reflection_good    || '';
+  if (taImprove) taImprove.value = k.reflection_improve || '';
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('modal-sheet').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -91,7 +99,7 @@ export function modalAdjust(type, delta) {
 
 export async function saveEditedMatch() {
   if (!modalMatchId) return;
-  var body = {
+  var body = Object.assign({
     date:       document.getElementById('modal-dato').value,
     opponent:   document.getElementById('modal-motstander').value.trim(),
     own_team:   document.getElementById('modal-own-team').value.trim(),
@@ -101,7 +109,7 @@ export async function saveEditedMatch() {
     goals:      mGoals,
     assists:    mAssists,
     match_type: mMatchType
-  };
+  }, getAssessmentPayload());
   if (!body.date || !body.opponent || !body.own_team) {
     showToast(t('toast_fyll_inn'), 'error'); return;
   }
