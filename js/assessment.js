@@ -23,8 +23,11 @@ export function openAssessmentSheet(matchId) {
   _matchId = matchId;
   _activeContext = 'sheet';
   renderAssessmentSheet();
-  document.getElementById('assessment-backdrop').classList.add('open');
-  document.getElementById('assessment-sheet').classList.add('open');
+  var backdrop = document.getElementById('assessment-backdrop');
+  var sheet    = document.getElementById('assessment-sheet');
+  if (!backdrop || !sheet) return;
+  backdrop.classList.add('open');
+  sheet.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
@@ -76,10 +79,12 @@ function buildAssessmentRows(context) {
   var wrap = document.createElement('div');
   wrap.className = 'assessment-rows';
 
-  var heading = document.createElement('div');
-  heading.className = 'assessment-heading';
-  heading.textContent = t('assess_heading');
-  wrap.appendChild(heading);
+  if (context === 'modal') {
+    var heading = document.createElement('div');
+    heading.className = 'assessment-heading';
+    heading.textContent = t('assess_heading');
+    wrap.appendChild(heading);
+  }
 
   CATEGORIES.forEach(function(cat) {
     var row = document.createElement('div');
@@ -151,6 +156,7 @@ function buildAssessmentRows(context) {
 function buildTextarea(id, placeholder) {
   var label = document.createElement('label');
   label.className = 'assessment-textarea-label';
+  label.htmlFor = id;
   label.textContent = placeholder;
   var ta = document.createElement('textarea');
   ta.id          = id;
