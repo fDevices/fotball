@@ -184,6 +184,7 @@ js/
   log.js                – adjust(), saveMatch(), resetForm(), setMatchType(), updateResult()
   stats.js              – loadStats(), renderStats(), renderAnalyse(), calcWDL(), getResult() m.m.
   modal.js              – openEditModal(), closeModal(), modalAdjust(), saveEditedMatch(), deleteMatch()
+  assessment.js         – self-assessment state, rendering, save/payload functions
   export.js             – exportCSV(), exportPDF()
   main.js               – bootstrap, sentralisert event delegation (ACTIONS-map)
 ```
@@ -271,6 +272,13 @@ assists (int)
 match_type (text) -- ALWAYS 'home' or 'away'
 created_at (timestamptz)
 result -- calculated client-side, not stored in DB
+rating_effort      SMALLINT (1–5, nullable)
+rating_focus       SMALLINT (1–5, nullable)
+rating_technique   SMALLINT (1–5, nullable)
+rating_team_play   SMALLINT (1–5, nullable)
+rating_impact      SMALLINT (1–5, nullable)
+reflection_good    TEXT (nullable)
+reflection_improve TEXT (nullable)
 ```
 
 ### Supabase-tabell: `profiles`
@@ -334,6 +342,7 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 **log.js** – `adjust(type, delta)`, `saveMatch()`, `resetForm()`, `setMatchType(type)`, `updateResult()`, `getMatchType()`
 **stats.js** – `loadStats(forceRefresh?)`, `renderStats()`, `renderAnalyse(matches)`, `calcWDL(matchArr)`, `getResult(k)`, `destroyCharts()`, `initChartDefaults()`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setTournamentFilter(tournament)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `activeTournament`, `matchPage`, `opponentSearch`, `CHART_COLORS`
 **modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
+**assessment.js** – `openAssessmentSheet(matchId)`, `closeAssessmentSheet()`, `resetAssessmentState()`, `loadMatchIntoAssessment(match)`, `renderAssessmentSheet()`, `renderModalAssessmentSection()`, `setRating(category, value, context)`, `saveAssessment()`, `getAssessmentPayload()`
 **export.js** – `exportCSV()`, `exportPDF()`
 **main.js** – bootstrap, `setupEventDelegation()`, ACTIONS-map
 

@@ -4,6 +4,16 @@
 
 ---
 
+## Økt 15 – 2026-03-19: Selvvurdering etter kamp
+
+- Ny `assessment.js`-modul med selvvurdering etter kamp (5 kategorier, 1–5 tall-knapper, 2 fritekstfelter)
+- Sheet-kontekst (Log-tab) og inline modal-seksjon (rediger kamp)
+- 17 nye i18n-nøkler (NO + EN)
+- 7 nye nullable kolonner dokumentert i datakontrakt (matches-tabell)
+- Premium-gate implementert (blokket overlay hvis `!isPremium()`)
+
+---
+
 ## Arkitektur: profile list-rendering flyttet til teams.js (økt 14, 2026-03-19) ✅
 
 ### Refaktor: renderProfileTeamList / renderProfileTournamentList
