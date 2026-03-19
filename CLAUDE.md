@@ -105,7 +105,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | ✅ Ferdig | Resetter begge booleans og skjuler `tournament-new-row` i tillegg til `team-new-row`. |
-| `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | 🟡 Medium | Valider `selectedTeam` mot `profil.team` ved rendering; nullstill hvis ikke lenger gyldig |
+| `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | ✅ Ferdig | `activeLag` valideres mot `profileTeams` i både `renderStats()` og `renderAnalyse()`; nullstilles til `'all'` hvis ikke lenger gyldig. |
 | `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | 🟡 Medium | Avklar om favorittmarkering skal endre aktivt valg; dokumenter eller separer |
 | Inkonsistent render-strategi: `renderTeamDropdown()` bruker HTML-streng, `renderTournamentDropdown()` bruker DOM API | 🟢 Lav | Velg én konsekvent strategi |
 | Eksporterte variabler `selectedTeam`/`selectedTournament` i dokumentasjonen – koden eksporterer bare gettere | 🟢 Lav | Oppdater dokumentasjonen til å reflektere faktiske gettere |
@@ -153,7 +153,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | ✅ Ferdig | Erstattet med `t('none')` – ny `none`-nøkkel i `TEKST` (`'ingen'` / `'none'`). |
 | `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | ✅ Ferdig | Sjekker mot `getAllSeasons()` etter formatbytte; nullstiller `activeSeason` hvis ikke lenger gyldig. |
-| `setSport()` har ingen validering av gyldige sportverdier | 🟡 Medium | Valider mot en tillatt-liste; definer som konstant for gjenbruk i Fase 3 |
+| `setSport()` har ingen validering av gyldige sportverdier | ✅ Ferdig | `ALLOWED_SPORTS`-konstant definert i `settings-render.js`; `setSport()` returnerer tidlig hvis sport ikke er i lista. |
 | `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |
 
 ### utils.js

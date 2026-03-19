@@ -4,6 +4,16 @@
 
 ---
 
+## To tekniske gjeldsfixer (økt 13, 2026-03-19) ✅
+
+### Bugfiks: `activeLag` hengende state i Analyse-visning
+- **stats.js** – `renderAnalyse()` validerer nå `activeLag` mot `profileTeams` og nullstiller til `'all'` hvis laget ikke lenger finnes i profilen — samme guard som allerede fantes i `renderStats()`
+
+### Kode-kvalitet: `setSport()` allowed-list
+- **settings-render.js** – `ALLOWED_SPORTS`-konstant definert (`['fotball', 'orientering', 'ski']`); `setSport()` returnerer tidlig ved ugyldig verdi i stedet for å la `saveSettings()` stille normalisere
+
+---
+
 ## Lag-filter kortnavn-fiks (økt 12, 2026-03-19) ✅
 
 ### Bugfiks: Lag-filter matchet ikke lag lagret med fullt navn

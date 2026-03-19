@@ -443,6 +443,7 @@ export function renderAnalyse(matches) {
   var seasons = getAllSeasons(allMatches);
   if (!seasons.length) seasons = [String(new Date().getFullYear())];
   var profileTeams = getProfile().team || [];
+  if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'all')) activeLag = 'all';
   var teamPills = [{ key: 'all', label: t('alle_lag') }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
 
   var selectorHTML =

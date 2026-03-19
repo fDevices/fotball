@@ -1,5 +1,7 @@
 import { getSettings, saveSettings, getAllSeasons } from './settings.js';
 
+const ALLOWED_SPORTS = ['fotball', 'orientering', 'ski'];
+
 const THEMES = {
   fotball:     { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
   orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
@@ -121,6 +123,7 @@ export function renderActiveSeasonPills() {
 
 
 export function setSport(sport) {
+  if (!ALLOWED_SPORTS.includes(sport)) return;
   var s = getSettings(); s.sport = sport;
   saveSettings(s); renderSettings();
   applyTheme(sport);
