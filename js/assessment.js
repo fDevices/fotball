@@ -1,7 +1,7 @@
 import { updateKamp } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
-import { isPremium } from './utils.js';
+import { isDevPremium } from './utils.js';
 
 var _matchId = null;
 var _ratings = { effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
@@ -135,7 +135,7 @@ function buildAssessmentRows(context) {
   wrap.appendChild(buildTextarea(improveId, t('assess_improve')));
 
   // Premium gate (sheet context only — modal always shows, save handles it)
-  if (context === 'sheet' && !isPremium()) {
+  if (context === 'sheet' && !isDevPremium()) {
     var overlay = document.createElement('div');
     overlay.className = 'assessment-lock-overlay';
     var lockTitle = document.createElement('div');

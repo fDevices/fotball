@@ -3,8 +3,7 @@ import { getAllMatches, setAllMatches } from './state.js';
 import { getSettings, getAllSeasons, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { t } from './i18n.js';
-import { esc } from './utils.js';
-import { isPremium } from './utils.js';
+import { esc, isDevPremium, getResult } from './utils.js';
 
 export var activeStatsView = 'overview';
 export var activeLag = 'all';
@@ -80,10 +79,6 @@ function getSeasonBaseYear(season) {
   return season.split(/[–\-]/)[0].trim();
 }
 
-export function getResult(k) {
-  if (k.match_type === 'home') return k.home_score > k.away_score ? 'wins' : k.home_score < k.away_score ? 'loss' : 'draw';
-  return k.away_score > k.home_score ? 'wins' : k.away_score < k.home_score ? 'loss' : 'draw';
-}
 
 export function calcWDL(matchArr) {
   var w = 0, d = 0, l = 0, g = 0, a = 0;
@@ -467,7 +462,7 @@ export function renderAnalyse(matches) {
   var statsSubEl2 = document.getElementById('stats-sub');
   if (statsSubEl2) statsSubEl2.textContent = n + ' ' + t('matches_short') + ' \xb7 ' + teamText;
 
-  if (!isPremium()) {
+  if (!isDevPremium()) {
     container.innerHTML = selectorHTML + renderFormStreak(matches) +
       '<div class="chart-locked">' +
         '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +

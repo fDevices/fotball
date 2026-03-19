@@ -7,6 +7,12 @@ export function esc(str) {
     .replace(/'/g, '&#039;');
 }
 
-export function isPremium() {
-  return true; // hardcoded until Stripe is implemented (Phase 4)
+// TODO Phase 4: replace with Stripe subscription check
+export function isDevPremium() {
+  return true;
+}
+
+export function getResult(k) {
+  if (k.match_type === 'home') return k.home_score > k.away_score ? 'wins' : k.home_score < k.away_score ? 'loss' : 'draw';
+  return k.away_score > k.home_score ? 'wins' : k.away_score < k.home_score ? 'loss' : 'draw';
 }

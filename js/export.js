@@ -3,8 +3,7 @@ import { fetchKamper } from './supabase.js';
 import { getSettings, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
-import { esc } from './utils.js';
-import { getResult } from './stats.js';
+import { esc, getResult } from './utils.js';
 import { t } from './i18n.js';
 
 async function getMatchesForExport() {
