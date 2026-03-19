@@ -1,5 +1,5 @@
 import { updateKamp } from './supabase.js';
-import { invalidateMatchCache } from './state.js';
+import { getAllMatches, setAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { isDevPremium } from './utils.js';
@@ -212,7 +212,13 @@ export async function saveAssessment() {
   try {
     var res = await updateKamp(_matchId, payload);
     if (res.ok) {
-      invalidateMatchCache(); // force re-fetch on next stats load so assessment data is fresh
+      // Update the match in-memory so edit modal and stats immediately reflect saved data
+      var current = getAllMatches();
+      if (current.length > 0) {
+        setAllMatches(current.map(function(m) {
+          return String(m.id) === String(_matchId) ? Object.assign({}, m, payload) : m;
+        }));
+      }
       closeAssessmentSheet();
       showToast(t('assess_saved'), 'success');
     } else {
