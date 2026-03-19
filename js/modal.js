@@ -4,7 +4,7 @@ import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, render
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { renderStats } from './stats.js';
-import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload } from './assessment.js';
+import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload, resetAssessmentState } from './assessment.js';
 
 var modalMatchId = null;
 var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
@@ -45,6 +45,7 @@ export function openEditModal(id) {
 }
 
 export function closeModal() {
+  resetAssessmentState();
   document.getElementById('modal-backdrop').classList.remove('open');
   document.getElementById('modal-sheet').classList.remove('open');
   document.body.style.overflow = '';

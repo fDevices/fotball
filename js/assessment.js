@@ -40,6 +40,10 @@ export function closeAssessmentSheet() {
   resetState();
 }
 
+export function resetAssessmentState() {
+  resetState();
+}
+
 export function renderAssessmentSheet() {
   var el = document.getElementById('assessment-body');
   if (!el) return;
