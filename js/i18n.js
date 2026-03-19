@@ -77,6 +77,12 @@ const TEKST = {
     stats_analyse:'Analyse',
     tournaments_title:'🏆 Mine turneringer / serier',
     saved:'✓ Lagret',
+    cat_effort:'Innsats', cat_focus:'Fokus', cat_technique:'Teknikk', cat_team_play:'Lagspill', cat_impact:'Påvirkning',
+    rating_1:'Veldig dårlig', rating_2:'Under mitt nivå', rating_3:'Greit', rating_4:'Bra', rating_5:'Veldig bra',
+    assess_heading:'Hvordan vurderer du deg selv i dag?', assess_btn:'⭐ Vurder deg selv',
+    assess_save:'Lagre vurdering', assess_skip:'Hopp over',
+    assess_good:'Hva gikk bra?', assess_improve:'Hva vil jeg forbedre?',
+    assess_saved:'✓ Vurdering lagret',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -154,6 +160,12 @@ const TEKST = {
     stats_analyse:'Analysis',
     tournaments_title:'🏆 My tournaments / leagues',
     saved:'✓ Saved',
+    cat_effort:'Effort', cat_focus:'Focus', cat_technique:'Technique', cat_team_play:'Teamwork', cat_impact:'Impact',
+    rating_1:'Very poor', rating_2:'Below my level', rating_3:'Okay', rating_4:'Good', rating_5:'Very good',
+    assess_heading:'How do you rate yourself today?', assess_btn:'⭐ Rate yourself',
+    assess_save:'Save assessment', assess_skip:'Skip',
+    assess_good:'What went well?', assess_improve:'What do I want to improve?',
+    assess_saved:'✓ Assessment saved',
   }
 };
 

@@ -1,5 +1,6 @@
 import { getSettings } from './settings.js';
 import { buildSeasonLabel } from './settings.js';
+import { closeAssessmentSheet } from './assessment.js';
 
 export function updateLogBadge() {
   var s = getSettings();
@@ -16,6 +17,7 @@ export function switchTab(tab) {
   var screen = document.getElementById('screen-' + tab);
   var tabBtn = document.getElementById('tab-' + tab);
   if (!screen || !tabBtn) return;
+  closeAssessmentSheet();
   document.dispatchEvent(new CustomEvent('athlytics:destroyCharts'));
   document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });

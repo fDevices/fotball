@@ -6,6 +6,7 @@ import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n
 import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
+import { openAssessmentSheet, closeAssessmentSheet, saveAssessment, setRating } from './assessment.js';
 import { exportCSV, exportPDF } from './export.js';
 import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
 import { showToast } from './toast.js';
@@ -61,6 +62,9 @@ const ACTIONS = {
   setDateFormat:                 (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setDateFormat(el.dataset.format); },
   setActiveSeason:               (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setActiveSeason(el.dataset.season); },
   showProToast:                  () => showToast('Coming soon \u2013 Stripe i Fase 4 \u{1F680}', 'success'),
+  closeAssessmentSheet:          () => closeAssessmentSheet(),
+  saveAssessment:                () => saveAssessment(),
+  setRating:                     (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value), el.dataset.context); },
   dismissProfilePrompt:          () => dismissProfilePrompt(),
 };
 
@@ -162,6 +166,10 @@ document.addEventListener('athlytics:destroyCharts', function() {
 document.addEventListener('athlytics:renderProfileLists', function() {
   renderProfileTeamList();
   renderProfileTournamentList();
+});
+
+document.addEventListener('athlytics:showAssessment', function(e) {
+  if (e.detail && e.detail.matchId) openAssessmentSheet(e.detail.matchId);
 });
 
 // ── Bootstrap ──────────────────────────────────────────────────────────────

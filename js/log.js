@@ -101,6 +101,11 @@ export async function saveMatch() {
       }
       showToast(t('toast_match_saved'), 'success');
       resetForm();
+      // Assessment sheet only opens if Supabase returns the inserted row (Prefer: return=representation).
+      // If the response body is empty, the sheet is silently skipped — match was still saved successfully.
+      if (newMatches && newMatches[0] && newMatches[0].id) {
+        document.dispatchEvent(new CustomEvent('athlytics:showAssessment', { detail: { matchId: newMatches[0].id } }));
+      }
     } else {
       showToast(t('toast_feil_lagring'), 'error');
     }
