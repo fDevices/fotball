@@ -2,7 +2,8 @@ import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, u
 import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
-import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
+import { t, toggleLangPicker } from './i18n.js';
+import { setLang, updateFlags, updateAllText } from './text-refresh.js';
 import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch } from './stats-overview.js';
 import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
@@ -295,7 +296,7 @@ document.addEventListener('athlytics:renderSettings', function() {
 });
 
 document.addEventListener('athlytics:updateAllText', function() {
-  // Dispatched by i18n.js:setLang() after language change
+  // Dispatched by text-refresh.js:updateAllText() after language change
   renderLogSub();
   updateResult();
   updateLogBadge();
