@@ -43,7 +43,7 @@ export function getProfile() {
     var stored = JSON.parse(localStorage.getItem(PROFIL_KEY));
     // Migrate legacy 'team' key to 'teams' if needed
     if (stored && stored.team && !stored.teams) stored.teams = stored.team;
-    _profileCache = stored || { name: '', club: '', position: '', teams: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
+    _profileCache = stored || { name: '', club: '', teams: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   } catch(e) {
     _profileCache = { name: '', club: '', position: '', teams: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   }
@@ -66,8 +66,6 @@ export async function fetchProfileFromSupabase() {
       var p = {
         name: row.name || '',
         club: row.club || '',
-        // position is local-only; no DB column exists
-        position: getProfile().position || '',
         teams: row.team || [],
         favoriteTeam: row.favorite_team || '',
         tournaments: row.tournaments || [],
@@ -102,7 +100,6 @@ export async function saveProfile() {
   var profil = {
     name: document.getElementById('profil-name').value.trim(),
     club: document.getElementById('profil-club').value.trim(),
-    position: document.getElementById('profil-posisjon').value.trim(),
     teams: remote.teams || [],
     favoriteTeam: remote.favoriteTeam || '',
     tournaments: remote.tournaments || [],
@@ -124,7 +121,6 @@ export async function saveProfile() {
 export function loadProfileData(profil) {
   document.getElementById('profil-name').value = profil.name || '';
   document.getElementById('profil-club').value = profil.club || '';
-  document.getElementById('profil-posisjon').value = profil.position || '';
   var nameEl = document.getElementById('avatar-name');
   var clubEl = document.getElementById('avatar-club');
   nameEl.textContent = profil.name || '';

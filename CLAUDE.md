@@ -282,7 +282,6 @@ updated_at (timestamptz)
 
 > **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Dette er et kjent unntak fra ellers identisk navngivning.
 >
-> **`position`** eksisterer ikke som DB-kolonne. Feltet er **local-only**: leses fra localStorage, vises i `profil-posisjon`-inputet, lagres lokalt, men skrives aldri til Supabase og leses aldri fra `row`. `fetchProfileFromSupabase()` beholder eksisterende lokal verdi ved fetch.
 
 **All kode og alle Supabase-kolonner bruker engelske navn.** Navngivningen er konsistent med ett kjent unntak: JS bruker `teams`, DB bruker `team` (se merknad over).
 
@@ -298,9 +297,8 @@ sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/dele
 
 ## Kodenavn-konvensjoner
 
-All kode bruker engelsk for variabelnavn, funksjonsnavn, ID-er, CSS-klasser og Supabase-kolonnenavn – med to kjente unntak:
+All kode bruker engelsk for variabelnavn, funksjonsnavn, ID-er, CSS-klasser og Supabase-kolonnenavn – med ett kjent unntak:
 - `teams` (JS) ↔ `team` (DB) — én kjent mapping, se profiles-kontrakten
-- `position` er local-only og har ingen DB-kolonne
 
 **Unntak: norske interne enum-verdier.** Deler av settings-laget bruker norske domeneverdier internt: `sport: 'fotball'`, `seasonFormat: 'aar' | 'sesong'`, og DOM-ID-er som `settings-sesong-options`. Disse lagres i localStorage og Supabase og er **ikke** UI-strenger. Rename krever datamigrasjon. Se gjeldstabell i settings.js-seksjonen.
 
