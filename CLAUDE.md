@@ -7,7 +7,7 @@
 ## Instruksjoner for Claude
 
 - **Les alltid prosjektfilene ved oppstart** av nye samtaler før du gjør endringer.
-- Prosjektet er nå splittet i moduler: `index.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
+- Prosjektet er nå splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
 - Arbeidsfiler: `/home/claude/` → output: `/mnt/user-data/outputs/`
 - **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`).
 - **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, commit begge filer, og push til `main`. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
@@ -26,7 +26,7 @@
 ## Workflow
 
 1. Utvikler tester lokalt (`file://` eller lokal server)
-2. Pusher til GitHub manuelt (inkludert oppdatert `CLAUDE.md`, `index.html`, `style.css`, og alle filer i `js/`)
+2. Pusher til GitHub manuelt (inkludert oppdatert `CLAUDE.md`, `app.html`, `style.css`, og alle filer i `js/`)
 3. Vercel auto-deployer fra `main`
 4. Ny samtale startes etter større endringer
 
@@ -51,12 +51,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 ## 🔧 Teknisk gjeld – kode (funn fra code review)
 
-### main.js / index.html
+### main.js / app.html
 
 | Problem | Fil | Alvorlighet | Løsning |
 |---|---|---|---|
-| Avatar-upload bruker `onclick`/`onchange` i HTML + `window._uploadImage` | `index.html` linje 188–192, `main.js` | 🟡 Medium | Migrer til delegert `input`-lytter og `data-action`; fjern global window-eksponering |
-| Bootstrap-kommentarer mangler for bevisst lazy init via events | `main.js` | 🟢 Lav | Legg til kommentarer der `renderSettings`, `loadStats` m.fl. trigges via `athlytics:`-events |
+| Avatar-upload bruker `onclick`/`onchange` i HTML + `window._uploadImage` | `app.html`, `main.js` | ✅ Ferdig | Delegert `change`-lytter i `main.js`; `data-action="uploadImage"` på input; `window._uploadImage` fjernet. |
+| Bootstrap-kommentarer mangler for bevisst lazy init via events | `main.js` | ✅ Ferdig | Kommentarer lagt til for alle `athlytics:`-event-lyttere i main.js. |
 
 > **Merk:** Guard clause-mønster for ACTIONS: `var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, ...)`
 
@@ -72,8 +72,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `allMatches` er muterbar eksportert variabel – state-kontrakten er svak | 🟢 Lav | Gjør variabel privat, eksponer `getAllMatches()` og `setAllMatches()` som API |
-| `invalidateMatchCache()` tømmer kun sessionStorage, ikke in-memory state | 🟢 Lav | Avklar kontrakt: er funksjonen kun cache-invalidering eller full state-reset? |
+| `allMatches` er muterbar eksportert variabel – state-kontrakten er svak | ✅ Ferdig | `_allMatches` er privat; `getAllMatches()` / `setAllMatches()` er eneste API. |
+| `invalidateMatchCache()` tømmer kun sessionStorage, ikke in-memory state | ✅ Ferdig | Tømmer nå også `_allMatches = []`. Kontrakt: full reset av både cache og in-memory state. |
 
 ### settings.js
 
@@ -81,8 +81,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | 🟠 Høy | Parametriser bruker-ID; byttes ut med `auth.users.id` i Fase 4 |
 | `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | ✅ Ferdig | Sorterer på `parseInt(a) - parseInt(b)` – baseår som tall. |
-| `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | 🟡 Medium | Rename til `requestRenderSettings()` eller flytt ansvaret tydelig |
-| `defaultSettings()` er ikke eksportert, men dokumentasjonen sier den skal være det | 🟡 Medium | Eksporter funksjonen eller oppdater dokumentasjonen |
+| `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | ✅ Ferdig | Renamed til `requestRenderSettings()` med kommentar om event-pattern. |
+| `defaultSettings()` er ikke eksportert, men dokumentasjonen sier den skal være det | ✅ Ferdig | Eksportert. |
 
 ### i18n.js
 
@@ -106,23 +106,23 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | ✅ Ferdig | Resetter begge booleans og skjuler `tournament-new-row` i tillegg til `team-new-row`. |
 | `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | ✅ Ferdig | `activeLag` valideres mot `profileTeams` i både `renderStats()` og `renderAnalyse()`; nullstilles til `'all'` hvis ikke lenger gyldig. |
-| `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | 🟡 Medium | Avklar om favorittmarkering skal endre aktivt valg; dokumenter eller separer |
-| Inkonsistent render-strategi: `renderTeamDropdown()` bruker HTML-streng, `renderTournamentDropdown()` bruker DOM API | 🟢 Lav | Velg én konsekvent strategi |
-| Eksporterte variabler `selectedTeam`/`selectedTournament` i dokumentasjonen – koden eksporterer bare gettere | 🟢 Lav | Oppdater dokumentasjonen til å reflektere faktiske gettere |
+| `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | ✅ Ferdig | Dokumentert som bevisst valg med kommentar i koden. |
+| Inkonsistent render-strategi: `renderTeamDropdown()` bruker HTML-streng, `renderTournamentDropdown()` bruker DOM API | ✅ Ferdig | `renderTeamDropdown()` konvertert til DOM API. |
+| Eksporterte variabler `selectedTeam`/`selectedTournament` i dokumentasjonen – koden eksporterer bare gettere | ✅ Ferdig | Dokumentasjon oppdatert til å reflektere faktiske gettere. |
 
 ### log.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | ✅ Ferdig | Bruker `setAllMatches([newMatch].concat(allMatches))` – ingen direkte mutasjon av delt state. |
-| `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | 🟢 Lav | Dokumenter som bevisst valg, eller legg til eksplisitt reset |
+| `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | ✅ Ferdig | Dokumentert som bevisst valg med kommentar i koden. |
 | `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | ✅ Ferdig | Null-sjekk på alle 4 toggle/label-elementer i `setMatchType()`; null-sjekk på `result-display` i `updateResult()`. |
 
 ### modal.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `saveEditedMatch()` og `confirmDeleteMatch()` kaller `renderStats()` direkte – tett kobling | 🟢 Lav | Vurder domene-event `athlytics:matchesChanged` for løsere kobling |
+| `saveEditedMatch()` og `confirmDeleteMatch()` kaller `renderStats()` direkte – tett kobling | ✅ Ferdig | Dispatcher `athlytics:matchesChanged`; `main.js` lytter og kaller `loadStats(true)`. |
 
 > **Kritisk invariant:** `modalAdjust()` og `adjust()` **må** alltid ha identisk clamp-logikk. Endre aldri én uten den andre.
 
@@ -133,12 +133,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | `switchTab()` mangler guard clauses – kaster hvis `screen-${tab}` eller `tab-${tab}` ikke finnes | ✅ Ferdig | Hoister begge `getElementById`-kall, returnerer tidlig hvis enten er null; gjenbruker variablene i `classList`-operasjoner. |
 | `updateLogBadge()` hardkoder sport-til-ikon-mapping inline | 🟢 Lav | Flytt til `SPORT_META`-map ved Fase 3 multi-sport |
 
-### stats.js
+### stats-overview.js / stats-analyse.js / stats-search.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `stats.js` har blitt for stor – eier data, filtre, paging, søk, overview, analyse og charts | 🟡 Medium | Planlegg videre splitt: `stats-overview.js`, `stats-analyse.js`, `stats-search.js` (Fase 3) |
-| `innerHTML` med store HTML-strenger dominerer – økt risiko for glemte escapes | 🟡 Medium | Verifiser at all brukerdata escapes med `esc()`; vurder DOM API for kritiske seksjoner |
+| `stats.js` hadde blitt for stor | ✅ Ferdig | Splittet i tre moduler (se filstruktur). |
+| `innerHTML` med store HTML-strenger – risiko for glemte escapes | 🟡 Medium | All brukerdata escapes med `esc()`; vurder DOM API ved videre refaktorering. |
 
 ### export.js
 
@@ -160,29 +160,31 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `isPremium()` returnerer alltid `true` – er en dev-toggle, ikke en domenefunksjon | 🟡 Medium | Rename til `isDevPremium()` eller kommenter tydelig at dette er midlertidig til Fase 4 |
+| `isPremium()` returnerer alltid `true` – er en dev-toggle, ikke en domenefunksjon | ✅ Ferdig | Renamed til `isDevPremium()` med TODO-kommentar for Fase 4. |
 
 ---
 
 ## Filstruktur
 
 ```
-index.html              – HTML-skall, laster kun <script type="module" src="js/main.js">
+app.html                – HTML-skall, laster kun <script type="module" src="js/main.js">
 style.css               – all CSS
 js/
   config.js             – SUPABASE_URL, SUPABASE_KEY, storage-nøkler
   supabase.js           – alle HTTP-kall mot Supabase REST API
-  state.js              – allMatches[], setAllMatches(), invalidateMatchCache()
-  utils.js              – esc(), isPremium()
+  state.js              – _allMatches (privat), getAllMatches(), setAllMatches(), invalidateMatchCache()
+  utils.js              – esc(), isDevPremium(), clampStats(), getResult()
   toast.js              – showToast()
-  settings.js           – getSettings(), saveSettings(), buildSeasonLabel(), getAllSeasons(), getDateLocale()
+  settings.js           – getSettings(), saveSettings(), defaultSettings(), buildSeasonLabel(), getAllSeasons(), getDateLocale(), requestRenderSettings()
   i18n.js               – TEKST, t(), setLang(), updateAllText(), updateFlags(), toggleLangPicker()
   profile.js            – profil-data, cache, Supabase-sync, rendering av profil-tab
   teams.js              – alle dropdown-funksjoner for lag og turnering (logg + modal)
   navigation.js         – switchTab(), updateLogBadge()
   settings-render.js    – renderSettings(), setSport(), setSeasonFormat(), setDateFormat(), setActiveSeason(), addSeason(), applyTheme()
   log.js                – adjust(), saveMatch(), resetForm(), setMatchType(), updateResult()
-  stats.js              – loadStats(), renderStats(), renderAnalyse(), calcWDL(), getResult() m.m.
+  stats-overview.js     – loadStats(), renderStats(), filter state, setSeason(), setTeamFilter(), setTournamentFilter(), setMatchPage(), setOpponentSearch(), calcWDL()
+  stats-analyse.js      – renderAnalyse(), renderFormStreak(), destroyCharts(), initChartDefaults()
+  stats-search.js       – renderMatchListPaged() — pure renderer, no state
   modal.js              – openEditModal(), closeModal(), modalAdjust(), saveEditedMatch(), deleteMatch()
   assessment.js         – self-assessment state, rendering, save/payload functions
   export.js             – exportCSV(), exportPDF()
@@ -195,7 +197,7 @@ js/
 
 ## Event delegation
 
-All brukerinteraksjon går via sentralisert event delegation i `main.js`. **Ingen** `onclick`-attributter i `index.html`.
+All brukerinteraksjon går via sentralisert event delegation i `main.js`. **Ingen** `onclick`- eller `onchange`-attributter i `app.html`.
 
 ### Mønster i HTML:
 ```html
@@ -211,10 +213,11 @@ Alle actions er registrert i `const ACTIONS = { ... }`. Ved nye knapper: legg ti
 ### Cross-modul events (custom DOM events):
 Brukes for å bryte sirkulære avhengigheter mellom moduler:
 - `athlytics:toast` – `{ detail: { msg, type } }` → showToast() i main.js
-- `athlytics:renderSettings` – trigger renderSettings() fra i18n
-- `athlytics:updateAllText` – renderLogSub(), updateResult(), updateLogBadge() fra i18n
-- `athlytics:loadStats` – loadStats() fra navigation
-- `athlytics:destroyCharts` – destroyCharts() fra navigation
+- `athlytics:renderSettings` – dispatched by settings.js:requestRenderSettings() → renderSettings() i main.js
+- `athlytics:updateAllText` – dispatched by i18n.js:setLang() → renderLogSub(), updateResult(), updateLogBadge() i main.js
+- `athlytics:loadStats` – dispatched by navigation.js:switchTab() → loadStats() i main.js
+- `athlytics:destroyCharts` – dispatched by navigation.js:switchTab() → destroyCharts() i main.js
+- `athlytics:matchesChanged` – dispatched by modal.js after save/delete → loadStats(true) i main.js
 
 ---
 
@@ -233,12 +236,14 @@ i18n.js  ←  settings.js
     ↓
 profile.js   teams.js   settings-render.js   navigation.js
     ↓           ↓              ↓                   ↓
-  log.js     modal.js       stats.js           export.js
+  log.js     modal.js    stats-overview.js      export.js
+                  ↓          ↙      ↘
+                  ↓  stats-analyse  stats-search
                   ↘              ↙
                       main.js  (orkestrator)
 ```
 
-`state.js` bryter sirkulær risiko: `stats.js`, `modal.js` og `export.js` bruker alle `allMatches` uten å importere hverandre.
+`state.js` bryter sirkulær risiko: `stats-overview.js`, `modal.js` og `export.js` bruker alle `getAllMatches()` uten å importere hverandre.
 
 ---
 
@@ -287,8 +292,7 @@ reflection_improve TEXT (nullable)
 id (text, default 'default')
 name (text)
 club (text)
-position (text)
-teams (jsonb, default '[]')
+team (jsonb, default '[]')       ← DB column name is 'team'; JS in-memory field is 'teams'
 favorite_team (text)
 tournaments (jsonb, default '[]')
 favorite_tournament (text, default '')
@@ -301,12 +305,14 @@ created_at (timestamptz)
 updated_at (timestamptz)
 ```
 
+> **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Kolonnen `position` eksisterer ikke i databasen.
+
 **All kode og alle Supabase-kolonner bruker engelske navn.** Ingen mapping mellom lag og applag – JS-feltnavn og DB-kolonnenavn er identiske.
 
 ### localStorage-nøkler
 
 ```
-athlytics_profile   → { name, club, position, teams[], favoriteTeam, tournaments[], favoriteTournament, avatar }
+athlytics_profile   → { name, club, teams[], favoriteTeam, tournaments[], favoriteTournament, avatar }
 athlytics_settings  → { sport, seasonFormat, activeSeason, lang, extraSeasons[] }
 sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/delete
 ```
@@ -330,17 +336,19 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 
 **config.js** – konstanter
 **supabase.js** – `fetchKamper()`, `insertKamp(body)`, `updateKamp(id, body)`, `deleteKamp(id)`, `fetchProfil()`, `upsertProfil(body)`, `upsertSettings(body)`
-**state.js** – `allMatches[]`, `setAllMatches(matches)`, `invalidateMatchCache()`
-**utils.js** – `esc(str)`, `isPremium()`
+**state.js** – `getAllMatches()`, `setAllMatches(matches)`, `invalidateMatchCache()`
+**utils.js** – `esc(str)`, `isDevPremium()`, `clampStats(goals, assists, ownScore)`, `getResult(k)`
 **toast.js** – `showToast(msg, type)`
-**settings.js** – `getSettings()`, `saveSettings(s)`, `buildSeasonLabel(aar, format)`, `getAllSeasons(allMatches)`, `getDateLocale()`
+**settings.js** – `getSettings()`, `saveSettings(s)`, `defaultSettings()`, `buildSeasonLabel(aar, format)`, `getAllSeasons(allMatches)`, `getDateLocale()`, `requestRenderSettings()`
 **i18n.js** – `t(key)`, `setLang(lang)`, `updateAllText()`, `updateFlags()`, `toggleLangPicker(btn)`
 **profile.js** – `getProfile()`, `saveProfile_local(profil)`, `fetchProfileFromSupabase()`, `saveProfileToSupabase(profil)`, `saveProfile()`, `loadProfileData(profil)`, `updateAvatar()`, `uploadImage(input)`, `showAvatarImage(src)`, `renderLogSub()`, `renderProfileTeamList()`, `renderProfileTournamentList()`
 **teams.js** – `getSelectedTeam()`, `getSelectedTournament()`, `selectTeam(name)`, `selectTournament(name)`, `toggleTeamDropdown()`, `renderTeamDropdown()`, `renderTournamentDropdown()`, `saveNewTeamFromDropdown()`, `saveNewTournamentFromDropdown()`, `toggleNewTeamInput()`, `toggleNewTournamentInput()`, `addTeamFromProfile()`, `addTournament()`, `deleteTeam(name)`, `deleteTournament(name)`, `setFavoriteTeam(name)`, `setFavoriteTournament(name)`, `selectModalTeam(name)`, `selectModalTournament(name)`, `toggleModalTeamDropdown()`, `toggleModalTournamentDropdown()`, `renderModalTeamDropdown()`, `renderModalTournamentDropdown()`, `closeAllDropdowns()`
 **navigation.js** – `switchTab(tab)`, `updateLogBadge()`
 **settings-render.js** – `renderSettings()`, `renderActiveSeasonPills()`, `setSport(sport)`, `setSeasonFormat(format)`, `setDateFormat(format)`, `setActiveSeason(sesong)`, `addSeason()`, `applyTheme(sport)`
 **log.js** – `adjust(type, delta)`, `saveMatch()`, `resetForm()`, `setMatchType(type)`, `updateResult()`, `getMatchType()`
-**stats.js** – `loadStats(forceRefresh?)`, `renderStats()`, `renderAnalyse(matches)`, `calcWDL(matchArr)`, `getResult(k)`, `destroyCharts()`, `initChartDefaults()`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setTournamentFilter(tournament)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `activeTournament`, `matchPage`, `opponentSearch`, `CHART_COLORS`
+**stats-overview.js** – `loadStats(forceRefresh?)`, `renderStats()`, `calcWDL(matchArr)`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setTournamentFilter(tournament)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `activeTournament`, `matchPage`, `opponentSearch`
+**stats-analyse.js** – `renderAnalyse(matches, activeLag, activeSeason)`, `renderFormStreak(matches)`, `destroyCharts()`, `initChartDefaults()`
+**stats-search.js** – `renderMatchListPaged(matches, page)`
 **modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
 **assessment.js** – `openAssessmentSheet(matchId)`, `closeAssessmentSheet()`, `resetAssessmentState()`, `loadMatchIntoAssessment(match)`, `renderAssessmentSheet()`, `renderModalAssessmentSection()`, `setRating(category, value, context)`, `saveAssessment()`, `getAssessmentPayload()`
 **export.js** – `exportCSV()`, `exportPDF()`
@@ -350,14 +358,14 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 
 ## ⚠️ Kritiske konvensjoner – lær av tidligere bugs
 
-### modalAdjust() – samme invariants som adjust()
-`modalAdjust()` håndhever identiske clamps som `adjust()`:
-- Goals kan ikke overstige eget lags score i modalen
+### clampStats() – delt invariant for adjust() og modalAdjust()
+Begge bruker `clampStats(goals, assists, ownScore)` fra `utils.js`. Logikken er:
+- Goals kan ikke overstige eget lags score
 - Assist kan ikke overstige `ownScore − goals`
 - Senkes score, clampes goals og assist automatisk ned
-- Eget lags score = `mHome` ved hjemmekamp, `mAway` ved bortekamp (styres av `mMatchType`)
+- Eget lags score = `home` i logg-skjema, `mHome`/`mAway` i modal (styres av matchType)
 
-**Ikke forenkle `modalAdjust()` tilbake til kun `Math.max(0, ...)`** – det vil gjeninnføre buggen der redigering kunne produsere logisk umulige kampdata (f.eks. 3 mål i en kamp der eget lag scoret 1).
+**Ikke dupliser clamping-logikk** — bruk alltid `clampStats()`. Endre aldri én implementasjon uten den andre.
 
 ### activeLag – filterverdier
 `activeLag` bruker alltid strengen `'all'` som standardverdi og "alle team"-nøkkel. **Aldri bruk `'alle'`**.
@@ -406,7 +414,7 @@ Uten dette lekkjer Chart.js-instanser og grafer tegnes dobbelt ved re-render.
 I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-content` (siden `#stats-filters` er skjult).
 
 ### Avatar upload
-`uploadImage()` er eksponert globalt som `window._uploadImage` fra `main.js` fordi avatar-input bruker `onchange`-attributt i HTML (eneste gjenværende `on*`-attributt).
+Avatar-input i `app.html` bruker `data-action="uploadImage"`. `main.js` håndterer dette via delegert `change`-event. Ingen `window._uploadImage` global og ingen `onchange`-attributt.
 
 ---
 
