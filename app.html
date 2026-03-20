@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Athlytics">
@@ -31,11 +32,13 @@
       <div class="auth-view" id="auth-login-view">
         <h2 class="auth-title" data-i18n="auth_login_title">Log in</h2>
         <div class="auth-error hidden" id="auth-login-error"></div>
-        <input type="email" id="auth-login-email" class="auth-input"
-               placeholder="Email" autocomplete="email">
-        <input type="password" id="auth-login-password" class="auth-input"
-               placeholder="Password" autocomplete="current-password">
-        <button class="auth-btn-primary" data-action="authLogin" data-i18n="auth_login_btn">Log in</button>
+        <form onsubmit="return false">
+          <input type="email" id="auth-login-email" class="auth-input"
+                 placeholder="Email" autocomplete="email">
+          <input type="password" id="auth-login-password" class="auth-input"
+                 placeholder="Password" autocomplete="current-password">
+          <button class="auth-btn-primary" data-action="authLogin" data-i18n="auth_login_btn">Log in</button>
+        </form>
         <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_signup">Don't have an account? Sign up</button>
       </div>
 
@@ -43,13 +46,15 @@
       <div class="auth-view hidden" id="auth-signup-view">
         <h2 class="auth-title" data-i18n="auth_signup_title">Create account</h2>
         <div class="auth-error hidden" id="auth-signup-error"></div>
-        <input type="email" id="auth-signup-email" class="auth-input"
-               placeholder="Email" autocomplete="email">
-        <input type="password" id="auth-signup-password" class="auth-input"
-               placeholder="Password" autocomplete="new-password">
-        <input type="password" id="auth-signup-confirm" class="auth-input"
-               placeholder="Confirm password" autocomplete="new-password">
-        <button class="auth-btn-primary" data-action="authSignup" data-i18n="auth_signup_btn">Create account</button>
+        <form onsubmit="return false">
+          <input type="email" id="auth-signup-email" class="auth-input"
+                 placeholder="Email" autocomplete="email">
+          <input type="password" id="auth-signup-password" class="auth-input"
+                 placeholder="Password" autocomplete="new-password">
+          <input type="password" id="auth-signup-confirm" class="auth-input"
+                 placeholder="Confirm password" autocomplete="new-password">
+          <button class="auth-btn-primary" data-action="authSignup" data-i18n="auth_signup_btn">Create account</button>
+        </form>
         <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_login">Already have an account? Log in</button>
       </div>
 
