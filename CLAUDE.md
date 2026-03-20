@@ -514,7 +514,7 @@ Fase 1 (MVP), 1.5 (teknisk opprydding), 1.6 (UX-polish) og 2 (analyse/grafer) er
 - [ ] Stripe-integrasjon
 - [ ] `isPremium()` kobles til Stripe-abonnement
 - [x] Auth (Supabase Auth) + riktig RLS-policy + `auth.js`-modul
-- [ ] **First login flow:** After a user authenticates for the first time (empty profile row), redirect to the Profile tab with a soft prompt encouraging them to fill in name, club, and position. Include a "Skip for now" option so users can proceed without filling anything in. Show a persistent incomplete-badge on the Profile tab icon until at least a name is entered. Returning users (profile already populated) go directly to the Log tab as normal.
+- [x] **First login flow:** New users (empty profile) are redirected to Profile tab after login/signup. Soft prompt banner with "Skip for now" shown; gold badge on Profile tab icon until name is entered. Returning users (profile has name) go to Log tab. Banner and badge hidden for demo/unauthenticated users. Dismissal is session-only.
 
 ---
 
