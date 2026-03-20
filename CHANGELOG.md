@@ -4,6 +4,19 @@
 
 ---
 
+## [Fase 4] Auth — 2026-03-20
+
+- Implemented Supabase email/password authentication (`auth.js`) via raw REST API
+- Added per-user data isolation with RLS: authenticated users own their rows; anon users see demo data read-only
+- Demo mode: unauthenticated visitors see demo data with sign-up prompt banner
+- WRITE_ACTIONS intercept in `main.js` blocks all write operations for unauthenticated users
+- Session persistence via localStorage with 50-min token refresh interval
+- Auth overlay UI (login + signup views) in `app.html`/`style.css`
+- Added 10 i18n keys for auth strings
+- `profiles.id` migrated from `text` to `uuid` FK; `matches.user_id` column added
+
+---
+
 ## Økt 15 – 2026-03-19: Selvvurdering etter kamp
 
 - Ny `assessment.js`-modul med selvvurdering etter kamp (5 kategorier, 1–5 tall-knapper, 2 fritekstfelter)

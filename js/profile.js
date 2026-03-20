@@ -1,4 +1,5 @@
 import { PROFIL_KEY } from './config.js';
+import { getUserId } from './auth.js';
 import { fetchProfil, upsertProfil } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -55,7 +56,7 @@ export function saveProfile_local(profil) {
 
 export async function fetchProfileFromSupabase() {
   try {
-    var row = await fetchProfil();
+    var row = await fetchProfil(getUserId());
     if (row) {
       var p = {
         name: row.name || '',
@@ -77,7 +78,7 @@ export async function fetchProfileFromSupabase() {
 export async function saveProfileToSupabase(profil) {
   try {
     await upsertProfil({
-      id: 'default',
+      id: getUserId(),
       name: profil.name,
       club: profil.club,
       team: profil.teams,

@@ -38,8 +38,8 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| RLS på Supabase er "Allow all" på begge tabeller | 🔴 Kritisk | Implementer riktig RLS-policy per bruker ved auth |
-| Ingen autentisering (Supabase Auth ikke implementert) | 🔴 Kritisk | Fase 4 – `auth.js` er reservert plass i modulstrukturen |
+| RLS på Supabase er "Allow all" på begge tabeller | ✅ Ferdig | RLS implementert — authenticated users: full CRUD på egne rader; anon: SELECT-only på demo-brukerens rader |
+| Ingen autentisering (Supabase Auth ikke implementert) | ✅ Ferdig | auth.js implementert med email/password via Supabase Auth REST API |
 | Supabase anon key er hardkodet i `js/config.js` | 🟠 Høy | Flytt til miljøvariabel via Vercel ved auth-implementasjon |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
@@ -188,10 +188,9 @@ js/
   modal.js              – openEditModal(), closeModal(), modalAdjust(), saveEditedMatch(), deleteMatch()
   assessment.js         – self-assessment state, rendering, save/payload functions
   export.js             – exportCSV(), exportPDF()
+  auth.js               – session lifecycle, login/signup/logout/restoreSession via Supabase Auth REST API
   main.js               – bootstrap, sentralisert event delegation (ACTIONS-map)
 ```
-
-`auth.js` er **ikke** implementert ennå – reservert plass for Supabase Auth i Fase 4.
 
 ---
 
@@ -225,9 +224,11 @@ Brukes for å bryte sirkulære avhengigheter mellom moduler:
 
 ```
 config.js
-    ↓
-supabase.js
-    ↓
+    ↓        ↓
+auth.js   supabase.js
+              ↑
+          (imports auth.js)
+              ↓
 state.js    utils.js    toast.js
     ↓
 settings.js
@@ -266,6 +267,7 @@ profile.js   teams.js   settings-render.js   navigation.js
 
 ```
 id (uuid, auto)
+user_id (uuid, NOT NULL, DEFAULT auth.uid(), FK to auth.users(id) ON DELETE CASCADE)
 date (date)
 opponent (text)
 own_team (text)
@@ -289,7 +291,7 @@ reflection_improve TEXT (nullable)
 ### Supabase-tabell: `profiles`
 
 ```
-id (text, default 'default')
+id (uuid, FK to auth.users(id))
 name (text)
 club (text)
 team (jsonb, default '[]')       ← DB column name is 'team'; JS in-memory field is 'teams'
@@ -352,7 +354,8 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 **modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
 **assessment.js** – `openAssessmentSheet(matchId)`, `closeAssessmentSheet()`, `resetAssessmentState()`, `loadMatchIntoAssessment(match)`, `renderAssessmentSheet()`, `renderModalAssessmentSection()`, `setRating(category, value, context)`, `saveAssessment()`, `getAssessmentPayload()`
 **export.js** – `exportCSV()`, `exportPDF()`
-**main.js** – bootstrap, `setupEventDelegation()`, ACTIONS-map
+**auth.js** – `login(email, password)`, `signup(email, password)`, `logout()`, `restoreSession()`, `getSession()`, `getUserId()`
+**main.js** – bootstrap, `setupEventDelegation()`, `openAuthOverlay(view)`, `closeAuthOverlay()`, `handleAuthLogin()`, `handleAuthSignup()`, `updateDemoBanner()`, ACTIONS-map
 
 ---
 
@@ -508,7 +511,7 @@ Fase 1 (MVP), 1.5 (teknisk opprydding), 1.6 (UX-polish) og 2 (analyse/grafer) er
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon
 - [ ] `isPremium()` kobles til Stripe-abonnement
-- [ ] Auth (Supabase Auth) + riktig RLS-policy + `auth.js`-modul
+- [x] Auth (Supabase Auth) + riktig RLS-policy + `auth.js`-modul
 - [ ] **First login flow:** After a user authenticates for the first time (empty profile row), redirect to the Profile tab with a soft prompt encouraging them to fill in name, club, and position. Include a "Skip for now" option so users can proceed without filling anything in. Show a persistent incomplete-badge on the Profile tab icon until at least a name is entered. Returning users (profile already populated) go directly to the Log tab as normal.
 
 ---

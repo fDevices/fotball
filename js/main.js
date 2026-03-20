@@ -1,4 +1,4 @@
-import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
+import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt, getProfile } from './profile.js';
 import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
@@ -11,6 +11,26 @@ import { openAssessmentSheet, closeAssessmentSheet, saveAssessment, setRating } 
 import { exportCSV, exportPDF } from './export.js';
 import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
 import { showToast } from './toast.js';
+import { restoreSession, isAuthenticated, logout } from './auth.js';
+import { PROFIL_KEY, SETTINGS_KEY, CACHE_KEY } from './config.js';
+
+// ── Auth helpers ──────────────────────────────────────────────────────────
+
+function _clearCaches() {
+  localStorage.removeItem(PROFIL_KEY);
+  localStorage.removeItem(SETTINGS_KEY);
+  sessionStorage.removeItem(CACHE_KEY);
+}
+
+const WRITE_ACTIONS = new Set([
+  'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
+  'addTeamFromProfile', 'addTournament', 'deleteTeam', 'deleteTournament',
+  'setFavoriteTeam', 'setFavoriteTournament', 'saveNewTeamFromDropdown',
+  'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
+  'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF'
+]);
+
+var _demoBannerDismissed = false;
 
 // ── Event delegation action map ────────────────────────────────────────────
 
@@ -67,7 +87,105 @@ const ACTIONS = {
   saveAssessment:                () => saveAssessment(),
   setRating:                     (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value), el.dataset.context); },
   dismissProfilePrompt:          () => dismissProfilePrompt(),
+  logout:              () => logout(),
+  openAuthOverlay:     () => openAuthOverlay('login'),
+  dismissDemoBanner:   () => { _demoBannerDismissed = true; updateDemoBanner(); },
+  authToggleView:      () => toggleAuthView(),
+  authLogin:           () => handleAuthLogin(),
+  authSignup:          () => handleAuthSignup(),
 };
+
+// ── Auth overlay ─────────────────────────────────────────────────────────
+
+function openAuthOverlay(view) {
+  var overlay = document.getElementById('auth-overlay');
+  if (overlay) overlay.classList.remove('hidden');
+  showAuthView(view || 'login');
+}
+
+function closeAuthOverlay() {
+  var overlay = document.getElementById('auth-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+function showAuthView(view) {
+  var loginView  = document.getElementById('auth-login-view');
+  var signupView = document.getElementById('auth-signup-view');
+  if (!loginView || !signupView) return;
+  if (view === 'signup') {
+    loginView.classList.add('hidden');
+    signupView.classList.remove('hidden');
+  } else {
+    signupView.classList.add('hidden');
+    loginView.classList.remove('hidden');
+  }
+}
+
+function toggleAuthView() {
+  var loginView = document.getElementById('auth-login-view');
+  var isLoginVisible = loginView && !loginView.classList.contains('hidden');
+  showAuthView(isLoginVisible ? 'signup' : 'login');
+}
+
+function showAuthError(viewId, msg) {
+  var el = document.getElementById(viewId);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function clearAuthErrors() {
+  ['auth-login-error', 'auth-signup-error'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = ''; el.classList.add('hidden'); }
+  });
+}
+
+async function handleAuthLogin() {
+  clearAuthErrors();
+  var email    = (document.getElementById('auth-login-email')    || {}).value || '';
+  var password = (document.getElementById('auth-login-password') || {}).value || '';
+  var { login: authLogin } = await import('./auth.js');
+  var result = await authLogin(email, password);
+  if (result.error) { showAuthError('auth-login-error', result.error); return; }
+  closeAuthOverlay();
+  _clearCaches();
+  var p = await fetchProfileFromSupabase();
+  loadProfileData(p);
+  switchTab('log');
+  updateDemoBanner();
+}
+
+async function handleAuthSignup() {
+  clearAuthErrors();
+  var email    = (document.getElementById('auth-signup-email')    || {}).value || '';
+  var password = (document.getElementById('auth-signup-password') || {}).value || '';
+  var confirm  = (document.getElementById('auth-signup-confirm')  || {}).value || '';
+  if (password !== confirm) {
+    showAuthError('auth-signup-error', t('auth_error_pw_mismatch'));
+    return;
+  }
+  var { signup: authSignup } = await import('./auth.js');
+  var result = await authSignup(email, password);
+  if (result.error) { showAuthError('auth-signup-error', result.error); return; }
+  closeAuthOverlay();
+  _clearCaches();
+  loadProfileData(getProfile());
+  switchTab('profile');
+  updateDemoBanner();
+}
+
+// ── Demo banner ───────────────────────────────────────────────────────────
+
+function updateDemoBanner() {
+  var banner = document.getElementById('demo-banner');
+  if (!banner) return;
+  if (isAuthenticated() || _demoBannerDismissed) {
+    banner.classList.add('hidden');
+  } else {
+    banner.classList.remove('hidden');
+  }
+}
 
 function updateDateLabel(val) {
   var el = document.getElementById('date-display-label');
@@ -114,6 +232,10 @@ function setupEventDelegation() {
     var btn = e.target.closest('[data-action]');
     if (!btn) return;
     var action = btn.dataset.action;
+    if (WRITE_ACTIONS.has(action) && !isAuthenticated()) {
+      document.dispatchEvent(new CustomEvent('athlytics:requireAuth'));
+      return;
+    }
     if (ACTIONS[action]) {
       try { ACTIONS[action](e); } catch(err) { console.error('Action error:', action, err); }
     }
@@ -133,12 +255,25 @@ function setupEventDelegation() {
   document.addEventListener('change', function(e) {
     var el = e.target.closest('input[data-action]');
     if (!el) return;
-    if (el.dataset.action === 'uploadImage') uploadImage(el);
+    if (el.dataset.action === 'uploadImage') {
+      if (!isAuthenticated()) {
+        document.dispatchEvent(new CustomEvent('athlytics:requireAuth'));
+        return;
+      }
+      uploadImage(el);
+    }
   });
 
   // Keydown: Enter for add-item inputs
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
+    if (!isAuthenticated()) {
+      var writeInputIds = ['team-new-input', 'tournament-new-input', 'profile-team-input', 'profile-new-tournament', 'settings-ny-sesong'];
+      if (writeInputIds.includes(e.target.id)) {
+        document.dispatchEvent(new CustomEvent('athlytics:requireAuth'));
+        return;
+      }
+    }
     if (e.target.id === 'team-new-input') saveNewTeamFromDropdown();
     if (e.target.id === 'tournament-new-input') saveNewTournamentFromDropdown();
     if (e.target.id === 'profile-team-input') addTeamFromProfile();
@@ -189,6 +324,11 @@ document.addEventListener('athlytics:showAssessment', function(e) {
   if (e.detail && e.detail.matchId) openAssessmentSheet(e.detail.matchId);
 });
 
+document.addEventListener('athlytics:requireAuth', function() {
+  // Dispatched by WRITE_ACTIONS intercept, keydown guard, and uploadImage guard
+  openAuthOverlay('login');
+});
+
 // ── Bootstrap ──────────────────────────────────────────────────────────────
 
 // Global outside-click handler for lang picker (runs once, not per toggle)
@@ -201,6 +341,7 @@ document.addEventListener('click', function(e) {
 
 window.addEventListener('load', async function() {
   try {
+    await restoreSession();
     initChartDefaults();
     var today = new Date().toISOString().split('T')[0];
     document.getElementById('date').value = today;
@@ -221,6 +362,7 @@ window.addEventListener('load', async function() {
     updateLogBadge();
     updateFlags();
     updateAllText();
+    updateDemoBanner();
   } catch(err) {
     console.error('Init failed:', err);
   }
