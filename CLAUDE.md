@@ -56,7 +56,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Fil | Alvorlighet | Løsning |
 |---|---|---|---|
-| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | Vurder split: `main.js` (bootstrap+wiring), `main-actions.js` (ACTIONS-map), `auth-ui.js` (overlay/banner/auth-view) i Fase 3 |
+| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | 🟡 Delvis løst – auth-ui.js ekstrahert 2026-03-20. Gjenstår: ACTIONS-map og dato-toggle. |
 
 > **Merk:** Guard clause-mønster for ACTIONS: `var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, ...)`
 
@@ -77,7 +77,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `i18n.js` har vokst fra oversettelsesordbok til global tekst-refresh-kontroller – oppdaterer DOM-noder direkte og dispatcher cross-module events | 🟡 Medium | Vurder split: `i18n.js` (ordbok + `t()`) og `text-refresh.js` (imperativ DOM-oppdatering) i Fase 3. |
+| `i18n.js` har vokst fra oversettelsesordbok til global tekst-refresh-kontroller – oppdaterer DOM-noder direkte og dispatcher cross-module events | ✅ Ferdig | Løst: tekst-refresh.js ekstrahert i 2026-03-20 |
 | `app.html` inneholder norske standardstrenger (placeholders, settings-tekst) som overskrives etter load | 🟢 Lav | Bevisst valg: `updateAllText()` og `renderSettings()` kjøres ved bootstrap. Skjørt hvis render-syklusen feiler. Vurder nøytralt / tom HTML ved Fase 3-redesign. |
 
 ### profile.js
@@ -140,7 +140,9 @@ js/
   utils.js              – esc(), isDevPremium(), clampStats(), getResult()
   toast.js              – showToast()
   settings.js           – getSettings(), saveSettings(), defaultSettings(), buildSeasonLabel(), getAllSeasons(), getDateLocale(), requestRenderSettings()
-  i18n.js               – TEKST, t(), setLang(), updateAllText(), updateFlags(), toggleLangPicker()
+  i18n.js               – TEKST, t(), toggleLangPicker() — pure dictionary only
+  auth-ui.js            – auth overlay (open/close/toggle view), login/signup handlers, demo banner
+  text-refresh.js       – DOM text and flag updates: setLang(), updateFlags(), updateAllText()
   profile.js            – profil-data, cache, Supabase-sync, rendering av profil-tab
   teams.js              – alle dropdown-funksjoner for lag og turnering (logg + modal)
   navigation.js         – switchTab(), updateLogBadge()
@@ -190,7 +192,7 @@ Brukes for å bryte sirkulære avhengigheter mellom moduler:
 ```
 config.js
     ↓
-auth.js                        ← imported by supabase.js, profile.js, settings.js, main.js
+auth.js                        ← imported by supabase.js, profile.js, settings.js, auth-ui.js, main.js
     ↓
 supabase.js
     ↓
@@ -199,6 +201,9 @@ state.js    utils.js    toast.js
 settings.js
     ↓
 i18n.js  ←  settings.js
+    ↓
+text-refresh.js  ←  i18n.js, settings.js        ← imported by main.js
+auth-ui.js       ←  auth.js, profile.js, navigation.js, i18n.js, config.js  ← imported by main.js
     ↓
 profile.js   teams.js   settings-render.js   navigation.js
     ↓           ↓              ↓                   ↓
