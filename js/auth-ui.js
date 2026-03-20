@@ -20,7 +20,7 @@ export function openAuthOverlay(view) {
   showAuthView(view || 'login');
 }
 
-export function closeAuthOverlay() {
+function closeAuthOverlay() {
   var overlay = document.getElementById('auth-overlay');
   if (overlay) overlay.classList.add('hidden');
 }

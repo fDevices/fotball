@@ -231,7 +231,8 @@ document.addEventListener('athlytics:requireAuth', function() {
 
 // ── Bootstrap ──────────────────────────────────────────────────────────────
 
-// Global outside-click handler for lang picker (runs once, not per toggle)
+// Global outside-click handler for lang picker — intentionally separate from setupEventDelegation()
+// because it must run regardless of whether the click hit a [data-action] element.
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.lang-picker-wrap')) {
     document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
