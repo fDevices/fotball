@@ -3,7 +3,7 @@ import { upsertSettings } from './supabase.js';
 
 var _settingsCache = null;
 
-function defaultSettings() {
+export function defaultSettings() {
   return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu' };
 }
 
@@ -68,7 +68,7 @@ export function getAllSeasons(allMatches) {
   return sett.sort(function(a, b) { return parseInt(a) - parseInt(b); });
 }
 
-export function renderSettings() {
-  // Import lazily via dynamic event to avoid circular dep chain
+export function requestRenderSettings() {
+  // Fires event to break circular dep chain: settings → settings-render → settings
   document.dispatchEvent(new CustomEvent('athlytics:renderSettings'));
 }

@@ -207,7 +207,7 @@ export function renderStats() {
   }).join('');
 
   var seasonMatches = getAllMatches().filter(function(k) { return matchesSeason(k, activeSeason); });
-  var profileTeams = getProfile().team || [];
+  var profileTeams = getProfile().teams || [];
   if (!activeLag || (!profileTeams.includes(activeLag) && activeLag !== 'all')) activeLag = 'all';
   var teamPills = [{ key: 'all', label: t('alle_lag') }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
   document.getElementById('team-filter-selector').innerHTML = teamPills.map(function(p) {

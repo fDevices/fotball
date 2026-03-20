@@ -4,6 +4,7 @@ import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, render
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload, resetAssessmentState } from './assessment.js';
+import { clampStats } from './utils.js';
 
 var modalMatchId = null;
 var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
@@ -69,18 +70,19 @@ export function setModalMatchType(type) {
 export function modalAdjust(type, delta) {
   var ownScore = mMatchType === 'home' ? mHome : mAway;
   if (type === 'goals') {
-    mGoals   = Math.min(ownScore, Math.max(0, mGoals + delta));
-    mAssists = Math.min(mAssists, ownScore - mGoals);
+    var cg = clampStats(mGoals + delta, mAssists, ownScore);
+    mGoals = cg.goals; mAssists = cg.assists;
     document.getElementById('modal-goals').textContent  = mGoals;
     document.getElementById('modal-assist').textContent = mAssists;
   } else if (type === 'assist') {
-    mAssists = Math.min(ownScore - mGoals, Math.max(0, mAssists + delta));
+    var ca = clampStats(mGoals, mAssists + delta, ownScore);
+    mAssists = ca.assists;
     document.getElementById('modal-assist').textContent = mAssists;
   } else if (type === 'home') {
     mHome = Math.max(0, mHome + delta);
     if (mMatchType === 'home') {
-      mGoals   = Math.min(mGoals, mHome);
-      mAssists = Math.min(mAssists, mHome - mGoals);
+      var ch = clampStats(mGoals, mAssists, mHome);
+      mGoals = ch.goals; mAssists = ch.assists;
       document.getElementById('modal-goals').textContent  = mGoals;
       document.getElementById('modal-assist').textContent = mAssists;
     }
@@ -88,8 +90,8 @@ export function modalAdjust(type, delta) {
   } else if (type === 'away') {
     mAway = Math.max(0, mAway + delta);
     if (mMatchType === 'away') {
-      mGoals   = Math.min(mGoals, mAway);
-      mAssists = Math.min(mAssists, mAway - mGoals);
+      var caw = clampStats(mGoals, mAssists, mAway);
+      mGoals = caw.goals; mAssists = caw.assists;
       document.getElementById('modal-goals').textContent  = mGoals;
       document.getElementById('modal-assist').textContent = mAssists;
     }

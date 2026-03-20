@@ -154,20 +154,24 @@ document.addEventListener('athlytics:toast', function(e) {
 });
 
 document.addEventListener('athlytics:renderSettings', function() {
+  // Dispatched by settings.js:requestRenderSettings() to break circular dep
   renderSettings();
 });
 
 document.addEventListener('athlytics:updateAllText', function() {
+  // Dispatched by i18n.js:setLang() after language change
   renderLogSub();
   updateResult();
   updateLogBadge();
 });
 
 document.addEventListener('athlytics:loadStats', function() {
+  // Dispatched by navigation.js:switchTab() when navigating to stats tab
   loadStats();
 });
 
 document.addEventListener('athlytics:destroyCharts', function() {
+  // Dispatched by navigation.js:switchTab() when leaving stats tab
   destroyCharts();
 });
 
@@ -210,7 +214,7 @@ window.addEventListener('load', async function() {
     updateProfilePrompt();
     renderTeamDropdown();
     renderLogSub();
-    if (p.favoriteTeam && p.team.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);
+    if (p.favoriteTeam && p.teams && p.teams.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);
     if (p.favoriteTournament && p.tournaments && p.tournaments.includes(p.favoriteTournament)) selectTournament(p.favoriteTournament);
     renderTournamentDropdown();
     applyTheme(getSettings().sport);

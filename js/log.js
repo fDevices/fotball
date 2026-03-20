@@ -3,6 +3,7 @@ import { getAllMatches, setAllMatches, invalidateMatchCache } from './state.js';
 import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDropdown } from './teams.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
+import { clampStats } from './utils.js';
 
 var goals = 0, assist = 0, home = 0, away = 0, matchType = 'home';
 
@@ -36,20 +37,21 @@ export function updateResult() {
 export function adjust(type, delta) {
   var ownScore = matchType === 'home' ? home : away;
   if (type === 'goals') {
-    goals = Math.min(ownScore, Math.max(0, goals + delta));
-    assist = Math.min(assist, ownScore - goals);
+    var cg = clampStats(goals + delta, assist, ownScore);
+    goals = cg.goals; assist = cg.assists;
     document.getElementById('goals-display').textContent = goals;
     document.getElementById('assist-display').textContent = assist;
   }
   if (type === 'assist') {
-    assist = Math.min(ownScore - goals, Math.max(0, assist + delta));
+    var ca = clampStats(goals, assist + delta, ownScore);
+    assist = ca.assists;
     document.getElementById('assist-display').textContent = assist;
   }
   if (type === 'home') {
     home = Math.max(0, home + delta);
     if (matchType === 'home') {
-      goals = Math.min(goals, home);
-      assist = Math.min(assist, home - goals);
+      var ch = clampStats(goals, assist, home);
+      goals = ch.goals; assist = ch.assists;
       document.getElementById('goals-display').textContent = goals;
       document.getElementById('assist-display').textContent = assist;
     }
@@ -59,8 +61,8 @@ export function adjust(type, delta) {
   if (type === 'away') {
     away = Math.max(0, away + delta);
     if (matchType === 'away') {
-      goals = Math.min(goals, away);
-      assist = Math.min(assist, away - goals);
+      var caw = clampStats(goals, assist, away);
+      goals = caw.goals; assist = caw.assists;
       document.getElementById('goals-display').textContent = goals;
       document.getElementById('assist-display').textContent = assist;
     }
@@ -125,5 +127,6 @@ export function resetForm() {
   setMatchType('home');
   updateResult();
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
+  // Intentional: keeps last selected team for convenience — user often logs multiple matches for the same team
   renderTeamDropdown();
 }

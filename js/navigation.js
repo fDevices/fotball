@@ -9,6 +9,7 @@ export function updateLogBadge() {
   var aar = s.activeSeason || String(new Date().getFullYear());
   var baseAar = aar.split(/[\u2013-]/)[0].trim();
   var label = buildSeasonLabel(baseAar, s.seasonFormat);
+  // TODO Phase 3: move to SPORT_META map when multi-sport is implemented
   var icon = s.sport === 'orientering' ? '\u{1F9ED}' : s.sport === 'ski' ? '\u26F7\uFE0F' : '\u26BD';
   badge.textContent = icon + ' ' + label;
 }

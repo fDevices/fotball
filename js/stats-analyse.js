@@ -63,7 +63,7 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
   // Use all matches (not just filtered) for season list so all seasons are shown
   var seasons = getAllSeasons(getAllMatches());
   if (!seasons.length) seasons = [String(new Date().getFullYear())];
-  var profileTeams = getProfile().team || [];
+  var profileTeams = getProfile().teams || [];
   var lag = activeLag || 'all';
   if (!lag || (!profileTeams.includes(lag) && lag !== 'all')) lag = 'all';
   var teamPills = [{ key: 'all', label: t('alle_lag') }].concat(profileTeams.map(function(l) { return { key: l, label: l }; }));
