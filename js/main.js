@@ -13,7 +13,7 @@ import { exportCSV, exportPDF } from './export.js';
 import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
 import { showToast } from './toast.js';
 import { restoreSession, isAuthenticated, logout } from './auth.js';
-import { openAuthOverlay, closeAuthOverlay, updateDemoBanner, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
+import { openAuthOverlay, updateDemoBanner, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
 
 const WRITE_ACTIONS = new Set([
   'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
