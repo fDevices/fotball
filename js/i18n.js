@@ -93,6 +93,9 @@ const TEKST = {
     auth_to_login:'Har du en konto? Logg inn',
     auth_logout:'Logg ut',
     auth_error_pw_mismatch:'Passordene stemmer ikke overens',
+    toast_avatar_invalid_type: 'Filen må være et bilde',
+    toast_avatar_too_large:    'Bildet er for stort (maks 10 MB)',
+    toast_avatar_upload_failed: 'Opplasting feilet – prøv igjen',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -186,6 +189,9 @@ const TEKST = {
     auth_to_login:'Already have an account? Log in',
     auth_logout:'Log out',
     auth_error_pw_mismatch:'Passwords do not match',
+    toast_avatar_invalid_type: 'File must be an image',
+    toast_avatar_too_large:    'Image is too large (max 10 MB)',
+    toast_avatar_upload_failed: 'Upload failed – please try again',
   }
 };
 
