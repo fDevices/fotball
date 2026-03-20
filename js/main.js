@@ -3,7 +3,8 @@ import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
-import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
+import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch } from './stats-overview.js';
+import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { openAssessmentSheet, closeAssessmentSheet, saveAssessment, setRating } from './assessment.js';
@@ -161,6 +162,11 @@ document.addEventListener('athlytics:loadStats', function() {
 
 document.addEventListener('athlytics:destroyCharts', function() {
   destroyCharts();
+});
+
+document.addEventListener('athlytics:matchesChanged', function() {
+  // Dispatched by modal.js after save/delete — force re-fetch from Supabase
+  loadStats(true);
 });
 
 document.addEventListener('athlytics:renderProfileLists', function() {

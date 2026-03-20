@@ -3,7 +3,6 @@ import { updateKamp, deleteKamp } from './supabase.js';
 import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, renderModalTournamentDropdown } from './teams.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
-import { renderStats } from './stats.js';
 import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload, resetAssessmentState } from './assessment.js';
 
 var modalMatchId = null;
@@ -123,7 +122,7 @@ export async function saveEditedMatch() {
         return String(m.id) === String(modalMatchId) ? Object.assign({}, m, body) : m;
       }));
       closeModal();
-      renderStats();
+      document.dispatchEvent(new CustomEvent('athlytics:matchesChanged'));
       showToast(t('toast_match_updated'), 'success');
     } else {
       showToast(t('toast_feil_lagring'), 'error');
@@ -151,7 +150,7 @@ export async function confirmDeleteMatch() {
       var updated = getAllMatches().filter(function(k) { return String(k.id) !== String(modalMatchId); });
       setAllMatches(updated);
       closeModal();
-      renderStats();
+      document.dispatchEvent(new CustomEvent('athlytics:matchesChanged'));
       showToast(t('toast_match_deleted'), 'success');
     } else {
       showToast(t('toast_delete_error'), 'error');
