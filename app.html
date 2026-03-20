@@ -16,6 +16,46 @@
 </head>
 <body>
 
+  <!-- Demo banner — visible when unauthenticated -->
+  <div class="demo-banner hidden" id="demo-banner">
+    <span data-i18n="demo_banner_text">You're viewing demo data — create a free account to track your own</span>
+    <button class="demo-banner-signup" data-action="openAuthOverlay" data-i18n="demo_banner_signup">Sign up free</button>
+    <button class="demo-banner-dismiss" data-action="dismissDemoBanner" aria-label="Dismiss">✕</button>
+  </div>
+
+  <!-- Auth overlay — full-screen, hidden by default -->
+  <div class="auth-overlay hidden" id="auth-overlay">
+    <div class="auth-modal">
+
+      <!-- Login view -->
+      <div class="auth-view" id="auth-login-view">
+        <h2 class="auth-title" data-i18n="auth_login_title">Log in</h2>
+        <div class="auth-error hidden" id="auth-login-error"></div>
+        <input type="email" id="auth-login-email" class="auth-input"
+               placeholder="Email" autocomplete="email">
+        <input type="password" id="auth-login-password" class="auth-input"
+               placeholder="Password" autocomplete="current-password">
+        <button class="auth-btn-primary" data-action="authLogin" data-i18n="auth_login_btn">Log in</button>
+        <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_signup">Don't have an account? Sign up</button>
+      </div>
+
+      <!-- Signup view -->
+      <div class="auth-view hidden" id="auth-signup-view">
+        <h2 class="auth-title" data-i18n="auth_signup_title">Create account</h2>
+        <div class="auth-error hidden" id="auth-signup-error"></div>
+        <input type="email" id="auth-signup-email" class="auth-input"
+               placeholder="Email" autocomplete="email">
+        <input type="password" id="auth-signup-password" class="auth-input"
+               placeholder="Password" autocomplete="new-password">
+        <input type="password" id="auth-signup-confirm" class="auth-input"
+               placeholder="Confirm password" autocomplete="new-password">
+        <button class="auth-btn-primary" data-action="authSignup" data-i18n="auth_signup_btn">Create account</button>
+        <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_login">Already have an account? Log in</button>
+      </div>
+
+    </div>
+  </div>
+
 <div class="landscape-block">
   <div class="landscape-block-inner">
     <div class="landscape-block-icon">📱</div>
@@ -330,6 +370,8 @@
         <button class="export-btn pdf-btn" data-action="exportPDF">📄 Last ned PDF</button>
       </div>
     </div>
+
+    <button class="settings-logout-btn" data-action="logout" data-i18n="auth_logout">Log out</button>
 
     <div class="settings-spacer"></div>
     <div class="settings-version">Athlytics Sport v0.1 · fotball</div>

@@ -531,4 +531,128 @@
   backdrop-filter: blur(4px);
 }
 /* Assessment sheet uses same modal-sheet / modal-backdrop pattern */
+
+/* ── Demo Banner ──────────────────────────────────────────────────────── */
+.demo-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--card);
+  border-bottom: 1px solid rgba(168,224,99,0.2);
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  flex-wrap: wrap;
+}
+.demo-banner span { flex: 1; min-width: 0; }
+.demo-banner-signup {
+  background: var(--lime);
+  color: var(--grass);
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.demo-banner-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ── Auth Overlay ─────────────────────────────────────────────────────── */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,20,12,0.97);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.auth-overlay.hidden { display: none; }
+.auth-modal {
+  width: 100%;
+  max-width: 360px;
+}
+.auth-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--lime);
+  margin: 0 0 20px;
+  text-align: center;
+}
+.auth-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--card);
+  border: 1px solid rgba(168,224,99,0.2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 15px;
+  color: #fff;
+  margin-bottom: 12px;
+  outline: none;
+}
+.auth-input:focus { border-color: var(--lime); }
+.auth-btn-primary {
+  display: block;
+  width: 100%;
+  background: var(--lime);
+  color: var(--grass);
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 12px;
+  margin-top: 4px;
+}
+.auth-btn-link {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  padding: 8px 0;
+}
+.auth-btn-link:hover { color: rgba(255,255,255,0.8); }
+.auth-error {
+  background: rgba(224,85,85,0.15);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--danger);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.auth-error.hidden { display: none; }
+.auth-view.hidden { display: none; }
+
+/* ── Logout button (in Settings tab) ─────────────────────────────────── */
+.settings-logout-btn {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 12px;
+  color: var(--danger);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 24px;
+}
 #assessment-body { padding: 16px 16px 0; overflow-y: auto; }
