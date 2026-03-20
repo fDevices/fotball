@@ -10,8 +10,6 @@ var _activeContext = null; // 'sheet' | 'modal'
 
 var CATEGORIES = ['overall', 'effort', 'focus', 'technique', 'team_play', 'impact'];
 var CAT_KEYS   = { overall: 'cat_overall', effort: 'cat_effort', focus: 'cat_focus', technique: 'cat_technique', team_play: 'cat_team_play', impact: 'cat_impact' };
-// Categories that span full width in the 2-column grid
-var FULL_WIDTH_CATS = new Set(['overall', 'impact']);
 
 function resetState() {
   _matchId = null;
@@ -100,7 +98,7 @@ function buildAssessmentRows(context) {
 
   CATEGORIES.forEach(function(cat) {
     var row = document.createElement('div');
-    row.className = 'assessment-row' + (FULL_WIDTH_CATS.has(cat) ? ' assessment-row--full' : '');
+    row.className = 'assessment-row';
 
     var label = document.createElement('div');
     label.className = 'assessment-cat-label';

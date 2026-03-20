@@ -443,8 +443,7 @@
 
 /* ── Assessment sheet & inline modal ──────────────────────────────────── */
 .assessment-rows { padding: 0; position: relative; }
-.assessment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.assessment-row--full { grid-column: span 2; }
+.assessment-grid { display: flex; flex-direction: column; gap: 8px; }
 .assessment-heading {
   font-family: var(--font-condensed);
   font-size: 15px;
@@ -453,27 +452,32 @@
   margin-bottom: 14px;
   letter-spacing: 0.04em;
 }
-.assessment-row {}
+.assessment-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
 .assessment-cat-label {
   font-family: var(--font-condensed);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
-  margin-bottom: 4px;
+  flex: 1;
 }
 .assessment-num-btns {
   display: flex;
-  gap: 6px;
+  gap: 5px;
 }
 .assessment-num-btn {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: var(--card);
   border: 1px solid rgba(168,224,99,0.15);
   color: var(--muted);
   font-family: var(--font-condensed);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
@@ -484,9 +488,10 @@
   border-color: var(--lime);
 }
 .assessment-rating-hint {
+  flex-basis: 100%;
+  text-align: right;
   font-size: 11px;
   color: var(--muted);
-  margin-top: 3px;
   min-height: 14px;
 }
 .assessment-textarea-wrap { margin-bottom: 10px; }
