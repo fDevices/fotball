@@ -443,6 +443,8 @@
 
 /* ── Assessment sheet & inline modal ──────────────────────────────────── */
 .assessment-rows { padding: 0; position: relative; }
+.assessment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.assessment-row--full { grid-column: span 2; }
 .assessment-heading {
   font-family: var(--font-condensed);
   font-size: 15px;
@@ -451,9 +453,7 @@
   margin-bottom: 14px;
   letter-spacing: 0.04em;
 }
-.assessment-row {
-  margin-bottom: 12px;
-}
+.assessment-row {}
 .assessment-cat-label {
   font-family: var(--font-condensed);
   font-size: 13px;

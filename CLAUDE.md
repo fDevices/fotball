@@ -251,6 +251,7 @@ assists (int)
 match_type (text) -- ALWAYS 'home' or 'away'
 created_at (timestamptz)
 result -- calculated client-side, not stored in DB
+rating_overall     SMALLINT (1–5, nullable)
 rating_effort      SMALLINT (1–5, nullable)
 rating_focus       SMALLINT (1–5, nullable)
 rating_technique   SMALLINT (1–5, nullable)

@@ -5,15 +5,17 @@ import { showToast } from './toast.js';
 import { isDevPremium } from './utils.js';
 
 var _matchId = null;
-var _ratings = { effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
+var _ratings = { overall: 0, effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
 var _activeContext = null; // 'sheet' | 'modal'
 
-var CATEGORIES = ['effort', 'focus', 'technique', 'team_play', 'impact'];
-var CAT_KEYS   = { effort: 'cat_effort', focus: 'cat_focus', technique: 'cat_technique', team_play: 'cat_team_play', impact: 'cat_impact' };
+var CATEGORIES = ['overall', 'effort', 'focus', 'technique', 'team_play', 'impact'];
+var CAT_KEYS   = { overall: 'cat_overall', effort: 'cat_effort', focus: 'cat_focus', technique: 'cat_technique', team_play: 'cat_team_play', impact: 'cat_impact' };
+// Categories that span full width in the 2-column grid
+var FULL_WIDTH_CATS = new Set(['overall', 'impact']);
 
 function resetState() {
   _matchId = null;
-  _ratings = { effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
+  _ratings = { overall: 0, effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
   _activeContext = null;
 }
 
@@ -62,6 +64,7 @@ export function renderAssessmentSheet() {
 
 export function loadMatchIntoAssessment(match) {
   _ratings = {
+    overall:   match.rating_overall   || 0,
     effort:    match.rating_effort    || 0,
     focus:     match.rating_focus     || 0,
     technique: match.rating_technique || 0,
@@ -91,9 +94,13 @@ function buildAssessmentRows(context) {
     wrap.appendChild(heading);
   }
 
+  var grid = document.createElement('div');
+  grid.className = 'assessment-grid';
+  wrap.appendChild(grid);
+
   CATEGORIES.forEach(function(cat) {
     var row = document.createElement('div');
-    row.className = 'assessment-row';
+    row.className = 'assessment-row' + (FULL_WIDTH_CATS.has(cat) ? ' assessment-row--full' : '');
 
     var label = document.createElement('div');
     label.className = 'assessment-cat-label';
@@ -121,7 +128,7 @@ function buildAssessmentRows(context) {
     hint.textContent = _ratings[cat] ? t('rating_' + _ratings[cat]) : '';
     row.appendChild(hint);
 
-    wrap.appendChild(row);
+    grid.appendChild(row);
   });
 
   // Reflection fields
@@ -199,6 +206,7 @@ export function setRating(category, value, context) {
 export async function saveAssessment() {
   if (!_matchId) return;
   var payload = {
+    rating_overall:   _ratings.overall   || null,
     rating_effort:    _ratings.effort    || null,
     rating_focus:     _ratings.focus     || null,
     rating_technique: _ratings.technique || null,
@@ -234,6 +242,7 @@ export async function saveAssessment() {
 
 export function getAssessmentPayload() {
   return {
+    rating_overall:   _ratings.overall   || null,
     rating_effort:    _ratings.effort    || null,
     rating_focus:     _ratings.focus     || null,
     rating_technique: _ratings.technique || null,
