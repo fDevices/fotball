@@ -533,6 +533,7 @@
 /* Assessment sheet uses same modal-sheet / modal-backdrop pattern */
 
 /* ── Demo Banner ──────────────────────────────────────────────────────── */
+.demo-banner.hidden { display: none; }
 .demo-banner {
   display: flex;
   align-items: center;
