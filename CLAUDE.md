@@ -39,7 +39,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | RLS på Supabase er "Allow all" på begge tabeller | ✅ Ferdig | RLS implementert — authenticated users: full CRUD på egne rader; anon: SELECT-only på demo-brukerens rader |
 | Ingen autentisering (Supabase Auth ikke implementert) | ✅ Ferdig | auth.js implementert med email/password via Supabase Auth REST API |
-| Supabase anon key er hardkodet i `js/config.js` | 🟠 Høy | Flytt til miljøvariabel via Vercel ved auth-implementasjon |
+| Supabase anon key er hardkodet i `js/config.js` | ✅ Akseptert | `sb_publishable_`-nøkkel er designet for å være offentlig; RLS beskytter data. Rotér nøkkel ved mistanke om misbruk. Ingen build-steg nødvendig. |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
