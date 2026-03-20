@@ -66,6 +66,17 @@ export async function upsertProfil(body) {
   if (!res.ok) throw new Error('upsertProfil failed: ' + res.status);
 }
 
+export async function uploadAvatar(userId, blob) {
+  var path = userId + '/avatar.jpg';
+  var res = await fetch(SUPABASE_URL + '/storage/v1/object/avatars/' + path, {
+    method: 'PUT',
+    headers: headers({ 'Content-Type': 'image/jpeg', 'x-upsert': 'true' }),
+    body: blob
+  });
+  if (!res.ok) throw new Error('uploadAvatar failed: ' + res.status);
+  return SUPABASE_URL + '/storage/v1/object/public/avatars/' + path;
+}
+
 // ── Settings ─────────────────────────────────────────────────────────────────
 
 export async function fetchSettings(userId) {
