@@ -83,6 +83,16 @@ const TEKST = {
     assess_save:'Lagre vurdering', assess_skip:'Hopp over',
     assess_good:'Hva gikk bra?', assess_improve:'Hva vil jeg forbedre?',
     assess_saved:'✓ Vurdering lagret',
+    demo_banner_text:'Du ser demodata — opprett en gratis konto for å logge dine egne kamper',
+    demo_banner_signup:'Registrer deg gratis',
+    auth_login_title:'Logg inn',
+    auth_login_btn:'Logg inn',
+    auth_signup_title:'Opprett konto',
+    auth_signup_btn:'Opprett konto',
+    auth_to_signup:'Ingen konto? Registrer deg',
+    auth_to_login:'Har du en konto? Logg inn',
+    auth_logout:'Logg ut',
+    auth_error_pw_mismatch:'Passordene stemmer ikke overens',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -166,6 +176,16 @@ const TEKST = {
     assess_save:'Save assessment', assess_skip:'Skip',
     assess_good:'What went well?', assess_improve:'What do I want to improve?',
     assess_saved:'✓ Assessment saved',
+    demo_banner_text:"You're viewing demo data — create a free account to track your own",
+    demo_banner_signup:'Sign up free',
+    auth_login_title:'Log in',
+    auth_login_btn:'Log in',
+    auth_signup_title:'Create account',
+    auth_signup_btn:'Create account',
+    auth_to_signup:"Don't have an account? Sign up",
+    auth_to_login:'Already have an account? Log in',
+    auth_logout:'Log out',
+    auth_error_pw_mismatch:'Passwords do not match',
   }
 };
 
