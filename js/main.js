@@ -1,4 +1,4 @@
-import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt } from './profile.js';
+import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt, getProfile } from './profile.js';
 import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
@@ -152,8 +152,8 @@ async function handleAuthLogin() {
   _clearCaches();
   var p = await fetchProfileFromSupabase();
   loadProfileData(p);
-  updateDemoBanner();
   switchTab('log');
+  updateDemoBanner();
 }
 
 async function handleAuthSignup() {
@@ -170,10 +170,9 @@ async function handleAuthSignup() {
   if (result.error) { showAuthError('auth-signup-error', result.error); return; }
   closeAuthOverlay();
   _clearCaches();
-  var { getProfile } = await import('./profile.js');
   loadProfileData(getProfile());
-  updateDemoBanner();
   switchTab('profile');
+  updateDemoBanner();
 }
 
 // ── Demo banner ───────────────────────────────────────────────────────────
