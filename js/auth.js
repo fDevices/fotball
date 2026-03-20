@@ -78,7 +78,7 @@ export async function signup(email, password) {
       body: JSON.stringify({ email: email, password: password })
     });
     var data = await res.json();
-    if (!res.ok) return { user: null, error: data.error_description || data.message || 'Signup failed' };
+    if (!res.ok) return { user: null, error: data.error_description || data.msg || data.message || 'Signup failed' };
     if (!data.access_token || !data.user) return { user: null, error: 'Check your email to confirm your account' };
     _storeSession(data);
     _scheduleRefresh();
@@ -94,7 +94,7 @@ export async function login(email, password) {
       body: JSON.stringify({ email: email, password: password })
     });
     var data = await res.json();
-    if (!res.ok) return { user: null, error: data.error_description || data.message || 'Login failed' };
+    if (!res.ok) return { user: null, error: data.error_description || data.msg || data.message || 'Login failed' };
     _storeSession(data);
     _scheduleRefresh();
     return { user: data.user, error: null };
