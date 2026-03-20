@@ -129,6 +129,13 @@ function setupEventDelegation() {
     }
   });
 
+  // Change events (file inputs)
+  document.addEventListener('change', function(e) {
+    var el = e.target.closest('input[data-action]');
+    if (!el) return;
+    if (el.dataset.action === 'uploadImage') uploadImage(el);
+  });
+
   // Keydown: Enter for add-item inputs
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
@@ -187,8 +194,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Expose uploadImage globally for avatar onchange handler
-window._uploadImage = uploadImage;
 
 window.addEventListener('load', async function() {
   try {
