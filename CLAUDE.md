@@ -94,7 +94,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Flytt til Supabase Storage i Fase 5 (auth er nå på plass) |
+| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | ✅ Ferdig | Supabase Storage for autentiserte brukere; uautentiserte beholder base64-flyt |
 | `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | ✅ Ferdig | Alle hardkodede strenger erstattet med `t()`; 6 nye nøkler lagt til i `TEKST`; døde variabler fjernet fra `renderLogSub()`. |
 | `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | ✅ Ferdig | Begge funksjoner flyttet til `teams.js`; `profile.js` dispatcher `athlytics:renderProfileLists`-event; `main.js` lytter og kaller begge. |
 | `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | ✅ Ferdig | Begge bruker nå DOM API — standardisert ved flytting til `teams.js`. |
