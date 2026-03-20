@@ -80,7 +80,6 @@ export async function saveProfileToSupabase(profil) {
       id: 'default',
       name: profil.name,
       club: profil.club,
-      position: profil.position,
       team: profil.teams,
       favorite_team: profil.favoriteTeam || '',
       tournaments: profil.tournaments || [],
