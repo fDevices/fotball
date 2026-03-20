@@ -3,7 +3,8 @@ import { getSettings, getDateLocale } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
 import { switchTab, updateLogBadge } from './navigation.js';
 import { t, setLang, toggleLangPicker, updateFlags, updateAllText } from './i18n.js';
-import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch, destroyCharts, initChartDefaults } from './stats.js';
+import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch } from './stats-overview.js';
+import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { openAssessmentSheet, closeAssessmentSheet, saveAssessment, setRating } from './assessment.js';
@@ -128,6 +129,13 @@ function setupEventDelegation() {
     }
   });
 
+  // Change events (file inputs)
+  document.addEventListener('change', function(e) {
+    var el = e.target.closest('input[data-action]');
+    if (!el) return;
+    if (el.dataset.action === 'uploadImage') uploadImage(el);
+  });
+
   // Keydown: Enter for add-item inputs
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
@@ -146,21 +154,30 @@ document.addEventListener('athlytics:toast', function(e) {
 });
 
 document.addEventListener('athlytics:renderSettings', function() {
+  // Dispatched by settings.js:requestRenderSettings() to break circular dep
   renderSettings();
 });
 
 document.addEventListener('athlytics:updateAllText', function() {
+  // Dispatched by i18n.js:setLang() after language change
   renderLogSub();
   updateResult();
   updateLogBadge();
 });
 
 document.addEventListener('athlytics:loadStats', function() {
+  // Dispatched by navigation.js:switchTab() when navigating to stats tab
   loadStats();
 });
 
 document.addEventListener('athlytics:destroyCharts', function() {
+  // Dispatched by navigation.js:switchTab() when leaving stats tab
   destroyCharts();
+});
+
+document.addEventListener('athlytics:matchesChanged', function() {
+  // Dispatched by modal.js after save/delete — force re-fetch from Supabase
+  loadStats(true);
 });
 
 document.addEventListener('athlytics:renderProfileLists', function() {
@@ -181,8 +198,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// Expose uploadImage globally for avatar onchange handler
-window._uploadImage = uploadImage;
 
 window.addEventListener('load', async function() {
   try {
@@ -199,7 +214,7 @@ window.addEventListener('load', async function() {
     updateProfilePrompt();
     renderTeamDropdown();
     renderLogSub();
-    if (p.favoriteTeam && p.team.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);
+    if (p.favoriteTeam && p.teams && p.teams.includes(p.favoriteTeam)) selectTeam(p.favoriteTeam);
     if (p.favoriteTournament && p.tournaments && p.tournaments.includes(p.favoriteTournament)) selectTournament(p.favoriteTournament);
     renderTournamentDropdown();
     applyTheme(getSettings().sport);

@@ -39,15 +39,26 @@ export function renderTeamDropdown() {
   var profil = getProfile();
   var list = document.getElementById('team-options-list');
   if (!list) return;
-  var html = '';
-  profil.team.forEach(function(name) {
-    html += '<div class="team-option ' + (selectedTeam === name ? 'selected' : '') + '" data-action="selectTeam" data-name="' + esc(name) + '">' +
-      esc(name) +
-      (selectedTeam === name ? ' <span style="color:var(--lime)">\u2713</span>' : '') +
-    '</div>';
+  list.innerHTML = '';
+  (profil.teams || []).forEach(function(name) {
+    var div = document.createElement('div');
+    div.className = 'team-option' + (selectedTeam === name ? ' selected' : '');
+    div.dataset.action = 'selectTeam';
+    div.dataset.name = name;
+    div.textContent = name;
+    if (selectedTeam === name) {
+      var check = document.createElement('span');
+      check.style.color = 'var(--lime)';
+      check.textContent = '\u2713';
+      div.appendChild(check);
+    }
+    list.appendChild(div);
   });
-  html += '<div class="team-option team-option-add" data-action="toggleNewTeamInput">' + t('nytt_lag') + '</div>';
-  list.innerHTML = html;
+  var addDiv = document.createElement('div');
+  addDiv.className = 'team-option team-option-add';
+  addDiv.dataset.action = 'toggleNewTeamInput';
+  addDiv.textContent = t('nytt_lag');
+  list.appendChild(addDiv);
 }
 
 export function selectTeam(name) {
@@ -69,8 +80,8 @@ export function saveNewTeamFromDropdown() {
   var name = input.value.trim();
   if (!name) return;
   var profil = getProfile();
-  if (!profil.team.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) {
-    profil.team.push(name);
+  if (!profil.teams.some(function(t) { return t.toLowerCase() === name.toLowerCase(); })) {
+    profil.teams.push(name);
     saveProfile_local(profil);
     saveProfileToSupabase(profil);
     renderProfileTeamList();
@@ -84,8 +95,8 @@ export function addTeamFromProfile() {
   var name = input.value.trim();
   if (!name) return;
   var profil = getProfile();
-  if (profil.team.some(function(tm) { return tm.toLowerCase() === name.toLowerCase(); })) { showToast(t('toast_lag_finnes'), 'error'); return; }
-  profil.team.push(name);
+  if (profil.teams.some(function(tm) { return tm.toLowerCase() === name.toLowerCase(); })) { showToast(t('toast_lag_finnes'), 'error'); return; }
+  profil.teams.push(name);
   saveProfile_local(profil);
   saveProfileToSupabase(profil);
   input.value = '';
@@ -96,7 +107,7 @@ export function addTeamFromProfile() {
 
 export function deleteTeam(name) {
   var profil = getProfile();
-  profil.team = profil.team.filter(function(l) { return l !== name; });
+  profil.teams = profil.teams.filter(function(l) { return l !== name; });
   if (profil.favoriteTeam === name) profil.favoriteTeam = '';
   saveProfile_local(profil);
   saveProfileToSupabase(profil);
@@ -111,6 +122,7 @@ export function setFavoriteTeam(name) {
   saveProfileToSupabase(profil);
   renderProfileTeamList();
   renderTeamDropdown();
+  // Intentional: marking a favorite also activates it as the current filter selection
   if (profil.favoriteTeam) selectTeam(profil.favoriteTeam);
 }
 
@@ -240,6 +252,7 @@ export function setFavoriteTournament(name) {
   saveProfileToSupabase(profil);
   renderProfileTournamentList();
   renderTournamentDropdown();
+  // Intentional: marking a favorite also activates it as the current filter selection
   if (profil.favoriteTournament) selectTournament(profil.favoriteTournament);
 }
 
@@ -256,7 +269,7 @@ export function renderModalTeamDropdown() {
   var list = document.getElementById('modal-team-options-list');
   if (!list) return;
   list.innerHTML = '';
-  var teamList = profil.team || [];
+  var teamList = profil.teams || [];
   if (modalSelectedTeam && !teamList.includes(modalSelectedTeam)) teamList = [modalSelectedTeam].concat(teamList);
   teamList.forEach(function(name) {
     var div = document.createElement('div');
@@ -355,12 +368,12 @@ export function renderProfileTeamList() {
   var list = document.getElementById('profile-team-list');
   if (!list) return;
   list.innerHTML = '';
-  if (!profil.team || !profil.team.length) {
+  if (!profil.teams || !profil.teams.length) {
     list.innerHTML = '<div class="team-list-empty">' + t('no_teams_yet') + '</div>';
     return;
   }
   var favoritt = profil.favoriteTeam || '';
-  profil.team.forEach(function(name) {
+  profil.teams.forEach(function(name) {
     var isFav = name === favoritt;
     var div = document.createElement('div');
     div.className = 'team-list-item';

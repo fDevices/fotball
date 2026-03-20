@@ -34,17 +34,19 @@ export function dismissProfilePrompt() {
 export function getProfile() {
   if (_profileCache) return _profileCache;
   try {
-    _profileCache = JSON.parse(localStorage.getItem(PROFIL_KEY)) ||
-      { name: '', club: '', position: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
+    var stored = JSON.parse(localStorage.getItem(PROFIL_KEY));
+    // Migrate legacy 'team' key to 'teams' if needed
+    if (stored && stored.team && !stored.teams) stored.teams = stored.team;
+    _profileCache = stored || { name: '', club: '', position: '', teams: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   } catch(e) {
-    _profileCache = { name: '', club: '', position: '', team: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
+    _profileCache = { name: '', club: '', position: '', teams: [], favoriteTeam: '', tournaments: [], favoriteTournament: '' };
   }
   return _profileCache;
 }
 
 export function saveProfile_local(profil) {
   var normalized = Object.assign({}, profil, {
-    team: Array.isArray(profil.team) ? profil.team : [],
+    teams: Array.isArray(profil.teams) ? profil.teams : [],
     tournaments: Array.isArray(profil.tournaments) ? profil.tournaments : []
   });
   _profileCache = normalized;
@@ -59,7 +61,7 @@ export async function fetchProfileFromSupabase() {
         name: row.name || '',
         club: row.club || '',
         position: row.position || '',
-        team: row.team || [],
+        teams: row.team || [],
         favoriteTeam: row.favorite_team || '',
         tournaments: row.tournaments || [],
         favoriteTournament: row.favorite_tournament || '',
@@ -78,8 +80,7 @@ export async function saveProfileToSupabase(profil) {
       id: 'default',
       name: profil.name,
       club: profil.club,
-      position: profil.position,
-      team: profil.team,
+      team: profil.teams,
       favorite_team: profil.favoriteTeam || '',
       tournaments: profil.tournaments || [],
       favorite_tournament: profil.favoriteTournament || '',
@@ -95,7 +96,7 @@ export async function saveProfile() {
     name: document.getElementById('profil-name').value.trim(),
     club: document.getElementById('profil-club').value.trim(),
     position: document.getElementById('profil-posisjon').value.trim(),
-    team: remote.team || [],
+    teams: remote.teams || [],
     favoriteTeam: remote.favoriteTeam || '',
     tournaments: remote.tournaments || [],
     favoriteTournament: remote.favoriteTournament || '',

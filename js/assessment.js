@@ -1,7 +1,8 @@
 import { updateKamp } from './supabase.js';
+import { getAllMatches, setAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
-import { isPremium } from './utils.js';
+import { isDevPremium } from './utils.js';
 
 var _matchId = null;
 var _ratings = { effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
@@ -135,7 +136,7 @@ function buildAssessmentRows(context) {
   wrap.appendChild(buildTextarea(improveId, t('assess_improve')));
 
   // Premium gate (sheet context only — modal always shows, save handles it)
-  if (context === 'sheet' && !isPremium()) {
+  if (context === 'sheet' && !isDevPremium()) {
     var overlay = document.createElement('div');
     overlay.className = 'assessment-lock-overlay';
     var lockTitle = document.createElement('div');
@@ -211,6 +212,13 @@ export async function saveAssessment() {
   try {
     var res = await updateKamp(_matchId, payload);
     if (res.ok) {
+      // Update the match in-memory so edit modal and stats immediately reflect saved data
+      var current = getAllMatches();
+      if (current.length > 0) {
+        setAllMatches(current.map(function(m) {
+          return String(m.id) === String(_matchId) ? Object.assign({}, m, payload) : m;
+        }));
+      }
       closeAssessmentSheet();
       showToast(t('assess_saved'), 'success');
     } else {

@@ -1,14 +1,13 @@
-import { allMatches } from './state.js';
+import { getAllMatches } from './state.js';
 import { fetchKamper } from './supabase.js';
 import { getSettings, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
-import { esc } from './utils.js';
-import { getResult } from './stats.js';
+import { esc, getResult } from './utils.js';
 import { t } from './i18n.js';
 
 async function getMatchesForExport() {
-  if (allMatches.length > 0) return allMatches;
+  if (getAllMatches().length > 0) return getAllMatches();
   try {
     return await fetchKamper();
   } catch(e) { return []; }

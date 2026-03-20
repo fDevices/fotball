@@ -17,7 +17,7 @@ const TEKST = {
     profile_title:'Min profil', profile_sub:'Innstillinger og team', avatar_upload:'Trykk for å laste opp bilde',
     spillerinfo:'Spillerinfo', name:'Navn', club:'Klubb', posisjon:'Posisjon',
     ph_navn:'Fullt navn', ph_klubb:'F.eks. Stabæk', ph_posisjon:'F.eks. Midtbane',
-    mine_lag:'Mine team / tropper', ph_add_team:'Legg til team...', add_item:'Legg til',
+    mine_lag:'Mine team / tropper', ph_add_team:'Legg til team...', ph_add_tournament:'Legg til turnering...', add_item:'Legg til',
     save_profile:'Lagre profil', standard_badge:'standard', today:'I dag',
     settings_sub:'Tilpass Athlytics Sport',
     lang_title:'🌍 Språk', lang_desc:'Velg språk for appen.',
@@ -100,7 +100,7 @@ const TEKST = {
     profile_title:'My profile', profile_sub:'Settings and teams', avatar_upload:'Tap to upload photo',
     spillerinfo:'Player info', name:'Name', club:'Club', posisjon:'Position',
     ph_navn:'Full name', ph_klubb:'E.g. Arsenal', ph_posisjon:'E.g. Midfielder',
-    mine_lag:'My teams / squads', ph_add_team:'Add team...', add_item:'Add',
+    mine_lag:'My teams / squads', ph_add_team:'Add team...', ph_add_tournament:'Add tournament...', add_item:'Add',
     save_profile:'Save profile', standard_badge:'default', today:'Today',
     settings_sub:'Customize Athlytics Sport',
     lang_title:'🌍 Language', lang_desc:'Choose language for the app.',
@@ -222,7 +222,7 @@ export function updateAllText() {
   var ph = {
     'opponent': 'ph_opponent',
     'profil-name': 'ph_navn', 'profil-club': 'ph_klubb', 'profil-posisjon': 'ph_posisjon',
-    'profile-new-tournament': 'ph_add_team', 'profile-team-input': 'ph_add_team', 'settings-ny-sesong': 'ph_new_season',
+    'profile-new-tournament': 'ph_add_tournament', 'profile-team-input': 'ph_add_team', 'settings-ny-sesong': 'ph_new_season',
     'team-new-input': 'ph_new_team', 'tournament-new-input': 'ph_new_tournament'
   };
   Object.keys(ph).forEach(function(id) {
