@@ -143,7 +143,7 @@ export function closeModal() {
   mMatchType = MODAL_DEFAULTS.mMatchType;
   mHome = MODAL_DEFAULTS.mHome; mAway = MODAL_DEFAULTS.mAway;
   mGoals = MODAL_DEFAULTS.mGoals; mAssists = MODAL_DEFAULTS.mAssists;
-  ['modal-dato', 'modal-motstander'].forEach(function(id) {
+  ['modal-dato', 'modal-motstander', 'modal-assess-reflection-good', 'modal-assess-reflection-improve'].forEach(function(id) {
     var el = document.getElementById(id); if (el) el.value = MODAL_DEFAULTS[id];
   });
   ['modal-team-dropdown', 'modal-tournament-dropdown'].forEach(function(id) {
