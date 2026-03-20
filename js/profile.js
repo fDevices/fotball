@@ -1,5 +1,5 @@
 import { PROFIL_KEY } from './config.js';
-import { getUserId } from './auth.js';
+import { getUserId, isAuthenticated } from './auth.js';
 import { fetchProfil, upsertProfil } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -16,6 +16,11 @@ export function isProfileComplete() {
 export function updateProfilePrompt() {
   var banner = document.getElementById('profile-prompt');
   var badge = document.getElementById('tab-profile-badge');
+  if (!isAuthenticated()) {
+    if (banner) banner.classList.add('hidden');
+    if (badge) badge.classList.remove('visible');
+    return;
+  }
   var complete = isProfileComplete();
   if (banner) {
     if (complete || _promptDismissed) banner.classList.add('hidden');
