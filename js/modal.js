@@ -6,6 +6,12 @@ import { showToast } from './toast.js';
 import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload, resetAssessmentState } from './assessment.js';
 import { clampStats } from './utils.js';
 
+const MODAL_DEFAULTS = {
+  mHome: 0, mAway: 0, mGoals: 0, mAssists: 0, mMatchType: 'home',
+  'modal-dato': '', 'modal-motstander': '',
+  'modal-assess-reflection-good': '', 'modal-assess-reflection-improve': ''
+};
+
 var modalMatchId = null;
 var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
 
@@ -50,14 +56,14 @@ export function closeModal() {
   document.getElementById('modal-sheet').classList.remove('open');
   document.body.style.overflow = '';
   modalMatchId = null;
-  mHome = 0; mAway = 0; mGoals = 0; mAssists = 0; mMatchType = 'home';
-  var dato = document.getElementById('modal-dato');
-  var motstander = document.getElementById('modal-motstander');
-  if (dato) dato.value = '';
-  if (motstander) motstander.value = '';
+  mMatchType = MODAL_DEFAULTS.mMatchType;
+  mHome = MODAL_DEFAULTS.mHome; mAway = MODAL_DEFAULTS.mAway;
+  mGoals = MODAL_DEFAULTS.mGoals; mAssists = MODAL_DEFAULTS.mAssists;
+  ['modal-dato', 'modal-motstander', 'modal-assess-reflection-good', 'modal-assess-reflection-improve'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = MODAL_DEFAULTS[id];
+  });
   ['modal-team-dropdown', 'modal-tournament-dropdown'].forEach(function(id) {
-    var dd = document.getElementById(id);
-    if (dd) dd.classList.remove('open');
+    var dd = document.getElementById(id); if (dd) dd.classList.remove('open');
   });
 }
 
