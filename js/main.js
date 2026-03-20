@@ -13,15 +13,7 @@ import { exportCSV, exportPDF } from './export.js';
 import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
 import { showToast } from './toast.js';
 import { restoreSession, isAuthenticated, logout } from './auth.js';
-import { PROFIL_KEY, SETTINGS_KEY, CACHE_KEY } from './config.js';
-
-// ── Auth helpers ──────────────────────────────────────────────────────────
-
-function _clearCaches() {
-  localStorage.removeItem(PROFIL_KEY);
-  localStorage.removeItem(SETTINGS_KEY);
-  sessionStorage.removeItem(CACHE_KEY);
-}
+import { openAuthOverlay, closeAuthOverlay, updateDemoBanner, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
 
 const WRITE_ACTIONS = new Set([
   'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
@@ -30,8 +22,6 @@ const WRITE_ACTIONS = new Set([
   'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
   'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF'
 ]);
-
-var _demoBannerDismissed = false;
 
 // ── Event delegation action map ────────────────────────────────────────────
 
@@ -91,103 +81,11 @@ const ACTIONS = {
   dismissProfilePrompt:          () => dismissProfilePrompt(),
   logout:              () => logout(),
   openAuthOverlay:     () => openAuthOverlay('login'),
-  dismissDemoBanner:   () => { _demoBannerDismissed = true; updateDemoBanner(); },
+  dismissDemoBanner:   () => dismissDemoBanner(),
   authToggleView:      () => toggleAuthView(),
   authLogin:           () => handleAuthLogin(),
   authSignup:          () => handleAuthSignup(),
 };
-
-// ── Auth overlay ─────────────────────────────────────────────────────────
-
-function openAuthOverlay(view) {
-  var overlay = document.getElementById('auth-overlay');
-  if (overlay) overlay.classList.remove('hidden');
-  showAuthView(view || 'login');
-}
-
-function closeAuthOverlay() {
-  var overlay = document.getElementById('auth-overlay');
-  if (overlay) overlay.classList.add('hidden');
-}
-
-function showAuthView(view) {
-  var loginView  = document.getElementById('auth-login-view');
-  var signupView = document.getElementById('auth-signup-view');
-  if (!loginView || !signupView) return;
-  if (view === 'signup') {
-    loginView.classList.add('hidden');
-    signupView.classList.remove('hidden');
-  } else {
-    signupView.classList.add('hidden');
-    loginView.classList.remove('hidden');
-  }
-}
-
-function toggleAuthView() {
-  var loginView = document.getElementById('auth-login-view');
-  var isLoginVisible = loginView && !loginView.classList.contains('hidden');
-  showAuthView(isLoginVisible ? 'signup' : 'login');
-}
-
-function showAuthError(viewId, msg) {
-  var el = document.getElementById(viewId);
-  if (!el) return;
-  el.textContent = msg;
-  el.classList.remove('hidden');
-}
-
-function clearAuthErrors() {
-  ['auth-login-error', 'auth-signup-error'].forEach(function(id) {
-    var el = document.getElementById(id);
-    if (el) { el.textContent = ''; el.classList.add('hidden'); }
-  });
-}
-
-async function handleAuthLogin() {
-  clearAuthErrors();
-  var email    = (document.getElementById('auth-login-email')    || {}).value || '';
-  var password = (document.getElementById('auth-login-password') || {}).value || '';
-  var { login: authLogin } = await import('./auth.js');
-  var result = await authLogin(email, password);
-  if (result.error) { showAuthError('auth-login-error', result.error); return; }
-  closeAuthOverlay();
-  _clearCaches();
-  var p = await fetchProfileFromSupabase();
-  loadProfileData(p);
-  switchTab(isProfileComplete() ? 'log' : 'profile');
-  updateDemoBanner();
-}
-
-async function handleAuthSignup() {
-  clearAuthErrors();
-  var email    = (document.getElementById('auth-signup-email')    || {}).value || '';
-  var password = (document.getElementById('auth-signup-password') || {}).value || '';
-  var confirm  = (document.getElementById('auth-signup-confirm')  || {}).value || '';
-  if (password !== confirm) {
-    showAuthError('auth-signup-error', t('auth_error_pw_mismatch'));
-    return;
-  }
-  var { signup: authSignup } = await import('./auth.js');
-  var result = await authSignup(email, password);
-  if (result.error) { showAuthError('auth-signup-error', result.error); return; }
-  closeAuthOverlay();
-  _clearCaches();
-  loadProfileData(getProfile());
-  switchTab('profile');
-  updateDemoBanner();
-}
-
-// ── Demo banner ───────────────────────────────────────────────────────────
-
-function updateDemoBanner() {
-  var banner = document.getElementById('demo-banner');
-  if (!banner) return;
-  if (isAuthenticated() || _demoBannerDismissed) {
-    banner.classList.add('hidden');
-  } else {
-    banner.classList.remove('hidden');
-  }
-}
 
 function updateDateLabel(val) {
   var el = document.getElementById('date-display-label');
