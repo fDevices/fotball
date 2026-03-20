@@ -29,7 +29,7 @@ function _storeSession(data) {
   return session;
 }
 
-export function _clearSession() {
+export function clearSession() {
   _cancelRefresh();
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(PROFIL_KEY);
@@ -55,7 +55,8 @@ async function _refreshSession() {
       headers: { 'apikey': SUPABASE_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh_token: s.refreshToken })
     });
-    if (!res.ok) { _clearSession(); return; }
+    if (res.status === 401 || res.status === 400) { clearSession(); return; }
+    if (!res.ok) { console.warn('Token refresh failed with status:', res.status); return; }
     _storeSession(await res.json());
   } catch(e) { console.warn('Token refresh failed:', e); }
 }
@@ -78,6 +79,7 @@ export async function signup(email, password) {
     });
     var data = await res.json();
     if (!res.ok) return { user: null, error: data.error_description || data.message || 'Signup failed' };
+    if (!data.access_token || !data.user) return { user: null, error: 'Check your email to confirm your account' };
     _storeSession(data);
     _scheduleRefresh();
     return { user: data.user, error: null };
@@ -109,6 +111,6 @@ export async function logout() {
       });
     } catch(e) { /* ignore network errors on logout */ }
   }
-  _clearSession();
+  clearSession();
   window.location.reload();
 }
