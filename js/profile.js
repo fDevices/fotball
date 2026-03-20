@@ -73,6 +73,15 @@ export async function fetchProfileFromSupabase() {
         favoriteTournament: row.favorite_tournament || '',
         avatar: row.avatar_url || ''
       };
+      // Legacy cleanup: clear base64 avatars stored before Storage migration.
+      // saveProfile_local inside the if-block fires immediately (so cache is clean
+      // even if the upsertProfil network call below fails). The saveProfile_local
+      // outside the if-block is the normal-path save — both are intentional.
+      if (isAuthenticated() && p.avatar && p.avatar.startsWith('data:')) {
+        p.avatar = '';
+        saveProfile_local(p);
+        upsertProfil({ id: getUserId(), avatar_url: '' }).catch(function() {});
+      }
       saveProfile_local(p);
       return p;
     }
