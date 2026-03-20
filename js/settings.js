@@ -1,4 +1,5 @@
 import { SETTINGS_KEY } from './config.js';
+import { getUserId } from './auth.js';
 import { upsertSettings } from './supabase.js';
 
 var _settingsCache = null;
@@ -30,7 +31,7 @@ export function saveSettings(s) {
 async function saveSettingsToSupabase(s) {
   try {
     await upsertSettings({
-      id: 'default',
+      id: getUserId(),
       sport: s.sport,
       season_format: s.seasonFormat,
       active_season: s.activeSeason || '',
