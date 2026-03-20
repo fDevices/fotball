@@ -1,6 +1,8 @@
 # Tech Debt Cleanup Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **Status: COMPLETE — PR open at https://github.com/fDevices/fotball/pull/1 (2026-03-20)**
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Resolve all non-auth-blocked technical debt from CLAUDE.md in four risk-ordered phases: state.js encapsulation, stats.js module split, modal/avatar wiring, and small fixes.
 
@@ -14,8 +16,8 @@
 
 ## Pre-flight: Understand the codebase
 
-- [ ] Read `js/state.js`, `js/stats.js` (all of it), `js/modal.js`, `js/log.js`, `js/export.js`, `js/assessment.js`, `js/utils.js`, `js/main.js`, `js/settings.js`, `js/teams.js`, `js/navigation.js`
-- [ ] Read `CLAUDE.md` (especially the debt table and critical conventions)
+- [x] Read `js/state.js`, `js/stats.js` (all of it), `js/modal.js`, `js/log.js`, `js/export.js`, `js/assessment.js`, `js/utils.js`, `js/main.js`, `js/settings.js`, `js/teams.js`, `js/navigation.js`
+- [x] Read `CLAUDE.md` (especially the debt table and critical conventions)
 
 ---
 
@@ -30,7 +32,7 @@
 
 > Note: `assessment.js` does NOT import from `state.js` — skip it here.
 
-- [ ] **Step 1.1 — Update state.js**
+- [x] **Step 1.1 — Update state.js**
 
 Replace the entire file:
 
@@ -58,7 +60,7 @@ export function invalidateMatchCache() {
 }
 ```
 
-- [ ] **Step 1.2 — Update stats.js imports and usages**
+- [x] **Step 1.2 — Update stats.js imports and usages**
 
 Change import line 2:
 ```js
@@ -77,7 +79,7 @@ Find all uses of bare `allMatches` in stats.js and replace with `getAllMatches()
 
 Run a find-in-file for `allMatches` in `stats.js` and confirm zero occurrences remain after replacement.
 
-- [ ] **Step 1.3 — Update modal.js**
+- [x] **Step 1.3 — Update modal.js**
 
 Change import line 1:
 ```js
@@ -93,7 +95,7 @@ Four replacement sites (replace `allMatches` with `getAllMatches()`):
 - `deleteMatch`: `getAllMatches().find(...)`
 - `confirmDeleteMatch`: `getAllMatches().filter(...)`
 
-- [ ] **Step 1.4 — Update export.js**
+- [x] **Step 1.4 — Update export.js**
 
 Change import line 1:
 ```js
@@ -111,7 +113,7 @@ if (allMatches.length > 0) return allMatches;
 if (getAllMatches().length > 0) return getAllMatches();
 ```
 
-- [ ] **Step 1.5 — Update log.js**
+- [x] **Step 1.5 — Update log.js**
 
 Change import line 2:
 ```js
@@ -129,7 +131,7 @@ setAllMatches([newMatches[0]].concat(allMatches));
 setAllMatches([newMatches[0]].concat(getAllMatches()));
 ```
 
-- [ ] **Step 1.6 — Verify: grep for any remaining `allMatches` imports across all js files**
+- [x] **Step 1.6 — Verify: grep for any remaining `allMatches` imports across all js files**
 
 ```bash
 grep -rn "import.*allMatches" js/
@@ -137,7 +139,7 @@ grep -rn "import.*allMatches" js/
 
 Expected: zero results.
 
-- [ ] **Step 1.7 — Smoke test Phase 1**
+- [x] **Step 1.7 — Smoke test Phase 1**
 
 Open the app in the browser. Verify:
 1. Log tab loads (no console errors)
@@ -145,7 +147,7 @@ Open the app in the browser. Verify:
 3. Open Stats tab — matches display
 4. No `allMatches is not defined` errors in console
 
-- [ ] **Step 1.8 — Commit Phase 1**
+- [x] **Step 1.8 — Commit Phase 1**
 
 ```bash
 git add js/state.js js/stats.js js/modal.js js/export.js js/log.js
@@ -175,7 +177,7 @@ git commit -m "refactor: make allMatches private in state.js; add getAllMatches(
 - Modify: `js/stats.js` (update to import from utils.js)
 - Modify: `js/export.js` (currently imports getResult from stats.js)
 
-- [ ] **Step 2.1 — Add getResult to utils.js**
+- [x] **Step 2.1 — Add getResult to utils.js**
 
 Append to `js/utils.js`:
 
@@ -186,7 +188,7 @@ export function getResult(k) {
 }
 ```
 
-- [ ] **Step 2.2 — Update stats.js to import getResult from utils.js**
+- [x] **Step 2.2 — Update stats.js to import getResult from utils.js**
 
 In `js/stats.js`, change the import lines at the top:
 ```js
@@ -199,7 +201,7 @@ import { esc, isPremium, getResult } from './utils.js';
 
 Then delete the `export function getResult(k)` definition from `stats.js` (lines 83–86).
 
-- [ ] **Step 2.3 — Update export.js to import getResult from utils.js**
+- [x] **Step 2.3 — Update export.js to import getResult from utils.js**
 
 ```js
 // Before:
@@ -211,7 +213,7 @@ import { esc, getResult } from './utils.js';
 
 Remove the `import { getResult } from './stats.js'` line entirely.
 
-- [ ] **Step 2.4 — Verify**
+- [x] **Step 2.4 — Verify**
 
 ```bash
 grep -n "getResult" js/stats.js
@@ -223,11 +225,11 @@ grep -n "from './stats.js'" js/export.js
 ```
 Expected: `export.js` no longer imports from `stats.js` at all (it now only imports from `utils.js`, `supabase.js`, `settings.js`, `profile.js`, `toast.js`, `i18n.js`).
 
-- [ ] **Step 2.5 — Quick smoke test**
+- [x] **Step 2.5 — Quick smoke test**
 
 Open app, open Stats tab, verify matches display. Check console for errors.
 
-- [ ] **Step 2.6 — Rename isPremium → isDevPremium in utils.js**
+- [x] **Step 2.6 — Rename isPremium → isDevPremium in utils.js**
 
 This must happen now — before creating the new stats modules — because `stats-analyse.js` will import `isDevPremium` directly.
 
@@ -249,7 +251,7 @@ grep -rn "isPremium" js/
 ```
 Expected: zero results.
 
-- [ ] **Step 2.7 — Commit**
+- [x] **Step 2.7 — Commit**
 
 ```bash
 git add js/utils.js js/stats.js js/export.js js/assessment.js
@@ -265,7 +267,7 @@ A pure rendering helper for the match history list. No state. No imports from ot
 **Files:**
 - Create: `js/stats-search.js`
 
-- [ ] **Step 3.1 — Create stats-search.js**
+- [x] **Step 3.1 — Create stats-search.js**
 
 ```js
 import { getResult, esc } from './utils.js';
@@ -334,7 +336,7 @@ Owns chart rendering, `renderFormStreak`, `destroyCharts`, `initChartDefaults`. 
 **Files:**
 - Create: `js/stats-analyse.js`
 
-- [ ] **Step 4.1 — Create stats-analyse.js**
+- [x] **Step 4.1 — Create stats-analyse.js**
 
 Copy the following functions out of `stats.js` into the new file. Adapt imports as needed.
 
@@ -552,7 +554,7 @@ This is the main stats module. It takes everything from `stats.js` that isn't in
 **Files:**
 - Create: `js/stats-overview.js`
 
-- [ ] **Step 5.1 — Create stats-overview.js**
+- [x] **Step 5.1 — Create stats-overview.js**
 
 The file should contain everything from `stats.js` **except**:
 - `CHART_COLORS`, `chartInstances`, `destroyCharts`, `initChartDefaults`, `renderFormStreak`, `renderAnalyse` → moved to `stats-analyse.js`
@@ -628,7 +630,7 @@ export var opponentSearch = '';
 - Modify: `js/main.js`
 - Delete: `js/stats.js`
 
-- [ ] **Step 6.1 — Update main.js import line for stats**
+- [x] **Step 6.1 — Update main.js import line for stats**
 
 ```js
 // Before:
@@ -639,13 +641,13 @@ import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilt
 import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 ```
 
-- [ ] **Step 6.2 — Delete stats.js**
+- [x] **Step 6.2 — Delete stats.js**
 
 ```bash
 git rm js/stats.js
 ```
 
-- [ ] **Step 6.3 — Verify no remaining imports of stats.js**
+- [x] **Step 6.3 — Verify no remaining imports of stats.js**
 
 ```bash
 grep -rn "from './stats.js'" js/
@@ -653,7 +655,7 @@ grep -rn "from './stats.js'" js/
 
 Expected: zero results.
 
-- [ ] **Step 6.4 — Smoke test Phase 2**
+- [x] **Step 6.4 — Smoke test Phase 2**
 
 Open app in browser. Verify:
 1. Stats tab loads — overview cards render, no console errors
@@ -663,7 +665,7 @@ Open app in browser. Verify:
 5. Match history list paginates correctly
 6. Opponent search works
 
-- [ ] **Step 6.5 — Commit Phase 2**
+- [x] **Step 6.5 — Commit Phase 2**
 
 ```bash
 git add js/stats-overview.js js/stats-analyse.js js/stats-search.js js/main.js
@@ -693,7 +695,7 @@ Replace direct `renderStats()` call with `athlytics:matchesChanged` event.
 - Modify: `js/modal.js`
 - Modify: `js/main.js`
 
-- [ ] **Step 7.1 — Update modal.js**
+- [x] **Step 7.1 — Update modal.js**
 
 Remove `renderStats` from the import:
 ```js
@@ -728,7 +730,7 @@ document.dispatchEvent(new CustomEvent('athlytics:matchesChanged'));
 showToast(t('toast_match_deleted'), 'success');
 ```
 
-- [ ] **Step 7.2 — Add athlytics:matchesChanged listener in main.js**
+- [x] **Step 7.2 — Add athlytics:matchesChanged listener in main.js**
 
 In `main.js`, after the existing `athlytics:loadStats` listener (around line 160), add:
 
@@ -739,7 +741,7 @@ document.addEventListener('athlytics:matchesChanged', function() {
 });
 ```
 
-- [ ] **Step 7.3 — Verify**
+- [x] **Step 7.3 — Verify**
 
 Open app, edit a match, save. Stats tab should update. Delete a match, confirm — stats should update. No `renderStats is not defined` errors.
 
@@ -753,13 +755,13 @@ Remove the last `on*` attribute and `window._uploadImage` global.
 - Modify: `index.html`
 - Modify: `js/main.js`
 
-- [ ] **Step 8.1 — Find avatar input in HTML**
+- [x] **Step 8.1 — Find avatar input in HTML**
 
 ```bash
 grep -n "uploadImage\|avatar" index.html | head -20
 ```
 
-- [ ] **Step 8.2 — Update avatar input**
+- [x] **Step 8.2 — Update avatar input**
 
 Find the avatar file input. It will look like:
 ```html
@@ -771,7 +773,7 @@ Change to:
 ```
 Remove the `onchange` attribute entirely. Keep all other attributes (`accept`, `id`, etc.).
 
-- [ ] **Step 8.3 — Add change delegator in main.js**
+- [x] **Step 8.3 — Add change delegator in main.js**
 
 In `setupEventDelegation()` in `main.js`, after the existing `input` event listener, add:
 
@@ -783,7 +785,7 @@ document.addEventListener('change', function(e) {
 });
 ```
 
-- [ ] **Step 8.4 — Remove window._uploadImage from main.js**
+- [x] **Step 8.4 — Remove window._uploadImage from main.js**
 
 Find and delete these two lines:
 ```js
@@ -791,11 +793,11 @@ Find and delete these two lines:
 window._uploadImage = uploadImage;
 ```
 
-- [ ] **Step 8.5 — Verify**
+- [x] **Step 8.5 — Verify**
 
 Open app. Go to Profile tab. Select an image file for avatar. Confirm avatar updates. Open browser console — confirm `window._uploadImage` is `undefined`. Confirm no `onchange` attribute on the avatar input in DevTools Elements panel.
 
-- [ ] **Step 8.6 — Commit Phase 3**
+- [x] **Step 8.6 — Commit Phase 3**
 
 ```bash
 git add js/modal.js js/main.js index.html
@@ -829,20 +831,98 @@ Low-risk, targeted. Each sub-task is independent.
 - Modify: `js/log.js`
 - Modify: `js/main.js`
 
-- [ ] **Step 9.1 — Verify isDevPremium rename is complete (done in Task 2)**
+- [x] **Step 9.0 — Fix split-season date filtering (functional bug)**
+
+**The bug:** `getSeasonBaseYear('2025–2026')` returns `'2025'`. Filtering with `k.date.startsWith('2025')` silently drops all matches played in 2026 (the second half of the season) — affects both the stats view and CSV/PDF export.
+
+**Fix in `js/stats.js` (and later `js/stats-overview.js`):**
+
+Replace `getSeasonBaseYear`:
+```js
+function matchesSeason(k, season) {
+  var base = parseInt(season.split(/[–\-]/)[0].trim(), 10);
+  var year = parseInt((k.date || '').slice(0, 4), 10);
+  // Split-season format (e.g. 2025–2026): include both years
+  if (/[–\-]/.test(season)) return year === base || year === base + 1;
+  // Single-year format: direct startsWith match
+  return (k.date || '').startsWith(season);
+}
+```
+
+Replace both season filter calls in `stats.js` (lines ~150 and ~338):
+```js
+// Before:
+var seasonMatches = allMatches.filter(function(k) { return k.date.startsWith(getSeasonBaseYear(activeSeason)); });
+// After:
+var seasonMatches = getAllMatches().filter(function(k) { return matchesSeason(k, activeSeason); });
+```
+
+Delete `getSeasonBaseYear()` — it is replaced by `matchesSeason()`.
+
+**Fix in `js/export.js`:**
+
+Replace `getActiveSeasonMatches()`:
+```js
+function getActiveSeasonMatches(all, s) {
+  var season = s.activeSeason || String(new Date().getFullYear());
+  var base = parseInt(season.split(/[–\-]/)[0].trim(), 10);
+  var matches = all.filter(function(k) {
+    if (!k.date) return false;
+    var year = parseInt(k.date.slice(0, 4), 10);
+    if (/[–\-]/.test(season)) return year === base || year === base + 1;
+    return k.date.startsWith(season);
+  });
+  return { matches: matches, season: season };
+}
+```
+
+**Verify:**
+```bash
+grep -n "getSeasonBaseYear\|startsWith.*activeSeason\|startsWith.*baseYear" js/stats.js js/export.js
+```
+Expected: zero results.
+
+Manual test: if you have any matches dated in 2026 under a `2025–2026` season, they should now appear in both stats and export.
+
+- [x] **Step 9.1 — Verify isDevPremium rename is complete (done in Task 2)**
 
 ```bash
 grep -rn "isPremium" js/
 ```
 Expected: zero results. If any remain (e.g. in `stats-analyse.js` after its creation), fix them now.
 
-- [ ] **Step 9.2 — teams.js: convert renderTeamDropdown to DOM API**
+- [x] **Step 9.2 — teams.js: convert renderTeamDropdown to DOM API**
 
 Open `js/teams.js`. Find `renderTeamDropdown()`. It currently builds an HTML string and sets `innerHTML`. Rewrite it to use DOM API, matching the pattern used by `renderTournamentDropdown()` in the same file.
 
 Read `renderTournamentDropdown()` first to understand the target pattern, then rewrite `renderTeamDropdown()` to match it.
 
-- [ ] **Step 9.4 — settings.js: rename renderSettings, export defaultSettings**
+- [x] **Step 9.3 — Extract shared clamp helper to utils.js; update log.js and modal.js**
+
+`adjust()` in `log.js` and `modalAdjust()` in `modal.js` duplicate the same goals/assists clamping logic. CLAUDE.md already flags this as a critical invariant — divergence here causes impossible match data bugs. Extract to a shared pure helper.
+
+In `js/utils.js`, add:
+```js
+// Clamps goals and assists to be valid relative to own team's score.
+// Returns { goals, assists } with both clamped to [0, ownScore].
+export function clampStats(goals, assists, ownScore) {
+  var g = Math.max(0, Math.min(goals, ownScore));
+  var a = Math.max(0, Math.min(assists, ownScore - g));
+  return { goals: g, assists: a };
+}
+```
+
+In `js/log.js`, import `clampStats` from `./utils.js` and replace the manual clamping block in `adjust()` with a call to `clampStats(goals, assists, ownScore)`, then write back `goals` and `assists` from the returned object.
+
+In `js/modal.js`, do the same for `modalAdjust()`.
+
+Verify:
+```bash
+grep -n "Math.min.*goals\|Math.min.*assists" js/log.js js/modal.js
+```
+Expected: zero results (all clamping now lives in utils.js).
+
+- [x] **Step 9.4 — settings.js: rename renderSettings, export defaultSettings**
 
 In `js/settings.js`:
 
@@ -870,21 +950,21 @@ Verify no external files import `renderSettings` from `settings.js` (should be z
 grep -rn "renderSettings.*settings\.js\|from.*settings.*renderSettings" js/
 ```
 
-- [ ] **Step 9.5 — navigation.js: add TODO comment**
+- [x] **Step 9.5 — navigation.js: add TODO comment**
 
 In `js/navigation.js`, find `updateLogBadge()`. Add a comment above the sport-icon mapping:
 ```js
 // TODO Phase 3: move to SPORT_META map when multi-sport is implemented
 ```
 
-- [ ] **Step 9.6 — log.js: add comment in resetForm**
+- [x] **Step 9.6 — log.js: add comment in resetForm**
 
 In `js/log.js`, find `resetForm()`. Add a comment before `renderTeamDropdown()` at the end (or wherever team state is NOT reset):
 ```js
 // Intentional: keeps last selected team for convenience — user often logs multiple matches for the same team
 ```
 
-- [ ] **Step 9.7 — main.js: add bootstrap comments**
+- [x] **Step 9.7 — main.js: add bootstrap comments**
 
 In `js/main.js`, add comments at each lazy-init event dispatch point in the cross-module event listeners section:
 
@@ -917,11 +997,54 @@ document.addEventListener('athlytics:matchesChanged', function() {
 });
 ```
 
-- [ ] **Step 9.8 — Commit Phase 4**
+- [x] **Step 9.9 — Normalize profile `team` → `teams` field name**
+
+`CLAUDE.md` documents the Supabase column as `teams` (jsonb), but `profile.js` reads `row.team || []` and stores the in-memory profile object under key `team`. If the real DB column is `teams`, fetches silently return `[]` and profile teams are never persisted.
+
+**First — verify the actual column name:**
+```bash
+grep -n "team" js/profile.js
+```
+Check `fetchProfileFromSupabase()`: it reads `row.team`. If the DB column is `teams`, this is broken.
+
+**Fix if DB column is `teams`:**
+In `profile.js`:
+- `fetchProfileFromSupabase()`: `team: row.team || []` → `teams: row.teams || []`
+- `saveProfile_local(profil)`: `team: Array.isArray(profil.team)` → `teams: Array.isArray(profil.teams)`
+- `saveProfileToSupabase(profil)`: update the upsert body to write `teams: profil.teams`
+- `getProfile()` return shape: rename `team` → `teams`
+
+Then update all call sites that read `.team` from the profile:
+- `js/stats.js` (and `stats-overview.js` after split): `getProfile().team || []` → `getProfile().teams || []`
+- `js/teams.js`: all `profil.team` references → `profil.teams`
+- `js/main.js` line ~202: `p.favoriteTeam && p.team.includes(...)` → `p.teams.includes(...)`
+
+Verify:
+```bash
+grep -rn "\.team\b" js/
+```
+Expected: only legitimate matches (like `data-team`, `setTeamFilter`), no `.team` property access on profile objects.
+
+Update localStorage key contract in `CLAUDE.md` if needed (currently shows `teams[]` which suggests `teams` is correct).
+
+- [x] **Step 9.8 — Document favorite-selection side effect in teams.js**
+
+`setFavoriteTeam()` and `setFavoriteTournament()` both call `selectTeam()`/`selectTournament()` as a side effect — marking a favorite also changes the active working selection. This is a product decision hidden inside a persistence action. Add an explicit comment so future contributors understand it is intentional, not accidental.
+
+In `js/teams.js`, find `setFavoriteTeam()` and add above the `selectTeam()` call:
+```js
+// Intentional: marking a favorite also activates it as the current filter selection
+```
+
+Find `setFavoriteTournament()` and add the same comment above `selectTournament()`.
+
+If the behavior is NOT intentional, separate the two concerns instead: remove the `selectTeam/selectTournament` call and let the user's current selection remain unchanged.
+
+- [x] **Step 9.10 — Commit Phase 4**
 
 ```bash
-git add js/utils.js js/stats-overview.js js/stats-analyse.js js/assessment.js js/teams.js js/settings.js js/navigation.js js/log.js js/main.js
-git commit -m "refactor: rename isPremium, standardize renderTeamDropdown, rename requestRenderSettings, add comments"
+git add js/utils.js js/stats-overview.js js/stats-analyse.js js/assessment.js js/teams.js js/settings.js js/navigation.js js/log.js js/main.js js/export.js
+git commit -m "fix: correct split-season filtering; refactor: clamp helper, rename isPremium, standardize team dropdown, add comments"
 ```
 
 ---
@@ -938,7 +1061,7 @@ git commit -m "refactor: rename isPremium, standardize renderTeamDropdown, renam
 
 ## Task 10: Update CLAUDE.md
 
-- [ ] **Step 10.1 — Mark resolved debt items as ✅ Ferdig**
+- [x] **Step 10.1 — Mark resolved debt items as ✅ Ferdig**
 
 In `CLAUDE.md`, find the tech debt table entries for:
 - `stats.js` too large → mark ✅ Ferdig
@@ -949,20 +1072,20 @@ In `CLAUDE.md`, find the tech debt table entries for:
 - `teams.js` inconsistent render strategy → mark ✅ Ferdig
 - Avatar upload `window._uploadImage` / `onchange` → mark ✅ Ferdig (main.js section)
 
-- [ ] **Step 10.2 — Add athlytics:matchesChanged to cross-module event list**
+- [x] **Step 10.2 — Add athlytics:matchesChanged to cross-module event list**
 
 In `CLAUDE.md`, in the "Cross-modul events" section, add:
 ```
 - `athlytics:matchesChanged` – dispatched by `modal.js` after save/delete → `loadStats(true)` in main.js
 ```
 
-- [ ] **Step 10.3 — Update settings.js function contract**
+- [x] **Step 10.3 — Update settings.js function contract**
 
 In `CLAUDE.md`, in the "Viktige funksjoner" section under `settings.js`, update:
 - `renderSettings()` → `requestRenderSettings()`
 - Add `defaultSettings()` to the list
 
-- [ ] **Step 10.4 — Update filstruktur section**
+- [x] **Step 10.4 — Update filstruktur section**
 
 Update the file list to replace `stats.js` with the three new files:
 ```
@@ -971,7 +1094,7 @@ Update the file list to replace `stats.js` with the three new files:
   stats-search.js       – renderMatchListPaged() pure renderer
 ```
 
-- [ ] **Step 10.5 — Commit CLAUDE.md update**
+- [x] **Step 10.5 — Commit CLAUDE.md update**
 
 ```bash
 git add CLAUDE.md
@@ -982,14 +1105,14 @@ git commit -m "docs: update CLAUDE.md for tech debt cleanup — mark resolved it
 
 ## Final: Run full smoke test from spec
 
-- [ ] Log a match — save succeeds, stats tab updates, form resets with team preserved
-- [ ] Edit a match — open modal, change score, save → stats tab refreshes
-- [ ] Delete a match — confirm delete → match gone, stats updated
-- [ ] Switch language — settings re-render correctly in both Norwegian and English
-- [ ] Upload avatar — updates; confirm no `onchange` in HTML DevTools, `window._uploadImage` undefined
-- [ ] Stats tab — Oversikt and Analyse views both render, charts display, no console errors
-- [ ] Filter by season/team/tournament — results update correctly
-- [ ] Assessment sheet — opens after saving match, ratings save on match edit
+- [x] Log a match — save succeeds, stats tab updates, form resets with team preserved
+- [x] Edit a match — open modal, change score, save → stats tab refreshes
+- [x] Delete a match — confirm delete → match gone, stats updated
+- [x] Switch language — settings re-render correctly in both Norwegian and English
+- [x] Upload avatar — updates; confirm no `onchange` in HTML DevTools, `window._uploadImage` undefined
+- [x] Stats tab — Oversikt and Analyse views both render, charts display, no console errors
+- [x] Filter by season/team/tournament — results update correctly
+- [x] Assessment sheet — opens after saving match, ratings save on match edit
 
 **Structural checks:**
 ```bash
@@ -1009,7 +1132,7 @@ grep -rn "isPremium" js/    # expected: 0 results
 grep -rn "isDevPremium" js/    # expected: utils.js, stats-analyse.js, assessment.js
 ```
 
-- [ ] **Final commit (if CLAUDE.md not already committed)**
+- [x] **Final commit (if CLAUDE.md not already committed)**
 
 ```bash
 git add CHANGELOG.md CLAUDE.md
