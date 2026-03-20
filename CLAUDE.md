@@ -8,9 +8,8 @@
 
 - **Les alltid prosjektfilene ved oppstart** av nye samtaler før du gjør endringer.
 - Prosjektet er nå splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
-- Arbeidsfiler: `/home/claude/` → output: `/mnt/user-data/outputs/`
 - **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`).
-- **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, commit begge filer, og push til `main`. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
+- **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, og commit. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
 
 ---
 
@@ -45,7 +44,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 
-> **Ikke legg til nye features som avhenger av brukerdata før auth og RLS er på plass.**
+> Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
 
 ---
 
@@ -64,9 +63,9 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `id=eq.default` hardkodet i `fetchProfil()` og `fetchSettings()` | 🟠 Høy | Forbered parametrisert bruker-ID; byttes ut med `auth.users.id` i Fase 4 |
-| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Dokumenter at settings er en del av profilraden; vurder rename ved auth-migrering |
-| `headers(extra)` bruker alltid statisk anon key som bearer – ikke auth-klar | 🟡 Medium | Skrives om i Fase 4 til å bruke session/access token fra `auth.js` |
+| `id=eq.default` hardkodet i `fetchProfil()` og `fetchSettings()` | ✅ Ferdig | `fetchProfil(userId)` og `fetchSettings(userId)` er parametrisert; bruker `getUserId()` fra `auth.js` |
+| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Settings er en del av profilraden; vurder rename i Fase 5 |
+| `headers(extra)` bruker alltid statisk anon key som bearer – ikke auth-klar | ✅ Ferdig | Bruker session.accessToken som bearer når autentisert, faller tilbake til anon key |
 
 ### state.js
 
@@ -79,7 +78,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | 🟠 Høy | Parametriser bruker-ID; byttes ut med `auth.users.id` i Fase 4 |
+| `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | ✅ Ferdig | `saveSettingsToSupabase()` bruker `getUserId()` fra `auth.js` |
 | `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | ✅ Ferdig | Sorterer på `parseInt(a) - parseInt(b)` – baseår som tall. |
 | `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | ✅ Ferdig | Renamed til `requestRenderSettings()` med kommentar om event-pattern. |
 | `defaultSettings()` er ikke eksportert, men dokumentasjonen sier den skal være det | ✅ Ferdig | Eksportert. |
@@ -95,7 +94,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Akseptabelt i MVP; flytt til Supabase Storage ved auth-migrering |
+| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟠 Høy | Flytt til Supabase Storage i Fase 5 (auth er nå på plass) |
 | `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | ✅ Ferdig | Alle hardkodede strenger erstattet med `t()`; 6 nye nøkler lagt til i `TEKST`; døde variabler fjernet fra `renderLogSub()`. |
 | `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | ✅ Ferdig | Begge funksjoner flyttet til `teams.js`; `profile.js` dispatcher `athlytics:renderProfileLists`-event; `main.js` lytter og kaller begge. |
 | `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | ✅ Ferdig | Begge bruker nå DOM API — standardisert ved flytting til `teams.js`. |
@@ -145,7 +144,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | Dokumenter som print-HTML, ikke ekte PDF; vurder bibliotek (f.eks. jsPDF) ved Fase 4 |
-| `profil.name` / `profil.club` i PDF-header – koblet til lokal profilform, ikke eksplisitt kontrakt | 🟢 Lav | Avklar mot endelig profilmodell etter auth-migrering |
+| `profil.name` / `profil.club` i PDF-header – koblet til lokal profilform, ikke eksplisitt kontrakt | ✅ Ferdig | Profilmodell er nå UUID-basert og stabil etter auth-migrering |
 
 ### settings-render.js
 
@@ -217,6 +216,7 @@ Brukes for å bryte sirkulære avhengigheter mellom moduler:
 - `athlytics:loadStats` – dispatched by navigation.js:switchTab() → loadStats() i main.js
 - `athlytics:destroyCharts` – dispatched by navigation.js:switchTab() → destroyCharts() i main.js
 - `athlytics:matchesChanged` – dispatched by modal.js after save/delete → loadStats(true) i main.js
+- `athlytics:requireAuth` – dispatched by WRITE_ACTIONS gate, keydown Enter guard, and uploadImage guard → openAuthOverlay('login') i main.js
 
 ---
 
@@ -224,11 +224,11 @@ Brukes for å bryte sirkulære avhengigheter mellom moduler:
 
 ```
 config.js
-    ↓        ↓
-auth.js   supabase.js
-              ↑
-          (imports auth.js)
-              ↓
+    ↓
+auth.js                        ← imported by supabase.js, profile.js, settings.js, main.js
+    ↓
+supabase.js
+    ↓
 state.js    utils.js    toast.js
     ↓
 settings.js
@@ -243,6 +243,8 @@ profile.js   teams.js   settings-render.js   navigation.js
                   ↘              ↙
                       main.js  (orkestrator)
 ```
+
+`auth.js` importeres av `supabase.js` (for session token), `profile.js`, `settings.js` og `main.js` (for `getUserId()`, `isAuthenticated()`, `restoreSession()`, `logout()`).
 
 `state.js` bryter sirkulær risiko: `stats-overview.js`, `modal.js` og `export.js` bruker alle `getAllMatches()` uten å importere hverandre.
 
