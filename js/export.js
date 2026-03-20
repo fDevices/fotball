@@ -13,10 +13,17 @@ async function getMatchesForExport() {
   } catch(e) { return []; }
 }
 
+function matchesSeason(k, season) {
+  var base = parseInt(season.split(/[–\-]/)[0].trim(), 10);
+  var year = parseInt((k.date || '').slice(0, 4), 10);
+  // Split-season (e.g. 2025–2026): include both years
+  if (/[–\-]/.test(season)) return year === base || year === base + 1;
+  return (k.date || '').startsWith(season);
+}
+
 function getActiveSeasonMatches(all, s) {
   var season = s.activeSeason || String(new Date().getFullYear());
-  var baseYear = season.split(/[\u2013-]/)[0].trim();
-  return { matches: all.filter(function(k) { return k.date && k.date.startsWith(baseYear); }), season: season };
+  return { matches: all.filter(function(k) { return matchesSeason(k, season); }), season: season };
 }
 
 function buildMatchResultLabel(k) {

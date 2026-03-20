@@ -86,6 +86,7 @@ const ACTIONS = {
   closeAssessmentSheet:          () => closeAssessmentSheet(),
   saveAssessment:                () => saveAssessment(),
   setRating:                     (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value), el.dataset.context); },
+  triggerAvatarUpload:           () => { var i = document.getElementById('avatar-upload'); if (i) i.click(); },
   dismissProfilePrompt:          () => dismissProfilePrompt(),
   logout:              () => logout(),
   openAuthOverlay:     () => openAuthOverlay('login'),

@@ -63,8 +63,10 @@ export function closeModal() {
 
 export function setModalMatchType(type) {
   mMatchType = type;
-  document.getElementById('modal-btn-home').classList.toggle('active', type === 'home');
-  document.getElementById('modal-btn-away').classList.toggle('active', type === 'away');
+  var btnHome = document.getElementById('modal-btn-home');
+  var btnAway = document.getElementById('modal-btn-away');
+  if (btnHome) btnHome.classList.toggle('active', type === 'home');
+  if (btnAway) btnAway.classList.toggle('active', type === 'away');
 }
 
 export function modalAdjust(type, delta) {

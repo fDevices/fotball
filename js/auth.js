@@ -38,12 +38,18 @@ export function clearSession() {
 }
 
 function _cancelRefresh() {
-  if (_refreshTimer) { clearInterval(_refreshTimer); _refreshTimer = null; }
+  if (_refreshTimer) { clearTimeout(_refreshTimer); _refreshTimer = null; }
 }
 
 function _scheduleRefresh() {
   _cancelRefresh();
-  _refreshTimer = setInterval(async function() { await _refreshSession(); }, 50 * 60 * 1000);
+  var s = getSession();
+  if (!s || !s.expiresAt) return;
+  var delay = Math.max(s.expiresAt - Date.now() - 5 * 60 * 1000, 30 * 1000);
+  _refreshTimer = setTimeout(async function() {
+    await _refreshSession();
+    _scheduleRefresh(); // reschedule after each refresh
+  }, delay);
 }
 
 async function _refreshSession() {

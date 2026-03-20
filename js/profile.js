@@ -66,7 +66,8 @@ export async function fetchProfileFromSupabase() {
       var p = {
         name: row.name || '',
         club: row.club || '',
-        position: row.position || '',
+        // position is local-only; no DB column exists
+        position: getProfile().position || '',
         teams: row.team || [],
         favoriteTeam: row.favorite_team || '',
         tournaments: row.tournaments || [],

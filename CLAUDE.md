@@ -8,7 +8,7 @@
 
 - **Les alltid prosjektfilene ved oppstart** av nye samtaler før du gjør endringer.
 - Prosjektet er nå splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
-- **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`).
+- **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`). **Unntak:** interne enum-verdier i settings (`'fotball'`, `'aar'`, `'sesong'`) er norske av historiske årsaker og lagres i DB – ikke rename uten datamigrasjon.
 - **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, og commit. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
 
 ---
@@ -20,7 +20,9 @@
 | **Live URL** | https://athlyticsport.app og https://www.athlyticsport.app |
 | **GitHub** | https://github.com/fDevices/fotball (public, `main` branch) |
 | **Hosting** | Vercel – prosjekt: `fdevices-projects/fotball` |
+| **Routing** | `vercel.json`: `/` → `landing.html` (marketing/entrypoint), `/app` → `app.html` (appskall). To-entry-modell: `landing.html` er permanent markedsføringsside; `app.html` er selve appen. Begge må deployeres ved releaser. |
 | **Database** | Supabase (URL og nøkler settes via miljøvariabler / deployment config – ikke hardkod i kode eller dokumentasjon) |
+| **E-post** | Resend – ⚠️ **Husk å gjenopprette e-postkonfigurasjon etter testing er fullført** |
 
 ## Workflow
 
@@ -37,25 +39,24 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| RLS på Supabase er "Allow all" på begge tabeller | ✅ Ferdig | RLS implementert — authenticated users: full CRUD på egne rader; anon: SELECT-only på demo-brukerens rader |
-| Ingen autentisering (Supabase Auth ikke implementert) | ✅ Ferdig | auth.js implementert med email/password via Supabase Auth REST API |
 | Supabase anon key er hardkodet i `js/config.js` | ✅ Akseptert | `sb_publishable_`-nøkkel er designet for å være offentlig; RLS beskytter data. Rotér nøkkel ved mistanke om misbruk. Ingen build-steg nødvendig. |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 
 > Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
+>
+> **Sikkerhetsposisjon auth.js (MVP):** Access- og refresh-token lagres i `localStorage`. Dette er standard browser-praksis for SPA-er uten backend, men betyr at XSS gir full session-kompromittering. Risikoen dempes av systematisk escaping i render-stier. Akseptabelt for MVP – vurder `httpOnly`-cookie-basert session ved hardening. `logout()` gjør `window.location.reload()` for å nullstille all app-state; dette er en bevisst forenkling og fungerer godt i en liten app. Token-refresh skjer nå expiry-drevet (5 min buffer) i stedet for fast 50-minutters intervall.
 
 ---
 
-## 🔧 Teknisk gjeld – kode (funn fra code review)
+## 🔧 Teknisk gjeld – kode
 
 ### main.js / app.html
 
 | Problem | Fil | Alvorlighet | Løsning |
 |---|---|---|---|
-| Avatar-upload bruker `onclick`/`onchange` i HTML + `window._uploadImage` | `app.html`, `main.js` | ✅ Ferdig | Delegert `change`-lytter i `main.js`; `data-action="uploadImage"` på input; `window._uploadImage` fjernet. |
-| Bootstrap-kommentarer mangler for bevisst lazy init via events | `main.js` | ✅ Ferdig | Kommentarer lagt til for alle `athlytics:`-event-lyttere i main.js. |
+| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | Vurder split: `main.js` (bootstrap+wiring), `main-actions.js` (ACTIONS-map), `auth-ui.js` (overlay/banner/auth-view) i Fase 3 |
 
 > **Merk:** Guard clause-mønster for ACTIONS: `var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, ...)`
 
@@ -63,80 +64,54 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `id=eq.default` hardkodet i `fetchProfil()` og `fetchSettings()` | ✅ Ferdig | `fetchProfil(userId)` og `fetchSettings(userId)` er parametrisert; bruker `getUserId()` fra `auth.js` |
 | `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Settings er en del av profilraden; vurder rename i Fase 5 |
-| `headers(extra)` bruker alltid statisk anon key som bearer – ikke auth-klar | ✅ Ferdig | Bruker session.accessToken som bearer når autentisert, faller tilbake til anon key |
-
-### state.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `allMatches` er muterbar eksportert variabel – state-kontrakten er svak | ✅ Ferdig | `_allMatches` er privat; `getAllMatches()` / `setAllMatches()` er eneste API. |
-| `invalidateMatchCache()` tømmer kun sessionStorage, ikke in-memory state | ✅ Ferdig | Tømmer nå også `_allMatches = []`. Kontrakt: full reset av både cache og in-memory state. |
+| `fetchKamper()` sender ingen user_id-filter i query-strengen | 🟡 Merknad | Riktig arkitektur — klient-side filter er unødvendig når RLS er korrekt konfigurert. **Konsekvens:** datakorrekthet og personvern avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. |
 
 ### settings.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `id: 'default'` hardkodet i settings-laget – tett koblet til midlertidig modell | ✅ Ferdig | `saveSettingsToSupabase()` bruker `getUserId()` fra `auth.js` |
-| `getAllSeasons()` sorterer leksikografisk – usikkert for `2025–2026`-format | ✅ Ferdig | Sorterer på `parseInt(a) - parseInt(b)` – baseår som tall. |
-| `renderSettings()` i `settings.js` renderer ikke selv – bare en event-trigger | ✅ Ferdig | Renamed til `requestRenderSettings()` med kommentar om event-pattern. |
-| `defaultSettings()` er ikke eksportert, men dokumentasjonen sier den skal være det | ✅ Ferdig | Eksportert. |
+| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | Disse lekker inn i validering, tema-valg og DB-data. Rename krever migrering av eksisterende data; vurder i Fase 3. |
 
 ### i18n.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `TEKST`-objektet inneholder blandet norsk/engelsk i verdiene (`'Eget team / tropp'`, `'Kamp saved!'`, `'Fullt name'` osv.) | ✅ Ferdig | 7 blandede verdier i `no`-grenen rettet; `en`-grenen var allerede korrekt. |
-| `updateAllText()` bruker `innerHTML` der bare tekst/emoji settes | ✅ Ferdig | Auditert: all tekst bruker `textContent`; eneste `innerHTML` er `profileTitle` som trenger `<span>`-markup – kommentert som bevisst valg. |
+| `i18n.js` har vokst fra oversettelsesordbok til global tekst-refresh-kontroller – oppdaterer DOM-noder direkte og dispatcher cross-module events | 🟡 Medium | Vurder split: `i18n.js` (ordbok + `t()`) og `text-refresh.js` (imperativ DOM-oppdatering) i Fase 3. |
+| `app.html` inneholder norske standardstrenger (placeholders, settings-tekst) som overskrives etter load | 🟢 Lav | Bevisst valg: `updateAllText()` og `renderSettings()` kjøres ved bootstrap. Skjørt hvis render-syklusen feiler. Vurder nøytralt / tom HTML ved Fase 3-redesign. |
 
 ### profile.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | ✅ Ferdig | Supabase Storage for autentiserte brukere; uautentiserte beholder base64-flyt |
-| `showAvatarImage()` og `renderLogSub()` har hardkodede tekster uten `t()` | ✅ Ferdig | Alle hardkodede strenger erstattet med `t()`; 6 nye nøkler lagt til i `TEKST`; døde variabler fjernet fra `renderLogSub()`. |
-| `renderProfileTeamList()` og `renderProfileTournamentList()` bør arkitektonisk tilhøre `teams.js` | ✅ Ferdig | Begge funksjoner flyttet til `teams.js`; `profile.js` dispatcher `athlytics:renderProfileLists`-event; `main.js` lytter og kaller begge. |
-| `renderProfileTeamList()` bruker HTML-streng mens `renderProfileTournamentList()` bruker DOM API | ✅ Ferdig | Begge bruker nå DOM API — standardisert ved flytting til `teams.js`. |
-
-### teams.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `closeAllDropdowns()` nullstiller ikke `showNewTournamentInput`, `showNewTeamInput` eller modal-state | ✅ Ferdig | Resetter begge booleans og skjuler `tournament-new-row` i tillegg til `team-new-row`. |
-| `selectedTeam` slettes ikke fra state hvis laget fjernes fra profilen – hengende state | ✅ Ferdig | `activeLag` valideres mot `profileTeams` i både `renderStats()` og `renderAnalyse()`; nullstilles til `'all'` hvis ikke lenger gyldig. |
-| `setFavoriteTeam()` / `setFavoriteTournament()` kaller `selectTeam()` som sideeffekt | ✅ Ferdig | Dokumentert som bevisst valg med kommentar i koden. |
-| Inkonsistent render-strategi: `renderTeamDropdown()` bruker HTML-streng, `renderTournamentDropdown()` bruker DOM API | ✅ Ferdig | `renderTeamDropdown()` konvertert til DOM API. |
-| Eksporterte variabler `selectedTeam`/`selectedTournament` i dokumentasjonen – koden eksporterer bare gettere | ✅ Ferdig | Dokumentasjon oppdatert til å reflektere faktiske gettere. |
-
-### log.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `saveMatch()` muterer `allMatches` direkte med `.unshift()` før `setAllMatches()` | ✅ Ferdig | Bruker `setAllMatches([newMatch].concat(allMatches))` – ingen direkte mutasjon av delt state. |
-| `resetForm()` resetter ikke valgt lag – bevisst UX-valg eller glemt? | ✅ Ferdig | Dokumentert som bevisst valg med kommentar i koden. |
-| `setMatchType()` og `updateResult()` mangler guard clauses på DOM-oppslag | ✅ Ferdig | Null-sjekk på alle 4 toggle/label-elementer i `setMatchType()`; null-sjekk på `result-display` i `updateResult()`. |
+| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🔴 Ikke ferdig | Kode bruker fortsatt base64 for alle brukere. Supabase Storage ikke implementert. Løs i Fase 4. |
+| `saveProfile()` avhenger av remote state ved lagring: fetcher Supabase for å bevare arrays/avatar, tar bare tekstfelt fra skjema | 🟡 Medium | Fungerer nå, men skjørt: nye profilfelt som legges til skjema må eksplisitt merges fra remote. Vurder å samle all profilstate lokalt og synkronisere atskilt. |
 
 ### modal.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `saveEditedMatch()` og `confirmDeleteMatch()` kaller `renderStats()` direkte – tett kobling | ✅ Ferdig | Dispatcher `athlytics:matchesChanged`; `main.js` lytter og kaller `loadStats(true)`. |
+| `closeModal()` resetter mange felt manuelt – korrekt i dag, men kostbart å utvide | 🟡 Medium | Vurder å samle modal-state i ett objekt og resette med Object.assign ved lukking. |
 
 > **Kritisk invariant:** `modalAdjust()` og `adjust()` **må** alltid ha identisk clamp-logikk. Endre aldri én uten den andre.
+
+### assessment.js
+
+| Problem | Alvorlighet | Løsning |
+|---|---|---|
+| Premium-gate bruker `isDevPremium()` som alltid returnerer `true` – er dev-toggle, ikke ekte entitlement | 🟡 Medium | Assessment-funksjonen er tilgjengelig for alle i praksis. Kobles til Stripe/ekte abonnement i Fase 4. Ikke endre `isDevPremium()` til `false` uten at betalingsflyt er på plass. |
+| `saveAssessment()` blander DOM-reads, API-kall, state-mutasjon, toast og knapp-state i én funksjon | 🟢 Lav | Akseptabelt nå; stopp videre vekst i samme retning. |
 
 ### navigation.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `switchTab()` mangler guard clauses – kaster hvis `screen-${tab}` eller `tab-${tab}` ikke finnes | ✅ Ferdig | Hoister begge `getElementById`-kall, returnerer tidlig hvis enten er null; gjenbruker variablene i `classList`-operasjoner. |
 | `updateLogBadge()` hardkoder sport-til-ikon-mapping inline | 🟢 Lav | Flytt til `SPORT_META`-map ved Fase 3 multi-sport |
 
 ### stats-overview.js / stats-analyse.js / stats-search.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `stats.js` hadde blitt for stor | ✅ Ferdig | Splittet i tre moduler (se filstruktur). |
 | `innerHTML` med store HTML-strenger – risiko for glemte escapes | 🟡 Medium | All brukerdata escapes med `esc()`; vurder DOM API ved videre refaktorering. |
 
 ### export.js
@@ -144,22 +119,12 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | Dokumenter som print-HTML, ikke ekte PDF; vurder bibliotek (f.eks. jsPDF) ved Fase 4 |
-| `profil.name` / `profil.club` i PDF-header – koblet til lokal profilform, ikke eksplisitt kontrakt | ✅ Ferdig | Profilmodell er nå UUID-basert og stabil etter auth-migrering |
 
 ### settings-render.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `setActiveSeason()` toast har hardkodet norsk fallback `'ingen'` – språkmix ved engelsk | ✅ Ferdig | Erstattet med `t('none')` – ny `none`-nøkkel i `TEKST` (`'ingen'` / `'none'`). |
-| `setSeasonFormat()` validerer ikke om `activeSeason` fortsatt er gyldig etter formatbytte | ✅ Ferdig | Sjekker mot `getAllSeasons()` etter formatbytte; nullstiller `activeSeason` hvis ikke lenger gyldig. |
-| `setSport()` har ingen validering av gyldige sportverdier | ✅ Ferdig | `ALLOWED_SPORTS`-konstant definert i `settings-render.js`; `setSport()` returnerer tidlig hvis sport ikke er i lista. |
 | `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |
-
-### utils.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `isPremium()` returnerer alltid `true` – er en dev-toggle, ikke en domenefunksjon | ✅ Ferdig | Renamed til `isDevPremium()` med TODO-kommentar for Fase 4. |
 
 ---
 
@@ -309,14 +274,16 @@ created_at (timestamptz)
 updated_at (timestamptz)
 ```
 
-> **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Kolonnen `position` eksisterer ikke i databasen.
+> **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Dette er et kjent unntak fra ellers identisk navngivning.
+>
+> **`position`** eksisterer ikke som DB-kolonne. Feltet er **local-only**: leses fra localStorage, vises i `profil-posisjon`-inputet, lagres lokalt, men skrives aldri til Supabase og leses aldri fra `row`. `fetchProfileFromSupabase()` beholder eksisterende lokal verdi ved fetch.
 
-**All kode og alle Supabase-kolonner bruker engelske navn.** Ingen mapping mellom lag og applag – JS-feltnavn og DB-kolonnenavn er identiske.
+**All kode og alle Supabase-kolonner bruker engelske navn.** Navngivningen er konsistent med ett kjent unntak: JS bruker `teams`, DB bruker `team` (se merknad over).
 
 ### localStorage-nøkler
 
 ```
-athlytics_profile   → { name, club, teams[], favoriteTeam, tournaments[], favoriteTournament, avatar }
+athlytics_profil    → { name, club, position, teams[], favoriteTeam, tournaments[], favoriteTournament, avatar }  ← note: Norwegian spelling in actual key
 athlytics_settings  → { sport, seasonFormat, activeSeason, lang, extraSeasons[] }
 sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/delete
 ```
@@ -325,7 +292,11 @@ sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/dele
 
 ## Kodenavn-konvensjoner
 
-All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske. Ingen mapping nødvendig.
+All kode bruker engelsk for variabelnavn, funksjonsnavn, ID-er, CSS-klasser og Supabase-kolonnenavn – med to kjente unntak:
+- `teams` (JS) ↔ `team` (DB) — én kjent mapping, se profiles-kontrakten
+- `position` er local-only og har ingen DB-kolonne
+
+**Unntak: norske interne enum-verdier.** Deler av settings-laget bruker norske domeneverdier internt: `sport: 'fotball'`, `seasonFormat: 'aar' | 'sesong'`, og DOM-ID-er som `settings-sesong-options`. Disse lagres i localStorage og Supabase og er **ikke** UI-strenger. Rename krever datamigrasjon. Se gjeldstabell i settings.js-seksjonen.
 
 | JS-variabel | Supabase-kolonne |
 |---|---|
@@ -335,29 +306,6 @@ All kode bruker engelsk – JS-variabelnavn og Supabase-kolonnenavn er identiske
 | `k.home_score` / `k.away_score` | `home_score` / `away_score` |
 | `k.goals` | `goals` |
 | `k.match_type` | `match_type` — ALWAYS `'home'` or `'away'` |
-
-### Viktige funksjoner per modul
-
-**config.js** – konstanter
-**supabase.js** – `fetchKamper()`, `insertKamp(body)`, `updateKamp(id, body)`, `deleteKamp(id)`, `fetchProfil()`, `upsertProfil(body)`, `upsertSettings(body)`
-**state.js** – `getAllMatches()`, `setAllMatches(matches)`, `invalidateMatchCache()`
-**utils.js** – `esc(str)`, `isDevPremium()`, `clampStats(goals, assists, ownScore)`, `getResult(k)`
-**toast.js** – `showToast(msg, type)`
-**settings.js** – `getSettings()`, `saveSettings(s)`, `defaultSettings()`, `buildSeasonLabel(aar, format)`, `getAllSeasons(allMatches)`, `getDateLocale()`, `requestRenderSettings()`
-**i18n.js** – `t(key)`, `setLang(lang)`, `updateAllText()`, `updateFlags()`, `toggleLangPicker(btn)`
-**profile.js** – `getProfile()`, `saveProfile_local(profil)`, `fetchProfileFromSupabase()`, `saveProfileToSupabase(profil)`, `saveProfile()`, `loadProfileData(profil)`, `updateAvatar()`, `uploadImage(input)`, `showAvatarImage(src)`, `renderLogSub()`, `renderProfileTeamList()`, `renderProfileTournamentList()`
-**teams.js** – `getSelectedTeam()`, `getSelectedTournament()`, `selectTeam(name)`, `selectTournament(name)`, `toggleTeamDropdown()`, `renderTeamDropdown()`, `renderTournamentDropdown()`, `saveNewTeamFromDropdown()`, `saveNewTournamentFromDropdown()`, `toggleNewTeamInput()`, `toggleNewTournamentInput()`, `addTeamFromProfile()`, `addTournament()`, `deleteTeam(name)`, `deleteTournament(name)`, `setFavoriteTeam(name)`, `setFavoriteTournament(name)`, `selectModalTeam(name)`, `selectModalTournament(name)`, `toggleModalTeamDropdown()`, `toggleModalTournamentDropdown()`, `renderModalTeamDropdown()`, `renderModalTournamentDropdown()`, `closeAllDropdowns()`
-**navigation.js** – `switchTab(tab)`, `updateLogBadge()`
-**settings-render.js** – `renderSettings()`, `renderActiveSeasonPills()`, `setSport(sport)`, `setSeasonFormat(format)`, `setDateFormat(format)`, `setActiveSeason(sesong)`, `addSeason()`, `applyTheme(sport)`
-**log.js** – `adjust(type, delta)`, `saveMatch()`, `resetForm()`, `setMatchType(type)`, `updateResult()`, `getMatchType()`
-**stats-overview.js** – `loadStats(forceRefresh?)`, `renderStats()`, `calcWDL(matchArr)`, `switchStatsView(view)`, `setSeason(s)`, `setTeamFilter(team)`, `setTournamentFilter(tournament)`, `setMatchPage(page)`, `setOpponentSearch(val)`; eksporterte vars: `activeStatsView`, `activeLag`, `activeSeason`, `activeTournament`, `matchPage`, `opponentSearch`
-**stats-analyse.js** – `renderAnalyse(matches, activeLag, activeSeason)`, `renderFormStreak(matches)`, `destroyCharts()`, `initChartDefaults()`
-**stats-search.js** – `renderMatchListPaged(matches, page)`
-**modal.js** – `openEditModal(id)`, `closeModal()`, `setModalMatchType(type)`, `modalAdjust(type, delta)`, `saveEditedMatch()`, `deleteMatch()`, `confirmDeleteMatch()`, `cancelDeleteMatch()`
-**assessment.js** – `openAssessmentSheet(matchId)`, `closeAssessmentSheet()`, `resetAssessmentState()`, `loadMatchIntoAssessment(match)`, `renderAssessmentSheet()`, `renderModalAssessmentSection()`, `setRating(category, value, context)`, `saveAssessment()`, `getAssessmentPayload()`
-**export.js** – `exportCSV()`, `exportPDF()`
-**auth.js** – `login(email, password)`, `signup(email, password)`, `logout()`, `restoreSession()`, `getSession()`, `getUserId()`
-**main.js** – bootstrap, `setupEventDelegation()`, `openAuthOverlay(view)`, `closeAuthOverlay()`, `handleAuthLogin()`, `handleAuthSignup()`, `updateDemoBanner()`, ACTIONS-map
 
 ---
 
@@ -419,26 +367,11 @@ Uten dette lekkjer Chart.js-instanser og grafer tegnes dobbelt ved re-render.
 I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-content` (siden `#stats-filters` er skjult).
 
 ### Avatar upload
-Avatar-input i `app.html` bruker `data-action="uploadImage"`. `main.js` håndterer dette via delegert `change`-event. Ingen `window._uploadImage` global og ingen `onchange`-attributt.
+Avatar-circle bruker `data-action="triggerAvatarUpload"` → ACTIONS-map kaller `#avatar-upload.click()`. Avatar-input bruker `data-action="uploadImage"` → delegert `change`-event i `main.js`. Ingen `onclick`/`onchange`-attributter og ingen `window._uploadImage` global.
+
+`uploadImage()` lagrer fortsatt base64 for **alle** brukere (Supabase Storage ikke implementert – se gjeldstabell).
 
 ---
-
-## Nøkkelfunksjoner implementert
-
-- Kamplogger med hjemme/borte-toggle og automatisk beregnet resultat
-- Statistikk-tab med sesongvelger, lag-filter, seier/uavgjort/tap-kort, mål/assist/G+A
-- **Form-streak** – siste 10 kamper som fargede bokser (S/U/T), vises i begge stats-visninger
-- **Hjemme vs Borte-seksjon** – to kort med W/D/L, mål/assist/G+A og mini-bar per kamptype
-- **Per turnering-seksjon** – turneringsnavn + antall kamper, S/U/T + G/A/G+A med uniform badge-bredde
-- Kamphistorikk med paginering (20 per side) og slide-up redigeringsmodal (edit + slett)
-- **Analyse-tab** – Chart.js-grafer bak toggle: kumulativ seiersprosent, mål & assist per kamp, mål per turnering
-- **Premium-gate** – gratis ser form-streak + låst kort med blur-overlay; `isPremium()` hardkodet `true` til Fase 4
-- Profil synkronisert til Supabase
-- Lag- og turnering-dropdown i logg og modal med favoritt og inline oppretting
-- **SVG-ikonsystem** – alle ikoner i `/icons/`-mappen, fargestyrt via CSS `mask-image` (tab-bar) og `currentColor` (match-type)
-- Fullt i18n-system (norsk/engelsk) med flagg-velger på alle tabs
-- Datoformat-valg (europeisk / amerikansk)
-- Turnerings-filter i stats-tab
 
 ## i18n-system
 
@@ -504,17 +437,12 @@ Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat
 
 ## Roadmap
 
-### Fase 1–2 ✅ Fullført
-Fase 1 (MVP), 1.5 (teknisk opprydding), 1.6 (UX-polish) og 2 (analyse/grafer) er alle fullført.
-
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
 
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon
 - [ ] `isPremium()` kobles til Stripe-abonnement
-- [x] Auth (Supabase Auth) + riktig RLS-policy + `auth.js`-modul
-- [x] **First login flow:** New users (empty profile) are redirected to Profile tab after login/signup. Soft prompt banner with "Skip for now" shown; gold badge on Profile tab icon until name is entered. Returning users (profile has name) go to Log tab. Banner and badge hidden for demo/unauthenticated users. Dismissal is session-only.
 
 ---
 
