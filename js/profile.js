@@ -197,8 +197,7 @@ export async function uploadImage(input) {
       var publicUrl = await uploadAvatar(getUserId(), blob);
 
       // Persist: Supabase first, then local cache
-      var profil = getProfile();
-      profil.avatar = publicUrl;
+      var profil = Object.assign({}, getProfile(), { avatar: publicUrl });
       await saveProfileToSupabase(profil);
       saveProfile_local(profil);
       showAvatarImage(publicUrl + '?t=' + Date.now());
