@@ -110,7 +110,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `innerHTML` med store HTML-strenger – risiko for glemte escapes | 🟡 Medium | All brukerdata escapes med `esc()`; vurder DOM API ved videre refaktorering. |
+| `innerHTML` med store HTML-strenger – risiko for glemte escapes | 🟡 Medium | ✅ Auditert 2026-03-21 – all brukerdata escapes med `esc()`. Ingen hull funnet. |
 
 ### export.js
 
