@@ -1,126 +1,17 @@
-import { fetchProfileFromSupabase, loadProfileData, renderLogSub, saveProfile, updateAvatar, uploadImage, dismissProfilePrompt, updateProfilePrompt, getProfile, isProfileComplete } from './profile.js';
-import { getSettings, getDateLocale } from './settings.js';
-import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, toggleTeamDropdown, toggleTournamentDropdown, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, toggleNewTeamInput, toggleNewTournamentInput, addTeamFromProfile, addTournament, deleteTeam, deleteTournament, setFavoriteTeam, setFavoriteTournament, closeAllDropdowns, toggleModalTeamDropdown, toggleModalTournamentDropdown, selectModalTeam, selectModalTournament } from './teams.js';
-import { switchTab, updateLogBadge } from './navigation.js';
-import { t, toggleLangPicker } from './i18n.js';
-import { setLang, updateFlags, updateAllText } from './text-refresh.js';
-import { loadStats, switchStatsView, setSeason, setTeamFilter, setTournamentFilter, setMatchPage, setOpponentSearch } from './stats-overview.js';
+import { fetchProfileFromSupabase, loadProfileData, renderLogSub, updateAvatar, uploadImage, updateProfilePrompt } from './profile.js';
+import { getSettings } from './settings.js';
+import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, closeAllDropdowns, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, addTeamFromProfile, addTournament } from './teams.js';
+import { updateLogBadge } from './navigation.js';
+import { updateFlags, updateAllText } from './text-refresh.js';
+import { loadStats, setOpponentSearch } from './stats-overview.js';
 import { destroyCharts, initChartDefaults } from './stats-analyse.js';
-import { adjust, saveMatch, setMatchType, updateResult } from './log.js';
-import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
-import { openAssessmentSheet, closeAssessmentSheet, saveAssessment, setRating } from './assessment.js';
-import { exportCSV, exportPDF } from './export.js';
-import { renderSettings, setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, applyTheme } from './settings-render.js';
+import { updateResult, setupDateToggle, updateDateLabel } from './log.js';
+import { openAssessmentSheet } from './assessment.js';
+import { renderSettings, applyTheme, addSeason } from './settings-render.js';
 import { showToast } from './toast.js';
-import { restoreSession, isAuthenticated, logout } from './auth.js';
-import { openAuthOverlay, updateDemoBanner, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
-
-const WRITE_ACTIONS = new Set([
-  'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
-  'addTeamFromProfile', 'addTournament', 'deleteTeam', 'deleteTournament',
-  'setFavoriteTeam', 'setFavoriteTournament', 'saveNewTeamFromDropdown',
-  'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
-  'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF'
-]);
-
-// ── Event delegation action map ────────────────────────────────────────────
-
-const ACTIONS = {
-  saveMatch:                     () => saveMatch(),
-  adjust:                        (e) => { var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, Number(el.dataset.delta)); },
-  setMatchType:                  (e) => { var el = e.target.closest('[data-match-type]'); if (!el) return; setMatchType(el.dataset.matchType); },
-  switchTab:                     (e) => { var el = e.target.closest('[data-tab]'); if (!el) return; switchTab(el.dataset.tab); },
-  setLang:                       (e) => { var el = e.target.closest('[data-lang]'); if (!el) return; setLang(el.dataset.lang); },
-  toggleLangPicker:              (e) => toggleLangPicker(e.target.closest('[data-action]')),
-  saveProfile:                   () => saveProfile(),
-  addTeamFromProfile:            () => addTeamFromProfile(),
-  addTournament:                 () => addTournament(),
-  toggleTeamDropdown:            () => toggleTeamDropdown(),
-  toggleTournamentDropdown:      () => toggleTournamentDropdown(),
-  saveNewTeamFromDropdown:       () => saveNewTeamFromDropdown(),
-  saveNewTournamentFromDropdown: () => saveNewTournamentFromDropdown(),
-  toggleNewTeamInput:            () => toggleNewTeamInput(),
-  toggleNewTournamentInput:      () => toggleNewTournamentInput(),
-  selectTeam:                    (e) => { var el = e.target.closest('[data-name]'); if (!el) return; selectTeam(el.dataset.name); },
-  selectTournament:              (e) => { var el = e.target.closest('[data-name]'); if (!el) return; selectTournament(el.dataset.name); },
-  setFavoriteTeam:               (e) => { var el = e.target.closest('[data-name]'); if (!el) return; setFavoriteTeam(el.dataset.name); },
-  deleteTeam:                    (e) => { var el = e.target.closest('[data-name]'); if (!el) return; deleteTeam(el.dataset.name); },
-  setFavoriteTournament:         (e) => { var el = e.target.closest('[data-name]'); if (!el) return; setFavoriteTournament(el.dataset.name); },
-  deleteTournament:              (e) => { var el = e.target.closest('[data-name]'); if (!el) return; deleteTournament(el.dataset.name); },
-  toggleModalTeamDropdown:       () => toggleModalTeamDropdown(),
-  toggleModalTournamentDropdown: () => toggleModalTournamentDropdown(),
-  selectModalTeam:               (e) => { var el = e.target.closest('[data-name]'); if (!el) return; selectModalTeam(el.dataset.name); },
-  selectModalTournament:         (e) => { var el = e.target.closest('[data-name]'); if (!el) return; selectModalTournament(el.dataset.name); },
-  openEditModal:                 (e) => { var el = e.target.closest('[data-id]'); if (!el) return; openEditModal(el.dataset.id); },
-  closeModal:                    () => closeModal(),
-  modalAdjust:                   (e) => { var el = e.target.closest('[data-type]'); if (!el) return; modalAdjust(el.dataset.type, Number(el.dataset.delta)); },
-  setModalMatchType:             (e) => { var el = e.target.closest('[data-match-type]'); if (!el) return; setModalMatchType(el.dataset.matchType); },
-  saveEditedMatch:               () => saveEditedMatch(),
-  deleteMatch:                   () => deleteMatch(),
-  cancelDeleteMatch:             () => cancelDeleteMatch(),
-  confirmDeleteMatch:            () => confirmDeleteMatch(),
-  switchStatsView:               (e) => { var el = e.target.closest('[data-view]'); if (!el) return; switchStatsView(el.dataset.view); },
-  setSeason:                     (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setSeason(el.dataset.season); },
-  setTeamFilter:                 (e) => { var el = e.target.closest('[data-team]'); if (!el) return; setTeamFilter(el.dataset.team); },
-  setTournamentFilter:           (e) => { var el = e.target.closest('[data-tournament]'); if (!el) return; setTournamentFilter(el.dataset.tournament); },
-  setMatchPage:                  (e) => { var el = e.target.closest('[data-page]'); if (!el) return; setMatchPage(Number(el.dataset.page)); },
-  setOpponentSearch:             (e) => setOpponentSearch(e.target.value),
-  clearOpponentSearch:           () => { var i = document.getElementById('opponent-search-input'); if (i) i.value = ''; setOpponentSearch(''); },
-  exportCSV:                     () => exportCSV(),
-  exportPDF:                     () => exportPDF(),
-  addSeason:                     () => addSeason(),
-  setSport:                      (e) => { var el = e.target.closest('[data-sport]'); if (!el) return; setSport(el.dataset.sport); },
-  setSeasonFormat:               (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setSeasonFormat(el.dataset.format); },
-  setDateFormat:                 (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setDateFormat(el.dataset.format); },
-  setActiveSeason:               (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setActiveSeason(el.dataset.season); },
-  showProToast:                  () => showToast('Coming soon \u2013 Stripe i Fase 4 \u{1F680}', 'success'),
-  closeAssessmentSheet:          () => closeAssessmentSheet(),
-  saveAssessment:                () => saveAssessment(),
-  setRating:                     (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value), el.dataset.context); },
-  triggerAvatarUpload:           () => { var i = document.getElementById('avatar-upload'); if (i) i.click(); },
-  dismissProfilePrompt:          () => dismissProfilePrompt(),
-  logout:              () => logout(),
-  openAuthOverlay:     () => openAuthOverlay('login'),
-  dismissDemoBanner:   () => dismissDemoBanner(),
-  authToggleView:      () => toggleAuthView(),
-  authLogin:           () => handleAuthLogin(),
-  authSignup:          () => handleAuthSignup(),
-};
-
-function updateDateLabel(val) {
-  var el = document.getElementById('date-display-label');
-  if (!el) return;
-  var today = new Date().toISOString().split('T')[0];
-  if (!val || val === today) {
-    el.textContent = t('today');
-  } else {
-    var d = new Date(val + 'T00:00:00');
-    el.textContent = d.toLocaleDateString(getDateLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
-  }
-}
-
-function setupDateToggle() {
-  var btn = document.getElementById('date-toggle-btn');
-  var input = document.getElementById('date');
-  if (!btn || !input) return;
-  var blurTimer = null;
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    var isOpen = input.classList.toggle('open');
-    if (isOpen) input.focus();
-  });
-  input.addEventListener('change', function() {
-    updateDateLabel(input.value);
-  });
-  input.addEventListener('blur', function() {
-    blurTimer = setTimeout(function() {
-      input.classList.remove('open');
-    }, 200);
-  });
-  input.addEventListener('focus', function() {
-    clearTimeout(blurTimer);
-  });
-}
+import { restoreSession, isAuthenticated } from './auth.js';
+import { openAuthOverlay, updateDemoBanner } from './auth-ui.js';
+import { ACTIONS, WRITE_ACTIONS } from './actions.js';
 
 function setupEventDelegation() {
   document.addEventListener('click', function(e) {
