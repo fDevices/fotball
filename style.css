@@ -62,8 +62,8 @@
 
   /* ── LOG TAB: compact layout to fit without scrolling ── */
   #screen-log .header { padding: 14px 24px 10px; }
-  #screen-log .form-section { margin-bottom: 5px; }
-  #screen-log .form-label { margin-bottom: 3px; }
+  #screen-log .form-section { margin-bottom: 10px; }
+  #screen-log .form-label { margin-bottom: 5px; }
   #screen-log input[type=text] { padding: 10px 16px; }
   #screen-log .team-selected { padding: 10px 44px 10px 16px; }
   #screen-log .result-auto { padding: 10px 16px; }
