@@ -19,6 +19,7 @@ export function toggleTeamDropdown() {
   if (dd) dd.classList.toggle('open', teamDropdownOpen);
   if (sel) sel.classList.toggle('open', teamDropdownOpen);
   if (chev) chev.classList.toggle('open', teamDropdownOpen);
+  if (sel) sel.setAttribute('aria-expanded', teamDropdownOpen ? 'true' : 'false');
   if (teamDropdownOpen) renderTeamDropdown();
 }
 
@@ -32,6 +33,7 @@ function closeLagDropdown() {
   if (dd) dd.classList.remove('open');
   if (sel) sel.classList.remove('open');
   if (chev) chev.classList.remove('open');
+  if (sel) sel.setAttribute('aria-expanded', 'false');
   if (nr) nr.classList.remove('visible');
 }
 
@@ -140,6 +142,8 @@ export function toggleTournamentDropdown() {
     dd.classList.toggle('open', !isOpen);
     var chev = document.getElementById('tournament-chevron');
     if (chev) chev.classList.toggle('open', !isOpen);
+    var trigger = document.getElementById('tournament-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
   }
 }
 
@@ -155,6 +159,8 @@ export function selectTournament(name) {
   if (dd) dd.classList.remove('open');
   var chev = document.getElementById('tournament-chevron');
   if (chev) chev.classList.remove('open');
+  var trigger = document.getElementById('tournament-trigger');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
   showNewTournamentInput = false;
   var newRow = document.getElementById('tournament-new-row');
   if (newRow) newRow.classList.remove('visible');
@@ -290,13 +296,20 @@ export function selectModalTeam(name) {
   if (dd) dd.classList.remove('open');
   var chev = document.getElementById('modal-team-chevron');
   if (chev) chev.classList.remove('open');
+  var trigger = document.getElementById('modal-team-trigger');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
   renderModalTeamDropdown();
 }
 
 export function toggleModalTeamDropdown() {
   var dd = document.getElementById('modal-team-dropdown');
   var chev = document.getElementById('modal-team-chevron');
-  if (dd) { var isOpen = dd.classList.toggle('open'); if (chev) chev.classList.toggle('open', isOpen); }
+  if (dd) {
+    var isOpen = dd.classList.toggle('open');
+    if (chev) chev.classList.toggle('open', isOpen);
+    var trigger = document.getElementById('modal-team-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
 }
 
 export function renderModalTournamentDropdown() {
@@ -327,13 +340,20 @@ export function selectModalTournament(name) {
   if (dd) dd.classList.remove('open');
   var chev = document.getElementById('modal-tournament-chevron');
   if (chev) chev.classList.remove('open');
+  var trigger = document.getElementById('modal-tournament-trigger');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
   renderModalTournamentDropdown();
 }
 
 export function toggleModalTournamentDropdown() {
   var dd = document.getElementById('modal-tournament-dropdown');
   var chev = document.getElementById('modal-tournament-chevron');
-  if (dd) { var isOpen = dd.classList.toggle('open'); if (chev) chev.classList.toggle('open', isOpen); }
+  if (dd) {
+    var isOpen = dd.classList.toggle('open');
+    if (chev) chev.classList.toggle('open', isOpen);
+    var trigger = document.getElementById('modal-tournament-trigger');
+    if (trigger) trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
 }
 
 export function closeAllDropdowns() {
@@ -359,6 +379,10 @@ export function closeAllDropdowns() {
   var tournNr = document.getElementById('tournament-new-row');
   if (tournNr) tournNr.classList.remove('visible');
   showNewTournamentInput = false;
+  ['team-selected', 'tournament-trigger', 'modal-team-trigger', 'modal-tournament-trigger'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.setAttribute('aria-expanded', 'false');
+  });
 }
 
 // ── Profile list rendering ───────────────────────────────────────────────────

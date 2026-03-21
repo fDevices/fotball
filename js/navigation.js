@@ -24,6 +24,9 @@ export function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
   screen.classList.add('active');
   tabBtn.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    b.setAttribute('aria-selected', b === tabBtn ? 'true' : 'false');
+  });
   if (tab === 'stats') document.dispatchEvent(new CustomEvent('athlytics:loadStats'));
   if (tab === 'settings') document.dispatchEvent(new CustomEvent('athlytics:renderSettings'));
 }
