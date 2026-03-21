@@ -4,6 +4,11 @@
 
 ---
 
+## 2026-03-21
+- refactor: extract ACTIONS map to actions.js and date-toggle to log.js — main.js shrinks from 271 to 161 lines
+
+---
+
 ## [Fase 4] Auth — 2026-03-20
 
 - Implemented Supabase email/password authentication (`auth.js`) via raw REST API

@@ -7,7 +7,7 @@
 ## Instruksjoner for Claude
 
 - **Les alltid prosjektfilene ved oppstart** av nye samtaler før du gjør endringer.
-- Prosjektet er nå splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
+- Prosjektet er splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
 - **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`). **Unntak:** interne enum-verdier i settings (`'fotball'`, `'aar'`, `'sesong'`) er norske av historiske årsaker og lagres i DB – ikke rename uten datamigrasjon.
 - **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, og commit. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
 
@@ -21,8 +21,10 @@
 | **GitHub** | https://github.com/fDevices/fotball (public, `main` branch) |
 | **Hosting** | Vercel – prosjekt: `fdevices-projects/fotball` |
 | **Routing** | `vercel.json`: `/` → `landing.html` (marketing/entrypoint), `/app` → `app.html` (appskall). To-entry-modell: `landing.html` er permanent markedsføringsside; `app.html` er selve appen. Begge må deployeres ved releaser. |
-| **Database** | Supabase (URL og nøkler settes via miljøvariabler / deployment config – ikke hardkod i kode eller dokumentasjon) |
+| **Database** | Supabase – URL og service keys settes via Vercel env vars. Anon key (`sb_publishable_`) er hardkodet i `js/config.js` — dette er design by intent; nøkkelen er offentlig og RLS beskytter data. Rotér ved mistanke om misbruk. |
 | **E-post** | Resend – ⚠️ **Husk å gjenopprette e-postkonfigurasjon etter testing er fullført** |
+
+---
 
 ## Workflow
 
@@ -39,14 +41,13 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Supabase anon key er hardkodet i `js/config.js` | ✅ Akseptert | `sb_publishable_`-nøkkel er designet for å være offentlig; RLS beskytter data. Rotér nøkkel ved mistanke om misbruk. Ingen build-steg nødvendig. |
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 | Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
 
 > Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
 >
-> **Sikkerhetsposisjon auth.js (MVP):** Access- og refresh-token lagres i `localStorage`. Dette er standard browser-praksis for SPA-er uten backend, men betyr at XSS gir full session-kompromittering. Risikoen dempes av systematisk escaping i render-stier. Akseptabelt for MVP – vurder `httpOnly`-cookie-basert session ved hardening. `logout()` gjør `window.location.reload()` for å nullstille all app-state; dette er en bevisst forenkling og fungerer godt i en liten app. Token-refresh skjer nå expiry-drevet (5 min buffer) i stedet for fast 50-minutters intervall.
+> **Sikkerhetsposisjon auth.js (MVP):** Access- og refresh-token lagres i `localStorage`. Dette er standard browser-praksis for SPA-er uten backend, men betyr at XSS gir full session-kompromittering. Risikoen dempes av systematisk escaping i render-stier. Akseptabelt for MVP – vurder `httpOnly`-cookie-basert session ved hardening. `logout()` gjør `window.location.reload()` for å nullstille all app-state; dette er en bevisst forenkling og fungerer godt i en liten app. Token-refresh skjer expiry-drevet (5 min buffer).
 
 ---
 
@@ -56,15 +57,13 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Fil | Alvorlighet | Løsning |
 |---|---|---|---|
-| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | 🟡 Delvis løst – auth-ui.js ekstrahert 2026-03-20. Gjenstår: ACTIONS-map og dato-toggle. |
-
-> **Merk:** Guard clause-mønster for ACTIONS: `var el = e.target.closest('[data-type]'); if (!el) return; adjust(el.dataset.type, ...)`
+| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | ✅ Ferdig | auth-ui.js ekstrahert 2026-03-20. ACTIONS-map → actions.js, dato-toggle → log.js 2026-03-21. |
 
 ### supabase.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Settings er en del av profilraden; vurder rename i Fase 5 |
+| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Settings er en del av profilraden; vurder rename ved Fase 4-refaktorering |
 | `fetchKamper()` sender ingen user_id-filter i query-strengen | 🟡 Merknad | Riktig arkitektur — klient-side filter er unødvendig når RLS er korrekt konfigurert. **Konsekvens:** datakorrekthet og personvern avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. |
 
 ### settings.js
@@ -73,18 +72,17 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | Disse lekker inn i validering, tema-valg og DB-data. Rename krever migrering av eksisterende data; vurder i Fase 3. |
 
-### i18n.js
+### app.html
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `i18n.js` har vokst fra oversettelsesordbok til global tekst-refresh-kontroller – oppdaterer DOM-noder direkte og dispatcher cross-module events | ✅ Ferdig | Løst: tekst-refresh.js ekstrahert i 2026-03-20 |
 | `app.html` inneholder norske standardstrenger (placeholders, settings-tekst) som overskrives etter load | 🟢 Lav | Bevisst valg: `updateAllText()` og `renderSettings()` kjøres ved bootstrap. Skjørt hvis render-syklusen feiler. Vurder nøytralt / tom HTML ved Fase 3-redesign. |
 
 ### profile.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🔴 Ikke ferdig | Kode bruker fortsatt base64 for alle brukere. Supabase Storage ikke implementert. Løs i Fase 4. |
+| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟡 Nesten ferdig | Fix implementert i `feature/avatar-storage`-branch (ikke merget ennå). Merge eller forkast før Fase 4. |
 | `saveProfile()` avhenger av remote state ved lagring: fetcher Supabase for å bevare arrays/avatar, tar bare tekstfelt fra skjema | 🟡 Medium | Fungerer nå, men skjørt: nye profilfelt som legges til skjema må eksplisitt merges fra remote. Vurder å samle all profilstate lokalt og synkronisere atskilt. |
 
 ### modal.js
@@ -119,12 +117,6 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | Dokumenter som print-HTML, ikke ekte PDF; vurder bibliotek (f.eks. jsPDF) ved Fase 4 |
-
-### settings-render.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `renderSettings()` bruker `innerHTML` for sport-piller med `<span>` | 🟢 Lav | Akseptabelt siden data ikke er brukerdata; men vurder DOM API for konsistens |
 
 ---
 
@@ -281,7 +273,6 @@ updated_at (timestamptz)
 ```
 
 > **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Dette er et kjent unntak fra ellers identisk navngivning.
->
 
 **All kode og alle Supabase-kolonner bruker engelske navn.** Navngivningen er konsistent med ett kjent unntak: JS bruker `teams`, DB bruker `team` (se merknad over).
 
@@ -373,7 +364,7 @@ I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-co
 ### Avatar upload
 Avatar-circle bruker `data-action="triggerAvatarUpload"` → ACTIONS-map kaller `#avatar-upload.click()`. Avatar-input bruker `data-action="uploadImage"` → delegert `change`-event i `main.js`. Ingen `onclick`/`onchange`-attributter og ingen `window._uploadImage` global.
 
-`uploadImage()` lagrer fortsatt base64 for **alle** brukere (Supabase Storage ikke implementert – se gjeldstabell).
+`uploadImage()` lagrer fortsatt base64 for **alle** brukere på `main`. Supabase Storage-implementasjon ligger i `feature/avatar-storage` (ikke merget).
 
 ---
 
