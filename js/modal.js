@@ -7,23 +7,26 @@ import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPay
 import { clampStats } from './utils.js';
 
 const MODAL_DEFAULTS = {
-  mHome: 0, mAway: 0, mGoals: 0, mAssists: 0, mMatchType: 'home',
+  mHome: 0, mAway: 0, mGoals: 0, mAssists: 0, mMatchType: 'home'
+};
+
+const MODAL_DOM_DEFAULTS = {
   'modal-dato': '', 'modal-motstander': '',
   'modal-assess-reflection-good': '', 'modal-assess-reflection-improve': ''
 };
 
 var modalMatchId = null;
-var mHome = 0, mAway = 0, mGoals = 0, mAssists = 0, mMatchType = 'home';
+var mState = Object.assign({}, MODAL_DEFAULTS);
 
 export function openEditModal(id) {
   var k = getAllMatches().find(function(m) { return String(m.id) === String(id); });
   if (!k) return;
   modalMatchId = id;
-  mHome     = k.home_score || 0;
-  mAway     = k.away_score || 0;
-  mGoals    = k.goals      || 0;
-  mAssists  = k.assists    || 0;
-  mMatchType = k.match_type || 'home';
+  mState.mHome      = k.home_score  || 0;
+  mState.mAway      = k.away_score  || 0;
+  mState.mGoals     = k.goals       || 0;
+  mState.mAssists   = k.assists     || 0;
+  mState.mMatchType = k.match_type  || 'home';
 
   document.getElementById('modal-dato').value = k.date;
   document.getElementById('modal-motstander').value = k.opponent || '';
@@ -31,12 +34,12 @@ export function openEditModal(id) {
   selectModalTournament(k.tournament || '');
   renderModalTeamDropdown();
   renderModalTournamentDropdown();
-  document.getElementById('modal-home').textContent   = mHome;
-  document.getElementById('modal-away').textContent   = mAway;
-  document.getElementById('modal-goals').textContent  = mGoals;
-  document.getElementById('modal-assist').textContent = mAssists;
+  document.getElementById('modal-home').textContent   = mState.mHome;
+  document.getElementById('modal-away').textContent   = mState.mAway;
+  document.getElementById('modal-goals').textContent  = mState.mGoals;
+  document.getElementById('modal-assist').textContent = mState.mAssists;
   document.getElementById('modal-title').textContent  = k.opponent || t('modal_rediger');
-  setModalMatchType(mMatchType);
+  setModalMatchType(mState.mMatchType);
 
   loadMatchIntoAssessment(k);
   renderModalAssessmentSection();
@@ -56,11 +59,9 @@ export function closeModal() {
   document.getElementById('modal-sheet').classList.remove('open');
   document.body.style.overflow = '';
   modalMatchId = null;
-  mMatchType = MODAL_DEFAULTS.mMatchType;
-  mHome = MODAL_DEFAULTS.mHome; mAway = MODAL_DEFAULTS.mAway;
-  mGoals = MODAL_DEFAULTS.mGoals; mAssists = MODAL_DEFAULTS.mAssists;
-  ['modal-dato', 'modal-motstander', 'modal-assess-reflection-good', 'modal-assess-reflection-improve'].forEach(function(id) {
-    var el = document.getElementById(id); if (el) el.value = MODAL_DEFAULTS[id];
+  Object.assign(mState, MODAL_DEFAULTS);
+  Object.entries(MODAL_DOM_DEFAULTS).forEach(function(entry) {
+    var el = document.getElementById(entry[0]); if (el) el.value = entry[1];
   });
   ['modal-team-dropdown', 'modal-tournament-dropdown'].forEach(function(id) {
     var dd = document.getElementById(id); if (dd) dd.classList.remove('open');
@@ -68,7 +69,7 @@ export function closeModal() {
 }
 
 export function setModalMatchType(type) {
-  mMatchType = type;
+  mState.mMatchType = type;
   var btnHome = document.getElementById('modal-btn-home');
   var btnAway = document.getElementById('modal-btn-away');
   if (btnHome) btnHome.classList.toggle('active', type === 'home');
@@ -76,34 +77,34 @@ export function setModalMatchType(type) {
 }
 
 export function modalAdjust(type, delta) {
-  var ownScore = mMatchType === 'home' ? mHome : mAway;
+  var ownScore = mState.mMatchType === 'home' ? mState.mHome : mState.mAway;
   if (type === 'goals') {
-    var cg = clampStats(mGoals + delta, mAssists, ownScore);
-    mGoals = cg.goals; mAssists = cg.assists;
-    document.getElementById('modal-goals').textContent  = mGoals;
-    document.getElementById('modal-assist').textContent = mAssists;
+    var cg = clampStats(mState.mGoals + delta, mState.mAssists, ownScore);
+    mState.mGoals = cg.goals; mState.mAssists = cg.assists;
+    document.getElementById('modal-goals').textContent  = mState.mGoals;
+    document.getElementById('modal-assist').textContent = mState.mAssists;
   } else if (type === 'assist') {
-    var ca = clampStats(mGoals, mAssists + delta, ownScore);
-    mAssists = ca.assists;
-    document.getElementById('modal-assist').textContent = mAssists;
+    var ca = clampStats(mState.mGoals, mState.mAssists + delta, ownScore);
+    mState.mAssists = ca.assists;
+    document.getElementById('modal-assist').textContent = mState.mAssists;
   } else if (type === 'home') {
-    mHome = Math.max(0, mHome + delta);
-    if (mMatchType === 'home') {
-      var ch = clampStats(mGoals, mAssists, mHome);
-      mGoals = ch.goals; mAssists = ch.assists;
-      document.getElementById('modal-goals').textContent  = mGoals;
-      document.getElementById('modal-assist').textContent = mAssists;
+    mState.mHome = Math.max(0, mState.mHome + delta);
+    if (mState.mMatchType === 'home') {
+      var ch = clampStats(mState.mGoals, mState.mAssists, mState.mHome);
+      mState.mGoals = ch.goals; mState.mAssists = ch.assists;
+      document.getElementById('modal-goals').textContent  = mState.mGoals;
+      document.getElementById('modal-assist').textContent = mState.mAssists;
     }
-    document.getElementById('modal-home').textContent = mHome;
+    document.getElementById('modal-home').textContent = mState.mHome;
   } else if (type === 'away') {
-    mAway = Math.max(0, mAway + delta);
-    if (mMatchType === 'away') {
-      var caw = clampStats(mGoals, mAssists, mAway);
-      mGoals = caw.goals; mAssists = caw.assists;
-      document.getElementById('modal-goals').textContent  = mGoals;
-      document.getElementById('modal-assist').textContent = mAssists;
+    mState.mAway = Math.max(0, mState.mAway + delta);
+    if (mState.mMatchType === 'away') {
+      var caw = clampStats(mState.mGoals, mState.mAssists, mState.mAway);
+      mState.mGoals = caw.goals; mState.mAssists = caw.assists;
+      document.getElementById('modal-goals').textContent  = mState.mGoals;
+      document.getElementById('modal-assist').textContent = mState.mAssists;
     }
-    document.getElementById('modal-away').textContent = mAway;
+    document.getElementById('modal-away').textContent = mState.mAway;
   }
 }
 
@@ -114,11 +115,11 @@ export async function saveEditedMatch() {
     opponent:   document.getElementById('modal-motstander').value.trim(),
     own_team:   document.getElementById('modal-own-team').value.trim(),
     tournament: document.getElementById('modal-tournament').value.trim(),
-    home_score: mHome,
-    away_score: mAway,
-    goals:      mGoals,
-    assists:    mAssists,
-    match_type: mMatchType
+    home_score: mState.mHome,
+    away_score: mState.mAway,
+    goals:      mState.mGoals,
+    assists:    mState.mAssists,
+    match_type: mState.mMatchType
   }, getAssessmentPayload());
   if (!body.date || !body.opponent || !body.own_team) {
     showToast(t('toast_fyll_inn'), 'error'); return;

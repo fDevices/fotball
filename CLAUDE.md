@@ -89,7 +89,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `closeModal()` resetter mange felt manuelt – korrekt i dag, men kostbart å utvide | 🟡 Medium | Vurder å samle modal-state i ett objekt og resette med Object.assign ved lukking. |
+| `closeModal()` resetter mange felt manuelt – korrekt i dag, men kostbart å utvide | 🟡 Medium | ✅ Ferdig – `mState`-objekt + `Object.assign(mState, MODAL_DEFAULTS)` ved lukking. |
 
 > **Kritisk invariant:** `modalAdjust()` og `adjust()` **må** alltid ha identisk clamp-logikk. Endre aldri én uten den andre.
 
