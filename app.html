@@ -26,7 +26,8 @@
 
   <!-- Auth overlay — full-screen, hidden by default -->
   <div class="auth-overlay hidden" id="auth-overlay">
-    <div class="auth-modal">
+    <div class="auth-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-dialog-title">
+      <h2 id="auth-dialog-title" class="sr-only"></h2>
 
       <!-- Login view -->
       <div class="auth-view" id="auth-login-view">
@@ -408,9 +409,9 @@
 
 <!-- Delete confirm dialog -->
 <div class="delete-confirm-backdrop" id="delete-confirm-backdrop" data-action="cancelDeleteMatch"></div>
-<div class="delete-confirm-dialog" id="delete-confirm-dialog">
+<div class="delete-confirm-dialog" id="delete-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-confirm-title">
   <div class="delete-confirm-icon">🗑</div>
-  <div class="delete-confirm-title">Slett kamp?</div>
+  <div class="delete-confirm-title" id="delete-confirm-title">Slett kamp?</div>
   <div class="delete-confirm-sub">Kampen mot <strong id="delete-confirm-name"></strong> slettes permanent.</div>
   <div class="delete-confirm-actions">
     <button class="delete-confirm-cancel" data-action="cancelDeleteMatch">Avbryt</button>
@@ -420,7 +421,7 @@
 
 <!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ -->
 <div class="modal-backdrop" id="modal-backdrop" data-action="closeModal"></div>
-<div class="modal-sheet" id="modal-sheet">
+<div class="modal-sheet" id="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="modal-handle"></div>
   <div class="modal-header">
     <div class="modal-title" id="modal-title">Rediger kamp</div>
@@ -515,7 +516,7 @@
 
 <!-- Assessment sheet (slide-up, Log tab context) -->
 <div class="modal-backdrop" id="assessment-backdrop" data-action="closeAssessmentSheet"></div>
-<div class="modal-sheet" id="assessment-sheet">
+<div class="modal-sheet" id="assessment-sheet" role="dialog" aria-modal="true" aria-labelledby="assess-title">
   <div class="modal-handle"></div>
   <div class="modal-header">
     <div class="modal-title" id="assess-title"></div>
