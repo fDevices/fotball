@@ -4,7 +4,7 @@ import { selectModalTeam, selectModalTournament, renderModalTeamDropdown, render
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { loadMatchIntoAssessment, renderModalAssessmentSection, getAssessmentPayload, resetAssessmentState } from './assessment.js';
-import { clampStats } from './utils.js';
+import { clampStats, getFocusableElements, trapFocus } from './utils.js';
 
 const MODAL_DEFAULTS = {
   mHome: 0, mAway: 0, mGoals: 0, mAssists: 0, mMatchType: 'home'
@@ -17,6 +17,11 @@ const MODAL_DOM_DEFAULTS = {
 
 var modalMatchId = null;
 var mState = Object.assign({}, MODAL_DEFAULTS);
+
+var _modalFocusSrc = null;
+var _deleteFocusSrc = null;
+var _modalTrapHandler = null;
+var _deleteTrapHandler = null;
 
 export function openEditModal(id) {
   var k = getAllMatches().find(function(m) { return String(m.id) === String(id); });
@@ -49,14 +54,22 @@ export function openEditModal(id) {
   if (taGood)    taGood.value    = k.reflection_good    || '';
   if (taImprove) taImprove.value = k.reflection_improve || '';
   document.getElementById('modal-backdrop').classList.add('open');
-  document.getElementById('modal-sheet').classList.add('open');
+  var mEl = document.getElementById('modal-sheet');
+  mEl.classList.add('open');
   document.body.style.overflow = 'hidden';
+  _modalFocusSrc = document.activeElement;
+  setTimeout(function() { getFocusableElements(mEl)[0]?.focus(); }, 50);
+  _modalTrapHandler = function(e) { trapFocus(mEl, e); };
+  mEl.addEventListener('keydown', _modalTrapHandler);
 }
 
 export function closeModal() {
   resetAssessmentState();
   document.getElementById('modal-backdrop').classList.remove('open');
-  document.getElementById('modal-sheet').classList.remove('open');
+  var mEl = document.getElementById('modal-sheet');
+  mEl.classList.remove('open');
+  if (_modalTrapHandler) { mEl.removeEventListener('keydown', _modalTrapHandler); _modalTrapHandler = null; }
+  if (_modalFocusSrc) { _modalFocusSrc.focus(); _modalFocusSrc = null; }
   document.body.style.overflow = '';
   modalMatchId = null;
   Object.assign(mState, MODAL_DEFAULTS);
@@ -148,12 +161,25 @@ export function deleteMatch() {
   var oppName = k ? (k.opponent || t('this_match')) : t('this_match');
   document.getElementById('delete-confirm-name').textContent = oppName;
   document.getElementById('delete-confirm-backdrop').classList.add('open');
-  document.getElementById('delete-confirm-dialog').classList.add('open');
+  var dialog = document.getElementById('delete-confirm-dialog');
+  dialog.classList.add('open');
+  _deleteFocusSrc = document.activeElement;
+  setTimeout(function() {
+    var cancelBtn = dialog.querySelector('[data-action="cancelDeleteMatch"]');
+    if (cancelBtn) cancelBtn.focus();
+  }, 50);
+  _deleteTrapHandler = function(e) { trapFocus(dialog, e); };
+  dialog.addEventListener('keydown', _deleteTrapHandler);
 }
 
 export async function confirmDeleteMatch() {
+  var dialog = document.getElementById('delete-confirm-dialog');
   document.getElementById('delete-confirm-backdrop').classList.remove('open');
-  document.getElementById('delete-confirm-dialog').classList.remove('open');
+  dialog.classList.remove('open');
+  if (_deleteTrapHandler) { dialog.removeEventListener('keydown', _deleteTrapHandler); _deleteTrapHandler = null; }
+  var restoreTo = _deleteFocusSrc || document.querySelector('[data-action="deleteMatch"]');
+  _deleteFocusSrc = null;
+  if (restoreTo) restoreTo.focus();
   if (!modalMatchId) return;
   try {
     var res = await deleteKamp(modalMatchId);
@@ -170,6 +196,11 @@ export async function confirmDeleteMatch() {
 }
 
 export function cancelDeleteMatch() {
+  var dialog = document.getElementById('delete-confirm-dialog');
   document.getElementById('delete-confirm-backdrop').classList.remove('open');
-  document.getElementById('delete-confirm-dialog').classList.remove('open');
+  dialog.classList.remove('open');
+  if (_deleteTrapHandler) { dialog.removeEventListener('keydown', _deleteTrapHandler); _deleteTrapHandler = null; }
+  var restoreTo = _deleteFocusSrc || document.querySelector('[data-action="deleteMatch"]');
+  _deleteFocusSrc = null;
+  if (restoreTo) restoreTo.focus();
 }
