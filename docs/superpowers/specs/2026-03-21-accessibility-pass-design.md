@@ -10,6 +10,8 @@
 - ARIA roles/attributes on modals so VoiceOver/TalkBack announce and manage them correctly
 - ARIA on custom dropdowns so their state is announced (expanded/collapsed, selected option)
 - Focus trap in modals so keyboard and screen reader users cannot escape to background content
+- `aria-live` on dynamic value displays and toast so changes are announced
+- ARIA tab pattern on the tab bar
 - Zero visual change — no CSS modifications
 
 ---
@@ -30,13 +32,21 @@ Each `<div class="screen">` becomes `<section class="screen">` with an `aria-lab
 | `screen-settings` | `"Settings"` |
 
 ### Log form → `<form>`
-Wrap the `<div class="form-body">` content in `<form class="form-body" novalidate onsubmit="return false">`. The save button gets `type="submit"`. Same pattern as the existing auth forms.
+Wrap the `<div class="form-body">` content in `<form class="form-body" novalidate>`. The save button gets `type="submit"`. **No `onsubmit` inline handler** — project convention requires event delegation. A `submit` event listener is added in `main.js` that calls `event.preventDefault()` and delegates to `saveMatch()`.
 
 ### Score and stats groups → `role="group"`
-Add `role="group"` and `aria-label` to the score and stats control wrappers instead of `<fieldset>` (avoids browser-default fieldset CSS):
+Add `role="group"` and `aria-labelledby` to the score and stats control wrappers instead of `<fieldset>` (avoids browser-default fieldset CSS). Point `aria-labelledby` at existing visible label elements:
 
-- Score row div → `role="group" aria-label="Score"`
-- Stats row div → `role="group" aria-label="Mål og assist"`
+- Score row div → `role="group" aria-labelledby="label-home"` (existing id on "Hjemmelag" label)
+- Stats row div → `role="group" aria-labelledby="label-goals"` (existing id on "Mål" label)
+
+### Score/stat display spans → `aria-live`
+The six stepper display spans get `aria-live="polite"` so VoiceOver/TalkBack announce changes when +/− is pressed:
+- `#home-display`, `#away-display`, `#goals-display`, `#assist-display` (log form)
+- `#modal-home`, `#modal-away`, `#modal-goals`, `#modal-assist` (edit modal)
+
+### Toast → `aria-live`
+Add `aria-live="polite"` and `aria-atomic="true"` to `#toast` so transient feedback is announced by screen readers.
 
 ---
 
@@ -44,41 +54,59 @@ Add `role="group"` and `aria-label` to the score and stats control wrappers inst
 
 ### ARIA attributes (`app.html`)
 
+The auth modal ARIA goes on the inner content box (`.auth-modal`), not on `#auth-overlay` (which is the full-screen backdrop). Add `id="auth-modal"` to the inner `<div class="auth-modal">`.
+
 | Element | Attributes to add |
 |---|---|
 | `#modal-sheet` | `role="dialog"` `aria-modal="true"` `aria-labelledby="modal-title"` |
 | `#assessment-sheet` | `role="dialog"` `aria-modal="true"` `aria-labelledby="assess-title"` |
 | `#delete-confirm-dialog` | `role="alertdialog"` `aria-modal="true"` `aria-labelledby="delete-confirm-title"` |
-| `#auth-modal` | `role="dialog"` `aria-modal="true"` `aria-labelledby="auth-dialog-title"` |
+| `#auth-modal` (inner div) | `role="dialog"` `aria-modal="true"` `aria-labelledby="auth-dialog-title"` |
 
 `alertdialog` on delete-confirm signals to screen readers that this requires an immediate response.
 
-The delete confirm title (`<div class="delete-confirm-title">`) needs `id="delete-confirm-title"` added.
-The auth modal needs a visually-hidden `<h2 id="auth-dialog-title">` that reflects the active view (login vs signup) — or `aria-labelledby` can point at the active view's existing `h2`.
+The delete confirm title (`<div class="delete-confirm-title">`) gets `id="delete-confirm-title"` added.
+
+### Auth dialog label
+Add a single visually-hidden `<h2 id="auth-dialog-title">` inside the auth modal (above the two view divs). `showAuthView()` in `auth-ui.js` updates its `textContent` when switching between login and signup views — this avoids fragility with `aria-labelledby` pointing at a conditionally-hidden element.
+
+```css
+/* Add to style.css — visually hidden but readable by screen readers */
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+```
 
 ### Focus utility (`utils.js`)
 
-Add `getFocusableElements(container)` — returns all focusable children (`button:not([disabled])`, `input:not([disabled])`, `a[href]`, `[tabindex]:not([tabindex="-1"])`).
+Add two exported functions:
 
-Add `trapFocus(container, event)` — called on `keydown` inside an open modal. Intercepts Tab/Shift+Tab and cycles focus within `getFocusableElements(container)`.
+**`getFocusableElements(container)`** — returns all focusable children as an array:
+`button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])`
 
-### Focus management per modal (`modal.js`, `auth-ui.js`)
+**`trapFocus(container, event)`** — called on `keydown` inside an open modal. Intercepts Tab/Shift+Tab and cycles focus within `getFocusableElements(container)`.
 
-**On open:**
-1. Save `document.activeElement` to a module-level variable
-2. `setTimeout(() => firstFocusable.focus(), 50)` — small delay lets the modal finish animating into view
+### Focus management per modal
 
-**On close:**
-1. Restore focus to saved element (if it still exists in the DOM)
+**Pattern (same for all four modals):**
+1. **On open:** save `document.activeElement` to a module-level variable; call `setTimeout(() => getFocusableElements(container)[0]?.focus(), 50)`
+2. **On close:** call `savedEl?.focus()` to restore focus
+3. **Trap:** add a named `keydown` handler on the container that calls `trapFocus(container, e)`; add it on open, remove it on close
 
-**Trap:**
-Add a `keydown` listener on each modal container that calls `trapFocus()` while the modal is open. Listener is added on open and removed on close to avoid memory leaks.
+**Edit modal** — `modal.js` (`openEditModal`, `closeModal`)
+
+**Assessment sheet** — `assessment.js` (`openAssessmentSheet`, `closeAssessmentSheet`). Same save/restore/trap pattern as edit modal. The assessment sheet opens after a match is saved from the log form; focus should return to `#submit-btn` on close.
+
+**Delete confirm dialog** — `modal.js` (`deleteMatch`, `confirmDeleteMatch` / `cancelDeleteMatch`). Focus moves to the cancel button on open; restores to the delete button in the modal (`[data-action="deleteMatch"]`) on close.
+
+**Auth overlay** — `auth-ui.js` (`openAuthOverlay`, `closeAuthOverlay`). Focus moves to the email input of the active view on open; restores to the element that triggered the overlay on close.
 
 ### Affected files
-- `app.html` — ARIA attributes
+- `app.html` — ARIA attributes, `id` additions, `aria-live` attributes
+- `style.css` — `.sr-only` utility class
 - `utils.js` — `getFocusableElements`, `trapFocus`
-- `modal.js` — `openEditModal`, `closeModal` (edit modal + assessment sheet share same backdrop/open pattern, but assessment is managed in `assessment.js`)
-- `auth-ui.js` — auth overlay open/close
+- `modal.js` — focus management for edit modal and delete confirm dialog
+- `assessment.js` — focus management for assessment sheet
+- `auth-ui.js` — focus management for auth overlay; update `showAuthView()` to update `#auth-dialog-title`
+- `main.js` — add `submit` event handler for log form
 
 ---
 
@@ -86,42 +114,73 @@ Add a `keydown` listener on each modal container that calls `trapFocus()` while 
 
 Four custom dropdowns: log team, log tournament, modal team, modal tournament.
 
-### Trigger elements (`.team-selected` divs) — `app.html`
+### Trigger elements — `app.html`
+
+The trigger divs that need ARIA, and the `id` values to add where missing:
+
+| Trigger div | Existing id | Add `id` | Controls |
+|---|---|---|---|
+| Log team trigger (`.team-selected` in log) | `team-selected` | — | `team-dropdown` |
+| Log tournament trigger | none | `tournament-trigger` | `tournament-dropdown` |
+| Modal team trigger | none | `modal-team-trigger` | `modal-team-dropdown` |
+| Modal tournament trigger | none | `modal-tournament-trigger` | `modal-tournament-dropdown` |
 
 Add to each trigger:
 - `role="combobox"`
 - `aria-haspopup="listbox"`
 - `aria-expanded="false"` (initial)
-- `aria-controls="<dropdown-id>"` pointing at the matching `.team-dropdown`
+- `aria-controls="<dropdown-id>"`
 
-### Dropdown containers (`.team-dropdown` divs) — `app.html`
+### Dropdown containers — `app.html`
 
-Add `role="listbox"` to each.
+Add `role="listbox"` to: `#team-dropdown`, `#tournament-dropdown`, `#modal-team-dropdown`, `#modal-tournament-dropdown`.
 
 ### Rendered options — `teams.js`
 
-In the option-rendering functions, add to each option element:
+In all option-rendering functions, add to each option element:
 - `role="option"`
 - `aria-selected="true"` on the currently selected item, `aria-selected="false"` on others
 
 ### `aria-expanded` toggling — `teams.js`
 
-In `toggleTeamDropdown()`, `toggleTournamentDropdown()`, `toggleModalTeamDropdown()`, `toggleModalTournamentDropdown()`: set `aria-expanded="true"` on open, `"false"` on close.
+Each toggle function locates its trigger by id using `document.getElementById('<trigger-id>')` and flips `aria-expanded`:
 
-The "add new" input rows inside dropdowns require no changes — they are standard inputs.
+| Function | Trigger id |
+|---|---|
+| `toggleTeamDropdown()` | `team-selected` |
+| `toggleTournamentDropdown()` | `tournament-trigger` |
+| `toggleModalTeamDropdown()` | `modal-team-trigger` |
+| `toggleModalTournamentDropdown()` | `modal-tournament-trigger` |
+
+The "add new" input rows inside dropdowns require no changes.
 
 ---
 
-## Files Changed
+## Section 4 — Tab Bar ARIA
+
+The `<nav class="tab-bar">` gets `aria-label="Main navigation"`.
+
+Each `<button class="tab-btn">` gets:
+- `role="tab"`
+- `aria-selected="true"` on the active tab, `"false"` on others
+
+`switchTab()` in `navigation.js` already sets `.active` class — add `aria-selected` toggling in the same place.
+
+---
+
+## Files Changed Summary
 
 | File | Changes |
 |---|---|
-| `app.html` | `<main>`, `<section>`, `<form>`, `role="group"`, modal ARIA attrs, dropdown trigger ARIA attrs |
-| `utils.js` | Add `getFocusableElements()`, `trapFocus()` |
-| `modal.js` | Focus save/restore on open/close, attach/detach trap listener |
-| `assessment.js` | Focus save/restore on assessment sheet open/close |
-| `auth-ui.js` | Focus save/restore on auth overlay open/close |
-| `teams.js` | `role="option"`, `aria-selected` on rendered options; `aria-expanded` toggling |
+| `app.html` | `<main>`, `<section>`, `<form novalidate>`, `role="group"` + `aria-labelledby`, modal ARIA attrs, dropdown trigger ARIA attrs + new ids, `aria-live` on display spans and toast, tab `role`/`aria-selected`, `id="auth-modal"`, `id="delete-confirm-title"`, `.sr-only` auth title |
+| `style.css` | `.sr-only` utility class |
+| `utils.js` | `getFocusableElements()`, `trapFocus()` |
+| `modal.js` | Focus save/restore + trap for edit modal and delete confirm |
+| `assessment.js` | Focus save/restore + trap for assessment sheet |
+| `auth-ui.js` | Focus save/restore + trap for auth overlay; update `showAuthView()` to set `#auth-dialog-title` text |
+| `navigation.js` | `aria-selected` toggling in `switchTab()` |
+| `teams.js` | `role="option"`, `aria-selected` on rendered options; `aria-expanded` toggling on triggers |
+| `main.js` | `submit` event handler for log form |
 
 ---
 
@@ -131,3 +190,4 @@ The "add new" input rows inside dropdowns require no changes — they are standa
 - `<fieldset>` / `<dialog>` element migration — deferred
 - Settings options (radio-button-style divs) — deferred
 - Landing page (`landing.html`) — separate concern
+- `<h2>` for `#modal-title` — deferred (no visual change constraint; `aria-labelledby` works without heading)
