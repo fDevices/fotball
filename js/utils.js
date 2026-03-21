@@ -33,13 +33,15 @@ export function getFocusableElements(container) {
 
 export function trapFocus(container, event) {
   if (event.key !== 'Tab') return;
+  event.preventDefault();
   var focusable = getFocusableElements(container);
-  if (!focusable.length) { event.preventDefault(); return; }
-  var first = focusable[0];
-  var last = focusable[focusable.length - 1];
+  if (!focusable.length) return;
+  var idx = focusable.indexOf(document.activeElement);
   if (event.shiftKey) {
-    if (document.activeElement === first) { event.preventDefault(); last.focus(); }
+    var prev = idx <= 0 ? focusable[focusable.length - 1] : focusable[idx - 1];
+    prev.focus();
   } else {
-    if (document.activeElement === last) { event.preventDefault(); first.focus(); }
+    var next = idx === focusable.length - 1 ? focusable[0] : focusable[idx + 1];
+    next.focus();
   }
 }
