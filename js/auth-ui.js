@@ -3,8 +3,11 @@ import { fetchProfileFromSupabase, loadProfileData, getProfile, isProfileComplet
 import { switchTab } from './navigation.js';
 import { t } from './i18n.js';
 import { PROFIL_KEY, SETTINGS_KEY, CACHE_KEY } from './config.js';
+import { getFocusableElements, trapFocus } from './utils.js';
 
 var _demoBannerDismissed = false;
+var _authFocusSrc = null;
+var _authTrapHandler = null;
 
 // Removes stale profile/settings caches on fresh login.
 // Do NOT replace with auth.js:clearSession() — that would also remove the session token just created.
@@ -18,11 +21,20 @@ export function openAuthOverlay(view) {
   var overlay = document.getElementById('auth-overlay');
   if (overlay) overlay.classList.remove('hidden');
   showAuthView(view || 'login');
+  _authFocusSrc = document.activeElement;
+  var modal = document.getElementById('auth-modal');
+  if (modal) {
+    _authTrapHandler = function(e) { trapFocus(modal, e); };
+    modal.addEventListener('keydown', _authTrapHandler);
+    setTimeout(function() { var f = getFocusableElements(modal)[0]; if (f) f.focus(); }, 50);
+  }
 }
 
 function closeAuthOverlay() {
   var overlay = document.getElementById('auth-overlay');
   if (overlay) overlay.classList.add('hidden');
+  if (_authTrapHandler) { var modal = document.getElementById('auth-modal'); if (modal) modal.removeEventListener('keydown', _authTrapHandler); _authTrapHandler = null; }
+  if (_authFocusSrc) { _authFocusSrc.focus(); _authFocusSrc = null; }
 }
 
 function showAuthView(view) {
@@ -36,6 +48,8 @@ function showAuthView(view) {
     signupView.classList.add('hidden');
     loginView.classList.remove('hidden');
   }
+  var titleEl = document.getElementById('auth-dialog-title');
+  if (titleEl) titleEl.textContent = view === 'login' ? t('auth_login_title') : t('auth_signup_title');
 }
 
 export function toggleAuthView() {

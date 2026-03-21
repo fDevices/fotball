@@ -2,11 +2,13 @@ import { updateKamp } from './supabase.js';
 import { getAllMatches, setAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
-import { isDevPremium } from './utils.js';
+import { isDevPremium, getFocusableElements, trapFocus } from './utils.js';
 
 var _matchId = null;
 var _ratings = { overall: 0, effort: 0, focus: 0, technique: 0, team_play: 0, impact: 0 };
 var _activeContext = null; // 'sheet' | 'modal'
+var _assessFocusSrc = null;
+var _assessTrapHandler = null;
 
 var CATEGORIES = ['overall', 'effort', 'focus', 'technique', 'team_play', 'impact'];
 var CAT_KEYS   = { overall: 'cat_overall', effort: 'cat_effort', focus: 'cat_focus', technique: 'cat_technique', team_play: 'cat_team_play', impact: 'cat_impact' };
@@ -30,6 +32,10 @@ export function openAssessmentSheet(matchId) {
   backdrop.classList.add('open');
   sheet.classList.add('open');
   document.body.style.overflow = 'hidden';
+  _assessFocusSrc = document.activeElement;
+  _assessTrapHandler = function(e) { trapFocus(sheet, e); };
+  sheet.addEventListener('keydown', _assessTrapHandler);
+  setTimeout(function() { var f = getFocusableElements(sheet)[0]; if (f) f.focus(); }, 50);
 }
 
 export function closeAssessmentSheet() {
@@ -38,6 +44,8 @@ export function closeAssessmentSheet() {
   if (backdrop) backdrop.classList.remove('open');
   if (sheet)    sheet.classList.remove('open');
   document.body.style.overflow = '';
+  if (_assessTrapHandler && sheet) { sheet.removeEventListener('keydown', _assessTrapHandler); _assessTrapHandler = null; }
+  if (_assessFocusSrc) { _assessFocusSrc.focus(); _assessFocusSrc = null; }
   resetState();
 }
 
