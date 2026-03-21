@@ -534,6 +534,8 @@
   gap: 10px;
   backdrop-filter: blur(4px);
 }
+#modal-assessment-body { padding: 0 20px; }
+
 /* Assessment sheet uses same modal-sheet / modal-backdrop pattern */
 
 /* ── Demo Banner ──────────────────────────────────────────────────────── */
