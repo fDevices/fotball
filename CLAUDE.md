@@ -41,9 +41,9 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | Refaktorer i Fase 3 |
-| Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
-| Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | Tilgjengelighetspass i Fase 3 |
+| Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | ✅ Ferdig — `<main>`, `<section aria-label>`, `<form novalidate>` implementert 2026-03-21 |
+| Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | ✅ Ferdig — ARIA + fokusstyring (save/restore/trap) på alle fire modaler 2026-03-21 |
+| Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | ✅ Delvis ferdig — ARIA (combobox/listbox/option + aria-expanded/aria-selected) implementert 2026-03-21. Keyboard nav (piltaster) utsatt til Fase 3/4 desktop-pass. |
 
 > Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
 >
