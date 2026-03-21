@@ -24,3 +24,22 @@ export function getResult(k) {
   if (k.match_type === 'home') return k.home_score > k.away_score ? 'wins' : k.home_score < k.away_score ? 'loss' : 'draw';
   return k.away_score > k.home_score ? 'wins' : k.away_score < k.home_score ? 'loss' : 'draw';
 }
+
+export function getFocusableElements(container) {
+  return Array.from(container.querySelectorAll(
+    'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+  ));
+}
+
+export function trapFocus(container, event) {
+  if (event.key !== 'Tab') return;
+  var focusable = getFocusableElements(container);
+  if (!focusable.length) { event.preventDefault(); return; }
+  var first = focusable[0];
+  var last = focusable[focusable.length - 1];
+  if (event.shiftKey) {
+    if (document.activeElement === first) { event.preventDefault(); last.focus(); }
+  } else {
+    if (document.activeElement === last) { event.preventDefault(); first.focus(); }
+  }
+}
