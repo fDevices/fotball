@@ -71,6 +71,14 @@ function setupEventDelegation() {
     if (e.target.id === 'profile-new-tournament') addTournament();
     if (e.target.id === 'settings-ny-sesong') addSeason();
   });
+
+  // Form submit
+  document.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (e.target.id === 'log-form') {
+      ACTIONS.saveMatch();
+    }
+  });
 }
 
 // ── Cross-module event listeners (break circular deps) ─────────────────────
