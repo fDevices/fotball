@@ -68,6 +68,9 @@
   #screen-log .team-selected { padding: 10px 44px 10px 16px; }
   #screen-log .result-auto { padding: 10px 16px; }
   #screen-log .submit-btn { padding: 14px; margin-top: 8px; }
+  .form-inline-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .form-inline-pair .form-section { margin-bottom: 5px; }
+  .form-inline-pair .team-selector-wrap { position: relative; }
 
   /* ── TOGGLE ── */
   .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
