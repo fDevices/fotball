@@ -4,6 +4,7 @@ import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDro
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { clampStats } from './utils.js';
+import { getDateLocale } from './settings.js';
 
 var goals = 0, assist = 0, home = 0, away = 0, matchType = 'home';
 
@@ -129,4 +130,39 @@ export function resetForm() {
   document.getElementById('date').value = new Date().toISOString().split('T')[0];
   // Intentional: keeps last selected team for convenience — user often logs multiple matches for the same team
   renderTeamDropdown();
+}
+
+export function updateDateLabel(val) {
+  var el = document.getElementById('date-display-label');
+  if (!el) return;
+  var today = new Date().toISOString().split('T')[0];
+  if (!val || val === today) {
+    el.textContent = t('today');
+  } else {
+    var d = new Date(val + 'T00:00:00');
+    el.textContent = d.toLocaleDateString(getDateLocale(), { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+}
+
+export function setupDateToggle() {
+  var btn = document.getElementById('date-toggle-btn');
+  var input = document.getElementById('date');
+  if (!btn || !input) return;
+  var blurTimer = null;
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = input.classList.toggle('open');
+    if (isOpen) input.focus();
+  });
+  input.addEventListener('change', function() {
+    updateDateLabel(input.value);
+  });
+  input.addEventListener('blur', function() {
+    blurTimer = setTimeout(function() {
+      input.classList.remove('open');
+    }, 200);
+  });
+  input.addEventListener('focus', function() {
+    clearTimeout(blurTimer);
+  });
 }
