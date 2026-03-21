@@ -1,6 +1,6 @@
 import { PROFIL_KEY } from './config.js';
 import { getUserId, isAuthenticated } from './auth.js';
-import { fetchProfil, upsertProfil } from './supabase.js';
+import { fetchProfil, upsertProfil, uploadAvatar } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { getSettings } from './settings.js';
@@ -72,6 +72,15 @@ export async function fetchProfileFromSupabase() {
         favoriteTournament: row.favorite_tournament || '',
         avatar: row.avatar_url || ''
       };
+      // Legacy cleanup: clear base64 avatars stored before Storage migration.
+      // saveProfile_local inside the if-block fires immediately (so cache is clean
+      // even if the upsertProfil network call below fails). The saveProfile_local
+      // outside the if-block is the normal-path save — both are intentional.
+      if (isAuthenticated() && p.avatar && p.avatar.startsWith('data:')) {
+        p.avatar = '';
+        saveProfile_local(p);
+        upsertProfil({ id: getUserId(), avatar_url: '' }).catch(function() {});
+      }
       saveProfile_local(p);
       return p;
     }
@@ -143,9 +152,60 @@ export function updateAvatar() {
   clubEl.style.display = club ? '' : 'none';
 }
 
-export function uploadImage(input) {
+export async function uploadImage(input) {
   if (!input.files || !input.files[0]) return;
   var file = input.files[0];
+
+  // Authenticated path: compress + upload to Supabase Storage
+  if (isAuthenticated()) {
+    if (!file.type.startsWith('image/')) {
+      showToast(t('toast_avatar_invalid_type'), 'error');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast(t('toast_avatar_too_large'), 'error');
+      return;
+    }
+    try {
+      // Load image (async)
+      var img = await new Promise(function(resolve, reject) {
+        var image = new Image();
+        var objectUrl = URL.createObjectURL(file);
+        image.onload = function() { URL.revokeObjectURL(objectUrl); resolve(image); };
+        image.onerror = function() { URL.revokeObjectURL(objectUrl); reject(new Error('Image load failed')); };
+        image.src = objectUrl;
+      });
+
+      // Compress via canvas (fit-within 800x800, no cropping)
+      var MAX = 800;
+      var scale = Math.min(1, MAX / img.width, MAX / img.height);
+      var canvas = document.createElement('canvas');
+      canvas.width  = Math.round(img.width  * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      // Export as JPEG blob (async)
+      var blob = await new Promise(function(resolve) {
+        canvas.toBlob(resolve, 'image/jpeg', 0.8);
+      });
+      if (!blob) throw new Error('Canvas toBlob returned null');
+
+      // Upload to Storage
+      var publicUrl = await uploadAvatar(getUserId(), blob);
+
+      // Persist: Supabase first, then local cache
+      var profil = Object.assign({}, getProfile(), { avatar: publicUrl });
+      await saveProfileToSupabase(profil);
+      saveProfile_local(profil);
+      showAvatarImage(publicUrl + '?t=' + Date.now());
+    } catch (err) {
+      console.warn('Avatar upload failed:', err);
+      showToast(t('toast_avatar_upload_failed'), 'error');
+    }
+    return;
+  }
+
+  // Unauthenticated path: base64 in localStorage (unchanged)
   var reader = new FileReader();
   reader.onload = function(e) {
     var base64 = e.target.result;
