@@ -141,11 +141,15 @@ export async function exportPDF() {
     '<div class="footer">' + t('export_footer') + ' \xb7 athlyticsport.app \xb7 ' + new Date().toLocaleDateString(locale) + '</div>' +
     '</body></html>';
 
-  var win = window.open('', '_blank');
-  if (!win) { showToast(t('export_popup_blocked'), 'error'); return; }
-  win.document.write(html);
-  win.document.close();
-  win.focus();
-  setTimeout(function() { win.print(); }, 400);
+  var iframe = document.createElement('iframe');
+  iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  document.body.appendChild(iframe);
+  var iDoc = iframe.contentDocument || iframe.contentWindow.document;
+  iDoc.open(); iDoc.write(html); iDoc.close();
+  setTimeout(function() {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    setTimeout(function() { document.body.removeChild(iframe); }, 1000);
+  }, 400);
   showToast(t('export_pdf_done'), 'success');
 }

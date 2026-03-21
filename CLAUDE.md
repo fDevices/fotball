@@ -116,7 +116,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | Dokumenter som print-HTML, ikke ekte PDF; vurder bibliotek (f.eks. jsPDF) ved Fase 4 |
+| PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | ✅ Ferdig – bruker skjult `<iframe>` istedet for `window.open()`; aldri blokkert av popup-blokkering. |
 
 ---
 
