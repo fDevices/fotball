@@ -184,6 +184,12 @@ Each `<button class="tab-btn">` gets:
 
 ---
 
+## Cleanup — Auth Form Inline Handlers
+
+The two auth `<form>` elements at lines 35 and 49 of `app.html` currently use `onsubmit="return false"` — an inline handler that violates the project's event-delegation convention. Replace both with `novalidate` only. The auth submit buttons already use `data-action` delegation; no additional JS handler is needed since auth forms are never submitted via Enter-key in practice (the buttons intercept).
+
+---
+
 ## Out of Scope
 
 - Keyboard navigation (arrow keys) in dropdowns — deferred to Fase 3/4 desktop pass
