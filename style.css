@@ -46,7 +46,7 @@
   .lang-flag-btn { background: none; border: none; font-size: 22px; cursor: pointer; z-index: 10; padding: 4px; border-radius: 8px; transition: transform 0.15s; }
   .lang-flag-btn:hover { transform: scale(1.15); }
   .header-badge { display: inline-flex; align-items: center; gap: 6px; font-family: 'Barlow Condensed',sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--lime); background: rgba(168,224,99,0.1); border: 1px solid var(--border); padding: 4px 10px; border-radius: 20px; }
-  h1 { font-family: 'Barlow Condensed',sans-serif; font-size: 42px; font-weight: 900; line-height: 1; text-transform: uppercase; }
+  h1 { font-family: 'Barlow Condensed',sans-serif; font-size: 38px; font-weight: 900; line-height: 1; text-transform: uppercase; }
   h1 span { color: var(--lime); }
   .header-sub { font-size: 14px; color: var(--muted); margin-top: 6px; font-weight: 300; }
 
@@ -57,7 +57,16 @@
   input[type=text], input[type=date] { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--white); font-family: 'Barlow',sans-serif; font-size: 16px; padding: 14px 16px; outline: none; transition: border-color 0.2s; appearance: none; -webkit-appearance: none; }
   input::placeholder { color: var(--muted); }
   input:focus { border-color: var(--lime); background: rgba(168,224,99,0.05); }
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+  .divider { height: 1px; background: var(--border); margin: 10px 0; }
+
+  /* ── LOG TAB: compact layout to fit without scrolling ── */
+  #screen-log .header { padding: 14px 24px 10px; }
+  #screen-log .form-section { margin-bottom: 5px; }
+  #screen-log .form-label { margin-bottom: 3px; }
+  #screen-log input[type=text] { padding: 10px 16px; }
+  #screen-log .team-selected { padding: 10px 44px 10px 16px; }
+  #screen-log .result-auto { padding: 10px 16px; }
+  #screen-log .submit-btn { padding: 14px; margin-top: 8px; }
 
   /* ── TOGGLE ── */
   .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -93,7 +102,7 @@
   /* ── NUMBER CONTROLS ── */
   .number-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .number-control { display: flex; align-items: center; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .num-btn { width: 48px; height: 52px; background: none; border: none; color: var(--lime); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  .num-btn { width: 48px; height: 46px; background: none; border: none; color: var(--lime); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
   .num-btn:active { background: rgba(168,224,99,0.1); }
   .num-display { flex: 1; text-align: center; font-family: 'Barlow Condensed',sans-serif; font-size: 26px; font-weight: 700; color: var(--white); }
   .num-label { font-family: 'Barlow Condensed',sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; text-align: center; padding-bottom: 6px; }
