@@ -105,16 +105,10 @@ export async function saveProfileToSupabase(profil) {
 }
 
 export async function saveProfile() {
-  var remote = await fetchProfileFromSupabase();
-  var profil = {
+  var profil = Object.assign({}, getProfile(), {
     name: document.getElementById('profil-name').value.trim(),
-    club: document.getElementById('profil-club').value.trim(),
-    teams: remote.teams || [],
-    favoriteTeam: remote.favoriteTeam || '',
-    tournaments: remote.tournaments || [],
-    favoriteTournament: remote.favoriteTournament || '',
-    avatar: remote.avatar || ''
-  };
+    club: document.getElementById('profil-club').value.trim()
+  });
   saveProfile_local(profil);
   await saveProfileToSupabase(profil);
   updateAvatar();

@@ -83,7 +83,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
 | `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟡 Nesten ferdig | ✅ Ferdig – merget `feature/avatar-storage` 2026-03-21. Supabase Storage for autentiserte brukere. |
-| `saveProfile()` avhenger av remote state ved lagring: fetcher Supabase for å bevare arrays/avatar, tar bare tekstfelt fra skjema | 🟡 Medium | Fungerer nå, men skjørt: nye profilfelt som legges til skjema må eksplisitt merges fra remote. Vurder å samle all profilstate lokalt og synkronisere atskilt. |
+| `saveProfile()` avhenger av remote state ved lagring: fetcher Supabase for å bevare arrays/avatar, tar bare tekstfelt fra skjema | 🟡 Medium | ✅ Ferdig – bruker `Object.assign({}, getProfile(), { name, club })`. Cache er autoritativ; ingen nettverksroundtrip ved lagring. |
 
 ### modal.js
 
