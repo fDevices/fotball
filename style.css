@@ -32,7 +32,7 @@
   body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px); pointer-events: none; z-index: 0; }
 
   /* ── SCREENS ── */
-  .screen { display: none; position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 calc(var(--tab-h) + 8px + env(safe-area-inset-bottom)); min-height: 100vh; pointer-events: none; }
+  .screen { display: none; position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 calc(var(--tab-h) + 8px); min-height: 100vh; pointer-events: none; }
   .screen.active { pointer-events: all; }
   .screen.active { display: block; animation: fadeIn 0.2s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
@@ -206,13 +206,13 @@
   .export-btn.pdf-btn:hover { border-color: var(--gold); background: rgba(240,192,80,0.12); }
 
   /* ── TOAST ── */
-  .toast { position: fixed; bottom: calc(var(--tab-h) + 12px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(120px); opacity: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+  .toast { position: fixed; bottom: calc(var(--tab-h) + 12px); left: 50%; transform: translateX(-50%) translateY(120px); opacity: 0; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 500; white-space: nowrap; z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
   .toast.success { border-color: var(--lime); color: var(--lime); }
   .toast.error   { border-color: var(--danger); color: var(--danger); }
 
   /* ── TAB BAR ── */
-  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: flex-end; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px); }
+  .tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; height: var(--tab-h); background: rgba(22,43,26,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--border); border-left: 1px solid var(--border); border-right: 1px solid var(--border); z-index: 150; display: flex; align-items: center; padding-bottom: 10px; }
   .tab-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; cursor: pointer; padding: 0 8px; transition: all 0.15s; }
   .tab-icon { display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s; }
   .tab-svg-icon { width: 26px; height: 26px; display: block; -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position: center; background-color: var(--muted); transition: background-color 0.2s, transform 0.2s; }
@@ -675,6 +675,8 @@
 
 /* ── PWA standalone: restore safe-area-inset-bottom for home indicator ── */
 @media (display-mode: standalone) {
-  .tab-bar { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 4px); }
+  .tab-bar { height: calc(var(--tab-h) + env(safe-area-inset-bottom, 0px)); align-items: flex-start; padding-top: 10px; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .screen  { padding-bottom: calc(var(--tab-h) + 8px + env(safe-area-inset-bottom, 0px)); }
+  .toast   { bottom: calc(var(--tab-h) + 12px + env(safe-area-inset-bottom, 0px)); }
   .modal-sheet { padding-bottom: env(safe-area-inset-bottom); }
 }
