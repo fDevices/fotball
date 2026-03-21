@@ -32,7 +32,7 @@
       <div class="auth-view" id="auth-login-view">
         <h2 class="auth-title" data-i18n="auth_login_title">Log in</h2>
         <div class="auth-error hidden" id="auth-login-error"></div>
-        <form onsubmit="return false">
+        <form novalidate>
           <input type="email" id="auth-login-email" class="auth-input"
                  placeholder="Email" autocomplete="email">
           <input type="password" id="auth-login-password" class="auth-input"
@@ -46,7 +46,7 @@
       <div class="auth-view hidden" id="auth-signup-view">
         <h2 class="auth-title" data-i18n="auth_signup_title">Create account</h2>
         <div class="auth-error hidden" id="auth-signup-error"></div>
-        <form onsubmit="return false">
+        <form novalidate>
           <input type="email" id="auth-signup-email" class="auth-input"
                  placeholder="Email" autocomplete="email">
           <input type="password" id="auth-signup-password" class="auth-input"
@@ -69,7 +69,8 @@
 </div>
 
 <!-- ══════════════════════════════════ LOGG ══════════════════════════════════ -->
-<div class="screen active" id="screen-log">
+<main>
+<section class="screen active" id="screen-log" aria-label="Match log">
   <div class="header">
     <div class="header-title-row">
       <h1>Match<span> log</span></h1>
@@ -84,7 +85,7 @@
     </div>
     <p class="header-sub" id="log-sub"></p>
   </div>
-  <div class="form-body">
+  <form class="form-body" novalidate>
     <div class="form-section date-compact-section">
       <div class="date-compact-row">
         <div class="date-left">
@@ -146,16 +147,16 @@
         <span class="score-team-label sep-spacer">–</span>
         <span class="score-team-label" id="label-away">Bortelag</span>
       </div>
-      <div class="score-row">
+      <div class="score-row" role="group" aria-labelledby="label-home">
         <div class="number-control">
           <button class="num-btn" data-action="adjust" data-type="home" data-delta="-1">−</button>
-          <span class="num-display" id="home-display">0</span>
+          <span class="num-display" id="home-display" aria-live="polite">0</span>
           <button class="num-btn" data-action="adjust" data-type="home" data-delta="1">+</button>
         </div>
         <span class="score-separator">–</span>
         <div class="number-control">
           <button class="num-btn" data-action="adjust" data-type="away" data-delta="-1">−</button>
-          <span class="num-display" id="away-display">0</span>
+          <span class="num-display" id="away-display" aria-live="polite">0</span>
           <button class="num-btn" data-action="adjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
@@ -166,12 +167,12 @@
     </div>
     <div class="divider"></div>
     <div class="form-section">
-      <div class="number-row">
+      <div class="number-row" role="group" aria-labelledby="label-goals">
         <div>
           <span class="num-label" id="label-goals">Mål</span>
           <div class="number-control">
             <button class="num-btn" data-action="adjust" data-type="goals" data-delta="-1">−</button>
-            <span class="num-display" id="goals-display">0</span>
+            <span class="num-display" id="goals-display" aria-live="polite">0</span>
             <button class="num-btn" data-action="adjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
@@ -179,18 +180,18 @@
           <span class="num-label" id="label-assist">Assist</span>
           <div class="number-control">
             <button class="num-btn" data-action="adjust" data-type="assist" data-delta="-1">−</button>
-            <span class="num-display" id="assist-display">0</span>
+            <span class="num-display" id="assist-display" aria-live="polite">0</span>
             <button class="num-btn" data-action="adjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
       </div>
     </div>
-    <button class="submit-btn" id="submit-btn" data-action="saveMatch">Lagre kamp</button>
-  </div>
-</div>
+    <button class="submit-btn" id="submit-btn" type="submit" data-action="saveMatch">Lagre kamp</button>
+  </form>
+</section>
 
 <!-- ══════════════════════════════════ STATS ══════════════════════════════════ -->
-<div class="screen" id="screen-stats">
+<section class="screen" id="screen-stats" aria-label="Statistics">
   <div class="header">
     <div class="header-top-row">
       <div class="header-badge">📊 Statistikk</div>
@@ -227,10 +228,10 @@
       <div class="loading"><div class="spinner"></div>Henter statistikk...</div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- ══════════════════════════════════ PROFIL ══════════════════════════════════ -->
-<div class="screen" id="screen-profil">
+<section class="screen" id="screen-profil" aria-label="Profile">
   <div class="header">
     <div class="header-title-row">
       <h1 id="profil-title">Min<span> profil</span></h1>
@@ -311,11 +312,11 @@
     <button class="profil-save-btn" id="btn-save-profil" data-action="saveProfile">Lagre profil</button>
     <div class="profil-saved" id="profil-saved">✓ Lagret</div>
   </div>
-</div>
+</section>
 
 <!-- ══════════════════════════════════ TAB BAR ══════════════════════════════════ -->
 <!-- ══════════════════ SETTINGS ══════════════════ -->
-<div class="screen" id="screen-settings">
+<section class="screen" id="screen-settings" aria-label="Settings">
   <div class="header">
     <div class="header-top-row">
       <div class="header-badge">⚙️ Innstillinger</div>
@@ -381,7 +382,8 @@
     <div class="settings-spacer"></div>
     <div class="settings-version">Athlytics Sport v0.1 · fotball</div>
   </div>
-</div>
+</section>
+</main>
 
 <nav class="tab-bar">
   <button class="tab-btn active" id="tab-log" data-action="switchTab" data-tab="log">
@@ -402,7 +404,7 @@
   </button>
 </nav>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
 
 <!-- Delete confirm dialog -->
 <div class="delete-confirm-backdrop" id="delete-confirm-backdrop" data-action="cancelDeleteMatch"></div>
@@ -471,13 +473,13 @@
       <div class="modal-score-row">
         <div class="number-control">
           <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="-1">−</button>
-          <span class="num-display" id="modal-home">0</span>
+          <span class="num-display" id="modal-home" aria-live="polite">0</span>
           <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="1">+</button>
         </div>
         <span class="score-separator">–</span>
         <div class="number-control">
           <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="-1">−</button>
-          <span class="num-display" id="modal-away">0</span>
+          <span class="num-display" id="modal-away" aria-live="polite">0</span>
           <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
@@ -488,7 +490,7 @@
           <label class="modal-label">Mål</label>
           <div class="number-control">
             <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="-1">−</button>
-            <span class="num-display" id="modal-goals">0</span>
+            <span class="num-display" id="modal-goals" aria-live="polite">0</span>
             <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
@@ -496,7 +498,7 @@
           <label class="modal-label">Assist</label>
           <div class="number-control">
             <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="-1">−</button>
-            <span class="num-display" id="modal-assist">0</span>
+            <span class="num-display" id="modal-assist" aria-live="polite">0</span>
             <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
