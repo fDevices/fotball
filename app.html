@@ -110,11 +110,11 @@
     <div class="form-section">
       <label class="form-label" id="label-egetlag">Eget team / tropp</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" id="team-selected" data-action="toggleTeamDropdown">
+        <div class="team-selected" id="team-selected" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-dropdown" data-action="toggleTeamDropdown">
           <span class="team-selected-text placeholder" id="team-selected-text">Velg team...</span>
           <span class="team-chevron" id="team-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="team-dropdown">
+        <div class="team-dropdown" id="team-dropdown" role="listbox">
           <div id="team-options-list"></div>
           <div class="team-new-row" id="team-new-row">
             <input class="team-new-input" id="team-new-input" placeholder="Navn på nytt team...">
@@ -128,11 +128,11 @@
     <div class="form-section">
       <label class="form-label" id="label-turnering">Turnering / serie</label>
       <div class="team-selector-wrap" id="tournament-selector-wrap">
-        <div class="team-selected" data-action="toggleTournamentDropdown">
+        <div class="team-selected" id="tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="tournament-dropdown" data-action="toggleTournamentDropdown">
           <span class="team-selected-text placeholder" id="tournament-selected-text">— Velg turnering —</span>
           <span class="team-chevron" id="tournament-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="tournament-dropdown">
+        <div class="team-dropdown" id="tournament-dropdown" role="listbox">
           <div id="tournament-options-list"></div>
           <div class="team-new-row" id="tournament-new-row">
             <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering...">
@@ -386,20 +386,20 @@
 </section>
 </main>
 
-<nav class="tab-bar">
-  <button class="tab-btn active" id="tab-log" data-action="switchTab" data-tab="log">
+<nav class="tab-bar" aria-label="Main navigation">
+  <button class="tab-btn active" id="tab-log" role="tab" aria-selected="true" data-action="switchTab" data-tab="log">
     <span class="tab-icon"><span class="tab-svg-icon tab-icon-log"></span></span>
     <span class="tab-label">Logg</span>
   </button>
-  <button class="tab-btn" id="tab-stats" data-action="switchTab" data-tab="stats">
+  <button class="tab-btn" id="tab-stats" role="tab" aria-selected="false" data-action="switchTab" data-tab="stats">
     <span class="tab-icon"><span class="tab-svg-icon tab-icon-stats"></span></span>
     <span class="tab-label">Statistikk</span>
   </button>
-  <button class="tab-btn" id="tab-profil" data-action="switchTab" data-tab="profil">
+  <button class="tab-btn" id="tab-profil" role="tab" aria-selected="false" data-action="switchTab" data-tab="profil">
     <span class="tab-icon"><span class="tab-svg-icon tab-icon-profile"></span><span class="tab-profile-badge" id="tab-profile-badge"></span></span>
     <span class="tab-label">Profil</span>
   </button>
-  <button class="tab-btn" id="tab-settings" data-action="switchTab" data-tab="settings">
+  <button class="tab-btn" id="tab-settings" role="tab" aria-selected="false" data-action="switchTab" data-tab="settings">
     <span class="tab-icon"><span class="tab-svg-icon tab-icon-settings"></span></span>
     <span class="tab-label">Innstillinger</span>
   </button>
@@ -446,11 +446,11 @@
     <div class="modal-field">
       <label class="modal-label">Eget team</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" data-action="toggleModalTeamDropdown">
+        <div class="team-selected" id="modal-team-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-team-dropdown" data-action="toggleModalTeamDropdown">
           <span class="team-selected-text placeholder" id="modal-own-team-text">Velg team...</span>
           <span class="team-chevron" id="modal-team-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="modal-team-dropdown">
+        <div class="team-dropdown" id="modal-team-dropdown" role="listbox">
           <div id="modal-team-options-list"></div>
         </div>
       </div>
@@ -459,11 +459,11 @@
     <div class="modal-field">
       <label class="modal-label">Turnering</label>
       <div class="team-selector-wrap">
-        <div class="team-selected" data-action="toggleModalTournamentDropdown">
+        <div class="team-selected" id="modal-tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-tournament-dropdown" data-action="toggleModalTournamentDropdown">
           <span class="team-selected-text placeholder" id="modal-tournament-text">Velg turnering...</span>
           <span class="team-chevron" id="modal-tournament-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="modal-tournament-dropdown">
+        <div class="team-dropdown" id="modal-tournament-dropdown" role="listbox">
           <div id="modal-tournament-options-list"></div>
         </div>
       </div>
