@@ -45,6 +45,8 @@ export function renderTeamDropdown() {
   (profil.teams || []).forEach(function(name) {
     var div = document.createElement('div');
     div.className = 'team-option' + (selectedTeam === name ? ' selected' : '');
+    div.setAttribute('role', 'option');
+    div.setAttribute('aria-selected', selectedTeam === name ? 'true' : 'false');
     div.dataset.action = 'selectTeam';
     div.dataset.name = name;
     div.textContent = name;
@@ -187,6 +189,8 @@ export function renderTournamentDropdown() {
   tournamentList.forEach(function(name) {
     var div = document.createElement('div');
     div.className = 'team-option' + (selectedTournament === name ? ' selected' : '');
+    div.setAttribute('role', 'option');
+    div.setAttribute('aria-selected', selectedTournament === name ? 'true' : 'false');
     div.innerHTML = esc(name) + (selectedTournament === name ? ' <span style="color:var(--lime)">\u2713</span>' : '');
     div.dataset.action = 'selectTournament';
     div.dataset.name = name;
@@ -280,6 +284,8 @@ export function renderModalTeamDropdown() {
   teamList.forEach(function(name) {
     var div = document.createElement('div');
     div.className = 'team-option' + (modalSelectedTeam === name ? ' selected' : '');
+    div.setAttribute('role', 'option');
+    div.setAttribute('aria-selected', modalSelectedTeam === name ? 'true' : 'false');
     div.innerHTML = esc(name) + (modalSelectedTeam === name ? ' <span style="color:var(--lime)">\u2713</span>' : '');
     div.dataset.action = 'selectModalTeam';
     div.dataset.name = name;
@@ -324,6 +330,8 @@ export function renderModalTournamentDropdown() {
   tournamentList.forEach(function(name) {
     var div = document.createElement('div');
     div.className = 'team-option' + (modalSelectedTournament === name ? ' selected' : '');
+    div.setAttribute('role', 'option');
+    div.setAttribute('aria-selected', modalSelectedTournament === name ? 'true' : 'false');
     div.innerHTML = esc(name) + (modalSelectedTournament === name ? ' <span style="color:var(--lime)">\u2713</span>' : '');
     div.dataset.action = 'selectModalTournament';
     div.dataset.name = name;
