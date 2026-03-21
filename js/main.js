@@ -131,6 +131,17 @@ document.addEventListener('click', function(e) {
 });
 
 
+function syncViewportBottom() {
+  var vp = window.visualViewport;
+  var offset = vp ? Math.max(0, window.innerHeight - vp.offsetTop - vp.height) : 0;
+  document.documentElement.style.setProperty('--vp-bottom', offset + 'px');
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', syncViewportBottom);
+  window.visualViewport.addEventListener('scroll', syncViewportBottom);
+}
+syncViewportBottom();
+
 window.addEventListener('load', async function() {
   try {
     await restoreSession();
