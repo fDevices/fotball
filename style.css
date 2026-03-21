@@ -28,8 +28,9 @@
   @media (orientation: landscape) and (max-height: 600px) {
     .landscape-block { display: flex; }
   }
-  body { font-family: 'Barlow', sans-serif; background: var(--grass); color: var(--white); min-height: 100vh; min-height: -webkit-fill-available; overflow-x: hidden; }
-  body::before { content: ''; position: fixed; inset: 0; background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px); pointer-events: none; z-index: 0; }
+  html { height: 100%; }
+  body { font-family: 'Barlow', sans-serif; background: var(--grass); color: var(--white); height: 100dvh; height: 100%; max-height: 100dvh; overflow: hidden; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: var(--tab-h, 56px); background: repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px),repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,0,0,0.025) 40px,rgba(0,0,0,0.025) 80px); pointer-events: none; z-index: 0; }
 
   /* ── SCREENS ── */
   .screen { display: none; position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 0 calc(var(--tab-h) + 8px); min-height: 100vh; pointer-events: none; }
