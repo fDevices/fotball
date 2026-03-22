@@ -4,6 +4,18 @@
 
 ---
 
+## 2026-03-22 — Share Link Feature
+
+- Players can now generate shareable links in Settings → Del statistikk
+- Each link has a label and expiry (30 days, 90 days, end of season, or permanent)
+- Third parties open the link in any browser — no account required
+- Viewer sees: profile card (avatar, name, club) + full stats (season/team/tournament filters, overview and analyse)
+- Self-assessment data (ratings and reflections) is never exposed
+- Multiple active links supported; revoke any link instantly
+- Foundation for Fase 4 coach/parent dashboard accounts
+
+---
+
 ## 2026-03-21
 - refactor: extract ACTIONS map to actions.js and date-toggle to log.js — main.js shrinks from 271 to 161 lines
 - feat(a11y): accessibility pass — semantic HTML (`<main>`, `<section aria-label>`, `<form novalidate>`), ARIA on all four modals (role=dialog/alertdialog, aria-modal, aria-labelledby, focus trap + save/restore), ARIA tab bar (role=tab, aria-selected), ARIA dropdowns (role=combobox/listbox/option, aria-expanded, aria-selected), aria-live on stepper displays and toast, `.sr-only` utility, log form submit handler for keyboard users
