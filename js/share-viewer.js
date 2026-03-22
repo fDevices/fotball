@@ -88,30 +88,43 @@ function calcWDL(arr) {
 var PAGE_SIZE = 20;
 
 function renderMatchList(matches, page) {
-  var start = page * PAGE_SIZE;
-  var slice = matches.slice(start, start + PAGE_SIZE);
+  var matchPage = page || 0;
   var total = matches.length;
-  var pageCount = Math.ceil(total / PAGE_SIZE);
+  var totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (matchPage >= totalPages) matchPage = totalPages - 1;
+  var start = matchPage * PAGE_SIZE;
+  var slice = matches.slice(start, start + PAGE_SIZE);
 
   if (slice.length === 0) return '<div class="loading">' + t('no_matches_yet') + '</div>';
 
   var rows = slice.map(function(k) {
     var r = getResult(k);
-    return '<div class="match-row">' +
-      '<div class="match-row-date">' + esc(k.date || '') + '</div>' +
-      '<div class="match-row-opponent">' + esc(k.opponent || '') + '</div>' +
-      '<div class="match-row-score">' + k.home_score + '–' + k.away_score + '</div>' +
-      '<div class="result-auto ' + r + '">' +
-        (r === 'wins' ? t('win_short') : r === 'draw' ? t('draw_short') : t('loss_short')) +
+    var resIkon = r === 'wins' ? t('win_short') : r === 'draw' ? t('draw_short') : t('loss_short');
+    var homeTeam = k.match_type === 'home' ? (k.own_team || '') : (k.opponent || '');
+    var awayTeam = k.match_type === 'home' ? (k.opponent || '') : (k.own_team || '');
+    var tournament = k.tournament ? ' \xb7 ' + esc(k.tournament) : '';
+    var goalText = (k.goals || 0) > 0
+      ? ' \xb7 ' + k.goals + '\u26BD' + ((k.assists || 0) > 0 ? ' ' + k.assists + '\uD83C\uDFAF' : '')
+      : '';
+    var date = esc(k.date || '');
+    return '<div class="match-item">' +
+      '<div class="match-result ' + r + '">' + resIkon + '</div>' +
+      '<div class="match-info">' +
+        '<div class="match-title-row">' +
+          '<div class="match-opponent">' + esc(homeTeam) + '</div>' +
+          (awayTeam ? '<div class="match-team-name">\xb7 ' + esc(awayTeam) + '</div>' : '') +
+        '</div>' +
+        '<div class="match-meta">' + date + tournament + goalText + '</div>' +
       '</div>' +
+      '<div class="match-score">' + k.home_score + '\u2013' + k.away_score + '</div>' +
     '</div>';
   }).join('');
 
-  var pagination = pageCount > 1
+  var pagination = totalPages > 1
     ? '<div class="pagination">' +
-        (page > 0 ? '<button data-action="shareSetPage" data-page="' + (page - 1) + '">' + t('page_prev') + '</button>' : '') +
-        '<span>' + (page + 1) + ' ' + t('page_of') + ' ' + pageCount + '</span>' +
-        (page < pageCount - 1 ? '<button data-action="shareSetPage" data-page="' + (page + 1) + '">' + t('page_next') + '</button>' : '') +
+        '<button class="page-btn" data-action="shareSetPage" data-page="' + (matchPage - 1) + '" ' + (matchPage === 0 ? 'disabled' : '') + '>' + t('page_prev') + '</button>' +
+        '<span class="page-info">' + (start + 1) + '\u2013' + Math.min(start + PAGE_SIZE, total) + ' ' + t('page_of') + ' ' + total + '</span>' +
+        '<button class="page-btn" data-action="shareSetPage" data-page="' + (matchPage + 1) + '" ' + (matchPage >= totalPages - 1 ? 'disabled' : '') + '>' + t('page_next') + '</button>' +
       '</div>'
     : '';
 
