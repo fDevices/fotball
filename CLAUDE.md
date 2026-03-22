@@ -438,6 +438,7 @@ Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat
 ### Fase 4 – Monetisering
 - [ ] Stripe-integrasjon
 - [ ] `isPremium()` kobles til Stripe-abonnement
+- [ ] Coach/parent/scout dashboard-kontoer — tredjeparter med egen innlogging som kan følge én eller flere spillere. Naturlig bygget på toppen av share-link-funksjonen (Fase 3). **Vurder Supabase Edge Functions** for dette steget: de passer godt til rollen som mellomlag (validering, tilgangsstyring, notifikasjoner) og er bedre egnet til kompleksiteten i en fler-bruker/coach-flyt enn rene PostgreSQL-funksjoner.
 
 ---
 
