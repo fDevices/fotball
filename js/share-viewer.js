@@ -2,6 +2,10 @@ import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
 import { esc, getResult } from './utils.js';
 import { t, initViewerLang } from './i18n.js';
 
+// ── Viewer lang (local mirror for flag rendering) ─────────────────────────────
+
+var _viewerLang = 'no';
+
 // ── RPC calls (anon key, no auth header) ─────────────────────────────────────
 
 async function fetchSharedProfile(code) {
@@ -116,6 +120,10 @@ function renderMatchList(matches, page) {
 
 // ── Profile card ─────────────────────────────────────────────────────────────
 
+function currentFlag() {
+  return _viewerLang === 'en' ? '🇬🇧' : '🇳🇴';
+}
+
 function renderProfileCard(profile) {
   var avatarHtml = profile.avatar_url
     ? '<img src="' + esc(profile.avatar_url) + '" class="share-avatar" alt="avatar">'
@@ -129,6 +137,13 @@ function renderProfileCard(profile) {
       '<div class="share-profile-name">' + esc(profile.name || '') + '</div>' +
       '<div class="share-profile-club">' + esc(profile.club || '') + '</div>' +
       (favoriteTeam ? '<div class="share-profile-team">' + esc(favoriteTeam) + '</div>' : '') +
+    '</div>' +
+    '<div class="lang-picker-wrap">' +
+      '<button class="lang-flag-btn" data-action="shareToggleLang" title="Change language">' + currentFlag() + '</button>' +
+      '<div class="lang-picker-dropdown">' +
+        '<button data-action="shareSetLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>' +
+        '<button data-action="shareSetLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>' +
+      '</div>' +
     '</div>' +
   '</div>';
 }
@@ -292,16 +307,8 @@ function renderStats() {
         return '<button class="season-pill' + (_activeTournament === p.key ? ' active' : '') +
           '" data-action="shareSetTournament" data-tournament="' + esc(p.key) + '">' + esc(p.label) + '</button>';
       }).join('');
-    tournamentPillsHtml = '<div class="stats-filters-row">' + tournamentPills + '</div>';
+    tournamentPillsHtml = '<div class="form-section tournament-filter-row"><div class="season-selector">' + tournamentPills + '</div></div>';
   }
-
-  // View toggle
-  var toggle = '<div class="stats-view-toggle">' +
-    '<button id="share-view-btn-overview" class="view-toggle-btn' + (_activeView === 'overview' ? ' active' : '') +
-      '" data-action="shareSetView" data-view="overview">' + t('stats_overview') + '</button>' +
-    '<button id="share-view-btn-analyse" class="view-toggle-btn' + (_activeView === 'analyse' ? ' active' : '') +
-      '" data-action="shareSetView" data-view="analyse">' + t('stats_analyse') + '</button>' +
-  '</div>';
 
   var statsContent = '';
   if (_activeView === 'overview' && n === 0) {
@@ -348,16 +355,29 @@ function renderStats() {
     statsContent = _renderAnalyse(filtered);
   }
 
+  // View toggle
+  var toggle =
+    '<div class="form-section">' +
+      '<div class="stats-view-toggle">' +
+        '<button id="share-view-btn-overview" class="stats-view-btn' + (_activeView === 'overview' ? ' active' : '') +
+          '" data-action="shareSetView" data-view="overview">' + t('stats_overview') + '</button>' +
+        '<button id="share-view-btn-analyse" class="stats-view-btn' + (_activeView === 'analyse' ? ' active' : '') +
+          '" data-action="shareSetView" data-view="analyse">' + t('stats_analyse') + '</button>' +
+      '</div>' +
+    '</div>';
+
   root.innerHTML =
     renderProfileCard(_profileCache) +
     '<div class="share-viewer-content">' +
-      toggle +
-      '<div class="stats-filters" id="share-filters">' +
-        '<div class="stats-filters-row" id="share-season-selector">' + seasonPills + '</div>' +
-        (teamValues.length > 0 ? '<div class="stats-filters-row">' + teamPills + '</div>' : '') +
-        tournamentPillsHtml +
+      '<div class="stats-body">' +
+        toggle +
+        '<div id="share-filters">' +
+          '<div class="form-section"><div class="season-selector">' + seasonPills + '</div></div>' +
+          (teamValues.length > 0 ? '<div class="form-section team-filter-row"><div class="season-selector">' + teamPills + '</div></div>' : '') +
+          tournamentPillsHtml +
+        '</div>' +
+        '<div id="share-stats-content">' + statsContent + '</div>' +
       '</div>' +
-      '<div id="share-stats-content">' + statsContent + '</div>' +
     '</div>';
 }
 
@@ -449,7 +469,8 @@ async function init() {
     return;
   }
 
-  initViewerLang(profileData.lang);
+  _viewerLang = (profileData.lang === 'en') ? 'en' : 'no';
+  initViewerLang(_viewerLang);
 
   _profileCache = profileData;
   _matches = matchData || [];
@@ -496,6 +517,16 @@ document.addEventListener('click', function(e) {
   } else if (action === 'shareSetPage') {
     _matchPage = parseInt(el.dataset.page, 10) || 0;
     renderStats();
+  } else if (action === 'shareToggleLang') {
+    var dropdown = el.closest('.lang-picker-wrap').querySelector('.lang-picker-dropdown');
+    var isOpen = dropdown.classList.contains('open');
+    document.querySelectorAll('.lang-picker-dropdown').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) dropdown.classList.add('open');
+  } else if (action === 'shareSetLang') {
+    _viewerLang = el.dataset.lang === 'en' ? 'en' : 'no';
+    initViewerLang(_viewerLang);
+    _matchPage = 0;
+    _destroyCharts(); renderStats();
   }
 });
 

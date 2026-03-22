@@ -862,7 +862,7 @@
 .share-viewer-content {
   max-width: 480px;
   margin: 0 auto;
-  padding: 0 0 40px;
+  padding-bottom: 40px;
 }
 
 .share-error-screen {
