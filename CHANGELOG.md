@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-03-22 — Stats Analysis Features
+
+- Stats Overview: Performance Profile Pro card — avg rating per dimension with colour-coded bars
+- Stats Overview: Scoring Streaks Pro card — current/best streak, drought, and scoring %
+- Stats Overview: Head-to-Head Records Pro card — W/D/L and goals per opponent
+- Stats Overview: Monthly Breakdown Pro card — WDL bar and goals per calendar month
+- Stats Analyse: Rating Trend chart (Pro) — 6 dimension lines with pill toggles
+
+---
+
 ## 2026-03-22 — Share Page Desktop Layout
 
 - Responsive two-column layout at ≥900px: sticky left sidebar (profile + season/team/tournament filters) + scrollable right content column
