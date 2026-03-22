@@ -432,6 +432,9 @@ Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat
 
 ## Roadmap
 
+### Fase 2.5 – Deling
+- [x] Share link — player generates shareable URL, third party views stats + profile (no assessments). Foundation for Fase 4 coach dashboard.
+
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
 

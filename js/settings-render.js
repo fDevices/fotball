@@ -98,6 +98,15 @@ export function renderSettings() {
     });
   }
 
+  var stShareTitle = document.getElementById('st-share-title');
+  if (stShareTitle) stShareTitle.textContent = t('share_panel_title');
+  var stShareDesc = document.getElementById('st-share-desc');
+  if (stShareDesc) stShareDesc.textContent = t('share_section_desc');
+  var shareManageBtn = document.getElementById('share-manage-btn');
+  if (shareManageBtn) shareManageBtn.textContent = t('share_manage_btn');
+  var sharePanelTitle = document.getElementById('share-panel-title');
+  if (sharePanelTitle) sharePanelTitle.textContent = t('share_panel_title');
+
   renderActiveSeasonPills();
 }
 

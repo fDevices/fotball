@@ -1,5 +1,14 @@
 import { getSettings } from './settings.js';
 
+// Note: named _viewerLang (not _activeLang as the spec draft shows) to avoid
+// naming collision with the _activeLang variable used in share-viewer.js.
+// Null means "use getSettings().lang" — normal app behaviour is unchanged.
+var _viewerLang = null;
+
+export function initViewerLang(lang) {
+  if (lang === 'en' || lang === 'no') _viewerLang = lang;
+}
+
 const TEKST = {
   no: {
     tab_log:'Logg', tab_stats:'Statistikk', tab_profile:'Profil', tab_settings:'Innstillinger',
@@ -97,6 +106,35 @@ const TEKST = {
     toast_avatar_invalid_type: 'Filen må være et bilde',
     toast_avatar_too_large:    'Bildet er for stort (maks 10 MB)',
     toast_avatar_upload_failed: 'Opplasting feilet – prøv igjen',
+    share_panel_title:'🔗 Del statistikk',
+    share_manage_btn:'Administrer delingslenker',
+    share_create_title:'Opprett ny lenke',
+    share_label_input:'Etikett (f.eks. Trener Hansen)',
+    share_expiry_label:'Utløper',
+    share_expiry_30:'30 dager',
+    share_expiry_90:'90 dager',
+    share_expiry_season:'Slutten av aktiv sesong',
+    share_expiry_permanent:'Permanent',
+    share_create_btn:'Opprett lenke',
+    share_active_links:'Aktive lenker',
+    share_expired_links:'Utløpte lenker',
+    share_section_desc:'Del statistikken din med andre',
+    share_no_links:'Ingen delingslenker ennå',
+    share_copy_btn:'Kopier',
+    share_revoke_btn:'Slett',
+    share_badge_expired:'Utløpt',
+    share_badge_permanent:'Permanent',
+    share_days_left:'dager igjen',
+    share_close:'Lukk',
+    toast_share_copied:'✓ Lenke kopiert',
+    toast_share_created:'✓ Delingslenke opprettet',
+    toast_share_deleted:'✓ Delingslenke slettet',
+    toast_share_error:'Noe gikk galt. Prøv igjen.',
+    toast_share_expiry_fallback:'Ugyldig sesongformat – lenken utløper om 90 dager',
+    share_viewer_invalid:'Denne lenken er ikke lenger gyldig eller har utløpt.',
+    share_viewer_no_code:'Ingen delingskode funnet i denne lenken.',
+    share_viewer_network_error:'Kunne ikke laste data. Prøv igjen.',
+    share_viewer_title:'Statistikk',
   },
   en: {
     tab_log:'Log', tab_stats:'Stats', tab_profile:'Profile', tab_settings:'Settings',
@@ -194,11 +232,40 @@ const TEKST = {
     toast_avatar_invalid_type: 'File must be an image',
     toast_avatar_too_large:    'Image is too large (max 10 MB)',
     toast_avatar_upload_failed: 'Upload failed – please try again',
+    share_panel_title:'🔗 Share statistics',
+    share_manage_btn:'Manage share links',
+    share_create_title:'Create new link',
+    share_label_input:'Label (e.g. Coach Hansen)',
+    share_expiry_label:'Expires',
+    share_expiry_30:'30 days',
+    share_expiry_90:'90 days',
+    share_expiry_season:'End of active season',
+    share_expiry_permanent:'Permanent',
+    share_create_btn:'Create link',
+    share_active_links:'Active links',
+    share_expired_links:'Expired links',
+    share_section_desc:'Share your statistics with others',
+    share_no_links:'No share links yet',
+    share_copy_btn:'Copy',
+    share_revoke_btn:'Delete',
+    share_badge_expired:'Expired',
+    share_badge_permanent:'Permanent',
+    share_days_left:'days left',
+    share_close:'Close',
+    toast_share_copied:'✓ Link copied',
+    toast_share_created:'✓ Share link created',
+    toast_share_deleted:'✓ Share link deleted',
+    toast_share_error:'Something went wrong. Try again.',
+    toast_share_expiry_fallback:'Invalid season format – link expires in 90 days',
+    share_viewer_invalid:'This link is no longer valid or has expired.',
+    share_viewer_no_code:'No share code found in this link.',
+    share_viewer_network_error:'Could not load data. Please try again.',
+    share_viewer_title:'Statistics',
   }
 };
 
 export function t(key) {
-  var lang = getSettings().lang || 'no';
+  var lang = _viewerLang || getSettings().lang || 'no';
   return (TEKST[lang] || TEKST.no)[key] || TEKST.no[key] || key;
 }
 

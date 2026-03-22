@@ -96,3 +96,31 @@ export async function upsertSettings(body) {
   });
   if (!res.ok) throw new Error('upsertSettings failed: ' + res.status);
 }
+
+// ── Share tokens ─────────────────────────────────────────────────────────────
+
+export async function fetchShareTokens() {
+  var res = await fetch(
+    SUPABASE_URL + '/rest/v1/share_tokens?select=id,code,label,expires_at,created_at&order=created_at.desc',
+    { headers: headers() }
+  );
+  if (!res.ok) throw new Error('fetchShareTokens failed: ' + res.status);
+  return res.json();
+}
+
+export async function insertShareToken(body) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/share_tokens', {
+    method: 'POST',
+    headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' }),
+    body: JSON.stringify(body)
+  });
+  return res;
+}
+
+export async function deleteShareToken(id) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/share_tokens?id=eq.' + id, {
+    method: 'DELETE',
+    headers: headers()
+  });
+  return res;
+}
