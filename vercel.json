@@ -1,6 +1,8 @@
 {
   "rewrites": [
-    { "source": "/app", "destination": "/app.html" },
-    { "source": "/", "destination": "/landing.html" }
+    { "source": "/app",    "destination": "/app.html" },
+    { "source": "/share",  "destination": "/share.html" },
+    { "source": "/share/", "destination": "/share.html" },
+    { "source": "/",       "destination": "/landing.html" }
   ]
 }
