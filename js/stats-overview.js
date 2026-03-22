@@ -615,8 +615,8 @@ export function setMatchPage(page) {
   header.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-export function setSeason(s) { activeSeason = s; activeLag = 'all'; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
-export function setTeamFilter(team) { activeLag = team; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; renderStats(); }
+export function setSeason(s) { activeSeason = s; activeLag = 'all'; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; h2hSearch = ''; renderStats(); }
+export function setTeamFilter(team) { activeLag = team; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; h2hSearch = ''; renderStats(); }
 export function setTournamentFilter(tournament) { activeTournament = tournament; matchPage = 0; renderStats(); }
 
 export function setOpponentSearch(val) {
@@ -631,4 +631,4 @@ export function setOpponentSearch(val) {
   }
 }
 
-export function setH2hSearch(v) { h2hSearch = v; loadStats(); }
+export function setH2hSearch(v) { h2hSearch = v; renderStats(); }
