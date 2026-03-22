@@ -3,7 +3,7 @@ import { getSettings } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, closeAllDropdowns, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, addTeamFromProfile, addTournament } from './teams.js';
 import { updateLogBadge } from './navigation.js';
 import { updateFlags, updateAllText } from './text-refresh.js';
-import { loadStats, renderStats, setOpponentSearch } from './stats-overview.js';
+import { loadStats, renderStats, setOpponentSearch, setH2hSearch } from './stats-overview.js';
 import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 import { updateResult, setupDateToggle, updateDateLabel } from './log.js';
 import { openAssessmentSheet } from './assessment.js';
@@ -36,6 +36,9 @@ function setupEventDelegation() {
   document.addEventListener('input', function(e) {
     if (e.target.id === 'opponent-search-input') {
       setOpponentSearch(e.target.value);
+    }
+    if (e.target.id === 'h2h-search-input') {
+      setH2hSearch(e.target.value);
     }
     if (e.target.dataset && e.target.dataset.action === 'updateAvatar') {
       updateAvatar();
