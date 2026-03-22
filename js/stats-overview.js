@@ -3,7 +3,7 @@ import { getAllMatches, setAllMatches } from './state.js';
 import { getSettings, getAllSeasons } from './settings.js';
 import { getProfile } from './profile.js';
 import { t } from './i18n.js';
-import { esc, getResult } from './utils.js';
+import { esc, getResult, isDevPremium } from './utils.js';
 import { renderAnalyse, destroyCharts, renderFormStreak } from './stats-analyse.js';
 import { renderMatchListPaged } from './stats-search.js';
 
@@ -78,6 +78,67 @@ function renderHomeAwaySection(matches) {
       cardHTML(t('stat_away'), awayMatches, 'away') +
     '</div>' +
   '</div>';
+}
+
+function renderPerformanceProfile(matches) {
+  var dims = [
+    { key: 'cat_effort',    field: 'rating_effort' },
+    { key: 'cat_focus',     field: 'rating_focus' },
+    { key: 'cat_technique', field: 'rating_technique' },
+    { key: 'cat_team_play', field: 'rating_team_play' },
+    { key: 'cat_impact',    field: 'rating_impact' },
+    { key: 'cat_overall',   field: 'rating_overall' }
+  ];
+
+  function avgField(field) {
+    var vals = matches.map(function(k) { return k[field]; }).filter(function(v) { return v != null; });
+    if (!vals.length) return null;
+    return vals.reduce(function(s, v) { return s + v; }, 0) / vals.length;
+  }
+
+  function barColor(avg) {
+    if (avg >= 4.0) return 'var(--lime)';
+    if (avg >= 3.0) return 'var(--gold)';
+    return 'var(--danger)';
+  }
+
+  function barWidth(avg) {
+    return Math.min(100, Math.max(20, ((avg - 1) / 4) * 80 + 20));
+  }
+
+  var rows = dims.map(function(d) {
+    var avg = avgField(d.field);
+    if (avg === null) return '';
+    var color = barColor(avg);
+    var width = barWidth(avg);
+    return '<div class="rating-avg-row">' +
+      '<span class="rating-avg-label">' + t(d.key) + '</span>' +
+      '<div class="rating-avg-bar-wrap"><div class="rating-avg-bar" style="width:' + width + '%;background:' + color + '"></div></div>' +
+      '<span class="rating-avg-val" style="color:' + color + '">' + avg.toFixed(1) + '</span>' +
+    '</div>';
+  }).join('');
+
+  var hasAnyRating = dims.some(function(d) { return avgField(d.field) !== null; });
+
+  var inner = '<div class="stat-row-card">' +
+    '<div class="stat-row-title">' + t('perf_profile_title') + '</div>' +
+    (rows || '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px 0">\u2014</div>') +
+  '</div>';
+
+  if (!isDevPremium()) {
+    return '<div class="chart-locked" style="margin-bottom:8px">' +
+      inner +
+      '<div class="chart-locked-overlay">' +
+        '<div class="chart-locked-icon">\u26A1</div>' +
+        '<div class="chart-locked-text">' + t('pro_feature') + '</div>' +
+        '<div class="chart-locked-sub">' + t('pro_upgrade_text') + '</div>' +
+        '<button class="chart-unlock-btn" data-action="showProToast">' + t('pro_unlock_btn') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  if (!hasAnyRating) return '';
+  return inner;
 }
 
 function renderTournamentSection(matches) {
@@ -296,6 +357,7 @@ export function renderStats() {
     '</div>' +
     renderHomeAwaySection(matches) +
     renderTournamentSection(matches) +
+    renderPerformanceProfile(matches) +
     '<div class="opponent-search-wrap">' +
       '<div class="match-list-header" style="margin-bottom:8px">' + t('match_history') + '</div>' +
       '<div class="opponent-search-field-wrap">' +

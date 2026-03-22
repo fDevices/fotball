@@ -989,6 +989,36 @@
   padding: 0 4px;
 }
 
+/* Performance Profile rating rows */
+.rating-avg-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.rating-avg-label {
+  font-size: 10px;
+  color: var(--muted);
+  width: 60px;
+  flex-shrink: 0;
+}
+.rating-avg-bar-wrap {
+  flex: 1;
+  height: 5px;
+  background: rgba(168,224,99,0.1);
+  border-radius: 3px;
+  margin: 0 8px;
+}
+.rating-avg-bar {
+  height: 5px;
+  border-radius: 3px;
+}
+.rating-avg-val {
+  font-size: 10px;
+  font-weight: 800;
+  width: 24px;
+  text-align: right;
+}
+
 /* Rating trend pill toggles */
 .rating-pill {
   border-radius: 20px;
