@@ -540,12 +540,13 @@
 
 <!-- Share panel -->
 <div id="share-panel-backdrop" class="modal-backdrop"></div>
-<div id="share-panel" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Del statistikk">
-  <div class="sheet-header">
-    <span class="sheet-title" id="share-panel-title">Del statistikk</span>
-    <button class="sheet-close" data-action="closeSharePanel" aria-label="Lukk">×</button>
+<div id="share-panel" class="modal-sheet" role="dialog" aria-modal="true" aria-label="Del statistikk">
+  <div class="modal-handle"></div>
+  <div class="modal-header">
+    <span class="modal-title" id="share-panel-title">Del statistikk</span>
+    <button class="modal-close-btn" data-action="closeSharePanel" aria-label="Lukk">×</button>
   </div>
-  <div class="sheet-body">
+  <div style="padding: 0 20px 32px; overflow-y: auto;">
     <!-- Create new link form -->
     <div class="share-create-form">
       <input
