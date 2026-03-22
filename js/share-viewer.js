@@ -254,7 +254,7 @@ function renderTournamentSection(matches) {
 
   return '<div class="stat-row-card" style="margin-bottom:8px">' +
     '<div class="stat-row-title">' + t('per_tournament') + '</div>' +
-    rows +
+    '<div class="tournament-stat-grid">' + rows + '</div>' +
   '</div>';
 }
 
@@ -316,7 +316,7 @@ function renderStats() {
     (teamValues.length > 0
       ? '<div class="share-sidebar-section">' +
           '<div class="share-sidebar-section-label">' + t('alle_lag') + '</div>' +
-          '<div class="season-selector">' + teamPills + '</div>' +
+          '<div class="season-selector" style="flex-wrap:wrap;overflow-x:visible">' + teamPills + '</div>' +
         '</div>'
       : '') +
     (tournamentValues.length > 1
