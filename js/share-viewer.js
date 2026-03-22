@@ -422,8 +422,16 @@ function _renderAnalyse(matches) {
   Chart.defaults.borderColor = 'rgba(168,224,99,0.08)';
   Chart.defaults.font.family = 'Barlow Condensed';
 
-  return '<div id="share-chart-winpct-wrap" class="chart-wrap"><canvas id="share-chart-winpct"></canvas></div>' +
-         '<div id="share-chart-ga-wrap" class="chart-wrap"><canvas id="share-chart-ga"></canvas></div>';
+  return '<div class="chart-section">' +
+           '<div class="chart-section-title">' + t('chart_win_pct') + '</div>' +
+           '<div class="chart-section-desc">' + t('chart_win_pct_desc') + '</div>' +
+           '<div id="share-chart-winpct-wrap" class="chart-wrap"><canvas id="share-chart-winpct"></canvas></div>' +
+         '</div>' +
+         '<div class="chart-section">' +
+           '<div class="chart-section-title">' + t('chart_goals_assists') + '</div>' +
+           '<div class="chart-section-desc">' + t('chart_ga_desc') + '</div>' +
+           '<div id="share-chart-ga-wrap" class="chart-wrap"><canvas id="share-chart-ga"></canvas></div>' +
+         '</div>';
 }
 
 function _initCharts(matches) {
