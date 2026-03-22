@@ -4,6 +4,12 @@
 
 ---
 
+## [Unreleased]
+### Changed
+- Stats Overview: Head-to-Head card replaced with opponent search — type to find an opponent and see W/D/L, goals scored/conceded inline
+
+---
+
 ## 2026-03-22 — Stats Analysis Features
 
 - Stats Overview: Performance Profile Pro card — avg rating per dimension with colour-coded bars
