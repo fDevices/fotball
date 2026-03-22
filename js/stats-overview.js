@@ -13,6 +13,7 @@ export var activeSeason = getSettings().activeSeason || String(new Date().getFul
 export var activeTournament = 'all';
 export var matchPage = 0;
 export var opponentSearch = '';
+var h2hSearch = '';
 
 function matchesTeamFilter(k, lag) {
   if (lag === 'all') return true;
@@ -148,29 +149,78 @@ function renderHeadToHead(matches) {
     oppMap[name].push(k);
   });
 
+  var totalOpponents = Object.keys(oppMap).length;
+
   var opponents = Object.keys(oppMap).sort(function(a, b) {
     var diff = oppMap[b].length - oppMap[a].length;
     return diff !== 0 ? diff : a.localeCompare(b);
   });
 
-  var rows = opponents.map(function(opp) {
-    var s = calcWDL(oppMap[opp]);
-    return '<div class="tournament-stat-row">' +
-      '<div class="tournament-stat-name">' + esc(opp) + ' <span style="color:var(--muted);font-size:11px;font-weight:400">(' + s.n + ')</span></div>' +
-      '<div class="tournament-stat-badges">' +
-        '<span class="t-badge win">' + s.w + t('win_short') + '</span>' +
-        '<span class="t-badge draw">' + s.d + t('draw_short') + '</span>' +
-        '<span class="t-badge loss">' + s.l + t('loss_short') + '</span>' +
-        '<span class="tournament-wdl-sep"></span>' +
-        '<span class="t-badge goals">\u26BD' + s.g + '</span>' +
+  var inner;
+
+  if (!h2hSearch) {
+    // Empty state: just the search input + count hint
+    inner = '<div class="stat-row-card">' +
+      '<div class="stat-row-title">' + t('h2h_title') + '</div>' +
+      '<input id="h2h-search-input" type="text" class="opponent-search-input" style="width:100%;box-sizing:border-box" placeholder="' + t('h2h_search_placeholder') + '" value="">' +
+      '<div style="text-align:center;color:var(--muted);font-size:10px;margin-top:5px">' +
+        t('h2h_matches_count').replace('{n}', totalOpponents) +
       '</div>' +
     '</div>';
-  }).join('');
+  } else {
+    var query = h2hSearch.toLowerCase();
+    var matched = opponents.filter(function(opp) {
+      return opp.toLowerCase().includes(query);
+    });
 
-  var inner = '<div class="stat-row-card">' +
-    '<div class="stat-row-title">' + t('h2h_title') + '</div>' +
-    rows +
-  '</div>';
+    var resultHTML;
+    if (!matched.length) {
+      resultHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;margin-top:8px">' + t('h2h_no_match') + '</div>';
+    } else {
+      var top = matched[0];
+      var ms = oppMap[top];
+      var total = ms.length;
+      var w = 0, d = 0, l = 0, gf = 0, ga = 0;
+      ms.forEach(function(k) {
+        var res = getResult(k);
+        if (res === 'wins') w++;
+        else if (res === 'draw') d++;
+        else l++;
+        gf += k.match_type === 'home' ? (k.home_score || 0) : (k.away_score || 0);
+        ga += k.match_type === 'home' ? (k.away_score || 0) : (k.home_score || 0);
+      });
+      var pctW = Math.round((w / total) * 100);
+      var pctD = Math.round((d / total) * 100);
+      var pctL = 100 - pctW - pctD;
+      var moreHTML = matched.length > 1
+        ? '<div style="color:var(--muted);font-size:10px;margin-top:4px">+ ' + (matched.length - 1) + ' ' + t('h2h_more_opponents') + '</div>'
+        : '';
+      resultHTML =
+        '<div style="background:rgba(168,224,99,0.06);border-radius:8px;padding:9px 10px;margin-top:8px">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px">' +
+            esc(top) + ' <span style="color:var(--muted);font-size:10px;font-weight:400">· ' + total + ' ' + t('matches_short') + '</span>' +
+          '</div>' +
+          '<div class="wdl-bar" style="height:5px;margin-bottom:4px">' +
+            '<div class="wdl-seg w" style="width:' + pctW + '%"></div>' +
+            '<div class="wdl-seg d" style="width:' + pctD + '%"></div>' +
+            '<div class="wdl-seg l" style="width:' + pctL + '%"></div>' +
+          '</div>' +
+          '<div class="stat-row"><span class="stat-row-label">' + t('stat_wins') + '</span><span class="stat-row-value" style="color:var(--lime)">' + w + '</span></div>' +
+          '<div class="stat-row"><span class="stat-row-label">' + t('stat_draws') + '</span><span class="stat-row-value" style="color:var(--gold)">' + d + '</span></div>' +
+          '<div class="stat-row"><span class="stat-row-label">' + t('stat_losses') + '</span><span class="stat-row-value" style="color:var(--danger)">' + l + '</span></div>' +
+          '<div style="border-top:1px solid rgba(168,224,99,0.08);margin:6px 0 4px"></div>' +
+          '<div class="stat-row"><span class="stat-row-label">' + t('stat_goals') + '</span><span class="stat-row-value" style="color:var(--lime)">' + gf + '</span></div>' +
+          '<div class="stat-row"><span class="stat-row-label">' + t('h2h_goals_conceded') + '</span><span class="stat-row-value" style="color:var(--danger)">' + ga + '</span></div>' +
+        '</div>' +
+        moreHTML;
+    }
+
+    inner = '<div class="stat-row-card">' +
+      '<div class="stat-row-title">' + t('h2h_title') + '</div>' +
+      '<input id="h2h-search-input" type="text" class="opponent-search-input" style="width:100%;box-sizing:border-box" placeholder="' + t('h2h_search_placeholder') + '" value="' + esc(h2hSearch) + '">' +
+      resultHTML +
+    '</div>';
+  }
 
   if (!isDevPremium()) {
     return '<div class="chart-locked" style="margin-bottom:8px">' +
@@ -580,3 +630,5 @@ export function setOpponentSearch(val) {
     renderStats();
   }
 }
+
+export function setH2hSearch(v) { h2hSearch = v; loadStats(); }
