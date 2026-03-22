@@ -80,6 +80,72 @@ function renderHomeAwaySection(matches) {
   '</div>';
 }
 
+function calcStreaks(matches) {
+  var sorted = matches.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
+  var n = sorted.length;
+
+  var currentStreak = 0;
+  for (var i = n - 1; i >= 0; i--) {
+    if ((sorted[i].goals || 0) > 0) currentStreak++;
+    else break;
+  }
+
+  var bestStreak = 0, runStreak = 0;
+  var bestDrought = 0, runDrought = 0;
+  for (var j = 0; j < n; j++) {
+    if ((sorted[j].goals || 0) > 0) {
+      runStreak++;
+      runDrought = 0;
+    } else {
+      runDrought++;
+      runStreak = 0;
+    }
+    if (runStreak > bestStreak) bestStreak = runStreak;
+    if (runDrought > bestDrought) bestDrought = runDrought;
+  }
+
+  var scoringCount = sorted.filter(function(k) { return (k.goals || 0) > 0; }).length;
+  var scoringPct = n > 0 ? Math.round((scoringCount / n) * 100) : 0;
+
+  return { currentStreak: currentStreak, bestStreak: bestStreak, bestDrought: bestDrought, scoringPct: scoringPct };
+}
+
+function renderScoringStreaks(matches) {
+  var s = calcStreaks(matches);
+
+  var inner = '<div class="stat-row-card">' +
+    '<div class="stat-row-title">' + t('scoring_streaks_title') + '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">' +
+      '<div style="background:rgba(168,224,99,0.06);border-radius:8px;padding:8px;text-align:center">' +
+        '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px">' + t('streak_current') + '</div>' +
+        '<div style="font-size:24px;font-weight:800;color:var(--lime);line-height:1">' + s.currentStreak + '</div>' +
+        '<div style="font-size:9px;color:var(--muted);margin-top:2px">' + t('streak_matches') + '</div>' +
+      '</div>' +
+      '<div style="background:rgba(240,192,80,0.06);border-radius:8px;padding:8px;text-align:center">' +
+        '<div style="font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:4px">' + t('streak_best') + '</div>' +
+        '<div style="font-size:24px;font-weight:800;color:var(--gold);line-height:1">' + s.bestStreak + '</div>' +
+        '<div style="font-size:9px;color:var(--muted);margin-top:2px">' + t('streak_matches') + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="stat-row"><span class="stat-row-label">' + t('streak_drought') + '</span><span class="stat-row-value" style="color:var(--danger)">' + s.bestDrought + ' ' + t('streak_drought_matches') + '</span></div>' +
+    '<div class="stat-row"><span class="stat-row-label">' + t('streak_scoring_pct') + '</span><span class="stat-row-value" style="color:var(--lime)">' + s.scoringPct + '%</span></div>' +
+  '</div>';
+
+  if (!isDevPremium()) {
+    return '<div class="chart-locked" style="margin-bottom:8px">' +
+      inner +
+      '<div class="chart-locked-overlay">' +
+        '<div class="chart-locked-icon">\u26A1</div>' +
+        '<div class="chart-locked-text">' + t('pro_feature') + '</div>' +
+        '<div class="chart-locked-sub">' + t('pro_upgrade_text') + '</div>' +
+        '<button class="chart-unlock-btn" data-action="showProToast">' + t('pro_unlock_btn') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return inner;
+}
+
 function renderPerformanceProfile(matches) {
   var dims = [
     { key: 'cat_effort',    field: 'rating_effort' },
@@ -358,6 +424,7 @@ export function renderStats() {
     renderHomeAwaySection(matches) +
     renderTournamentSection(matches) +
     renderPerformanceProfile(matches) +
+    renderScoringStreaks(matches) +
     '<div class="opponent-search-wrap">' +
       '<div class="match-list-header" style="margin-bottom:8px">' + t('match_history') + '</div>' +
       '<div class="opponent-search-field-wrap">' +
