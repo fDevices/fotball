@@ -13,6 +13,7 @@ import { showToast } from './toast.js';
 import { logout, isAuthenticated } from './auth.js';
 import { openSharePanel, closeSharePanel, createShareToken, removeShareToken, copyShareLink } from './share-manage.js';
 import { openAuthOverlay, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
+import { getChartInstance } from './stats-analyse.js';
 
 export const WRITE_ACTIONS = new Set([
   'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
@@ -88,6 +89,17 @@ export const ACTIONS = {
   createShareToken: function() { createShareToken(); },
   deleteShareToken: function(e) { var el = e.target.closest('[data-id]'); if (!el) return; removeShareToken(el.dataset.id); },
   copyShareLink:    function(e) { var el = e.target.closest('[data-url]'); if (!el) return; copyShareLink(el.dataset.url); },
+  toggleRatingLine: function(e) {
+    var el = e.target.closest('[data-dataset-index]');
+    if (!el) return;
+    var idx = parseInt(el.dataset.datasetIndex, 10);
+    var chart = getChartInstance('ratingTrend');
+    if (!chart) return;
+    var meta = chart.getDatasetMeta(idx);
+    meta.hidden = !meta.hidden;
+    chart.update();
+    el.classList.toggle('rating-pill-on', !meta.hidden);
+  },
   logout:              () => logout(),
   openAuthOverlay:     () => openAuthOverlay('login'),
   dismissDemoBanner:   () => dismissDemoBanner(),

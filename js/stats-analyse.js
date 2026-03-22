@@ -11,10 +11,17 @@ var CHART_COLORS = {
   muted:    '#8a9a80',
   card:     '#162b1a',
   border:   'rgba(168,224,99,0.15)',
-  gridLine: 'rgba(168,224,99,0.08)'
+  gridLine: 'rgba(168,224,99,0.08)',
+  blue:     '#63b8e0',
+  purple:   '#b08ae0',
+  teal:     '#50d0a0'
 };
 
 var chartInstances = {};
+
+export function getChartInstance(key) {
+  return chartInstances[key] || null;
+}
 
 function fmtDate(dateStr, opts) {
   return new Date(dateStr).toLocaleDateString(getDateLocale(), opts);
