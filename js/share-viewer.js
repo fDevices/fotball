@@ -137,14 +137,12 @@ function currentFlag() {
   return _viewerLang === 'en' ? '🇬🇧' : '🇳🇴';
 }
 
-function renderProfileCard(profile) {
+function renderSidebarProfile(profile) {
   var avatarHtml = profile.avatar_url
     ? '<img src="' + esc(profile.avatar_url) + '" class="share-avatar" alt="avatar">'
     : '<div class="share-avatar share-avatar-placeholder"></div>';
-
   var favoriteTeam = (profile.favorite_team || '').trim();
-
-  return '<div class="share-profile-card">' +
+  return '<div class="share-sidebar-profile">' +
     avatarHtml +
     '<div class="share-profile-info">' +
       '<div class="share-profile-name">' + esc(profile.name || '') + '</div>' +
@@ -309,19 +307,31 @@ function renderStats() {
         '" data-action="shareSetTeam" data-team="' + esc(p.key) + '">' + esc(p.label) + '</button>';
     }).join('');
 
-  // Tournament pills (only if >1)
-  var tournamentPillsHtml = '';
-  if (tournamentValues.length > 1) {
-    var tournamentPills = [{ key: 'all', label: t('tournament_filter_all') }]
-      .concat(tournamentValues.map(function(v) {
-        return { key: v, label: v === '' ? t('no_tournament') : v };
-      }))
-      .map(function(p) {
-        return '<button class="season-pill' + (_activeTournament === p.key ? ' active' : '') +
-          '" data-action="shareSetTournament" data-tournament="' + esc(p.key) + '">' + esc(p.label) + '</button>';
-      }).join('');
-    tournamentPillsHtml = '<div class="form-section tournament-filter-row"><div class="season-selector">' + tournamentPills + '</div></div>';
-  }
+  var sidebarFilters =
+    '<div class="share-sidebar-divider"></div>' +
+    '<div class="share-sidebar-section">' +
+      '<div class="share-sidebar-section-label">' + t('stats_season_label') + '</div>' +
+      '<div class="season-selector">' + seasonPills + '</div>' +
+    '</div>' +
+    (teamValues.length > 0
+      ? '<div class="share-sidebar-section">' +
+          '<div class="share-sidebar-section-label">' + t('alle_lag') + '</div>' +
+          '<div class="season-selector">' + teamPills + '</div>' +
+        '</div>'
+      : '') +
+    (tournamentValues.length > 1
+      ? '<div class="share-sidebar-section">' +
+          '<div class="share-sidebar-section-label">' + t('tournament_filter_all') + '</div>' +
+          '<div class="season-selector" style="flex-wrap:wrap;overflow-x:visible">' +
+            [{ key: 'all', label: t('tournament_filter_all') }]
+              .concat(tournamentValues.map(function(v) { return { key: v, label: v === '' ? t('no_tournament') : v }; }))
+              .map(function(p) {
+                return '<button class="season-pill' + (_activeTournament === p.key ? ' active' : '') +
+                  '" data-action="shareSetTournament" data-tournament="' + esc(p.key) + '">' + esc(p.label) + '</button>';
+              }).join('') +
+          '</div>' +
+        '</div>'
+      : '');
 
   var statsContent = '';
   if (_activeView === 'overview' && n === 0) {
@@ -380,16 +390,16 @@ function renderStats() {
     '</div>';
 
   root.innerHTML =
-    renderProfileCard(_profileCache) +
-    '<div class="share-viewer-content">' +
-      '<div class="stats-body">' +
-        toggle +
-        '<div id="share-filters">' +
-          '<div class="form-section"><div class="season-selector">' + seasonPills + '</div></div>' +
-          (teamValues.length > 0 ? '<div class="form-section team-filter-row"><div class="season-selector">' + teamPills + '</div></div>' : '') +
-          tournamentPillsHtml +
+    '<div class="share-desktop-layout">' +
+      '<div class="share-sidebar">' +
+        renderSidebarProfile(_profileCache) +
+        sidebarFilters +
+      '</div>' +
+      '<div class="share-main">' +
+        '<div class="stats-body">' +
+          toggle +
+          '<div id="share-stats-content">' + statsContent + '</div>' +
         '</div>' +
-        '<div id="share-stats-content">' + statsContent + '</div>' +
       '</div>' +
     '</div>';
 }
