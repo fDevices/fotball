@@ -199,6 +199,11 @@ export function renderStats() {
   if (!seasons.length) seasons = [String(new Date().getFullYear())];
   if (!seasons.includes(activeSeason)) activeSeason = seasons[0];
 
+  var statsHeading = document.getElementById('stats-heading');
+  if (statsHeading) statsHeading.firstChild.textContent = t('stats_season_label');
+  var statsHeadingSeason = document.getElementById('stats-heading-season');
+  if (statsHeadingSeason) statsHeadingSeason.textContent = ' ' + activeSeason;
+
   var filtersDiv = document.getElementById('stats-filters');
   if (filtersDiv) filtersDiv.style.display = activeStatsView === 'overview' ? '' : 'none';
 

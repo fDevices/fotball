@@ -3,7 +3,7 @@ import { getSettings } from './settings.js';
 import { renderTeamDropdown, renderTournamentDropdown, renderProfileTeamList, renderProfileTournamentList, selectTeam, selectTournament, closeAllDropdowns, saveNewTeamFromDropdown, saveNewTournamentFromDropdown, addTeamFromProfile, addTournament } from './teams.js';
 import { updateLogBadge } from './navigation.js';
 import { updateFlags, updateAllText } from './text-refresh.js';
-import { loadStats, setOpponentSearch } from './stats-overview.js';
+import { loadStats, renderStats, setOpponentSearch } from './stats-overview.js';
 import { destroyCharts, initChartDefaults } from './stats-analyse.js';
 import { updateResult, setupDateToggle, updateDateLabel } from './log.js';
 import { openAssessmentSheet } from './assessment.js';
@@ -97,6 +97,7 @@ document.addEventListener('athlytics:updateAllText', function() {
   renderLogSub();
   updateResult();
   updateLogBadge();
+  renderStats();
 });
 
 document.addEventListener('athlytics:loadStats', function() {

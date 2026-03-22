@@ -49,6 +49,8 @@ export function updateAllText() {
   if (teamNewSave) teamNewSave.textContent = t('add_item');
   var tournamentNewSave = document.getElementById('tournament-new-save-btn');
   if (tournamentNewSave) tournamentNewSave.textContent = t('add_item');
+  var statsHeaderBadge = document.getElementById('stats-header-badge');
+  if (statsHeaderBadge) statsHeaderBadge.textContent = '📊 ' + t('tab_stats');
   var statsOverview = document.getElementById('stats-view-btn-overview');
   if (statsOverview) statsOverview.textContent = t('stats_overview');
   var statsAnalyseText = document.getElementById('stats-analyse-text');
