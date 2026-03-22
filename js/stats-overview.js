@@ -617,7 +617,7 @@ export function setMatchPage(page) {
 
 export function setSeason(s) { activeSeason = s; activeLag = 'all'; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; h2hSearch = ''; renderStats(); }
 export function setTeamFilter(team) { activeLag = team; activeTournament = 'all'; matchPage = 0; opponentSearch = ''; h2hSearch = ''; renderStats(); }
-export function setTournamentFilter(tournament) { activeTournament = tournament; matchPage = 0; renderStats(); }
+export function setTournamentFilter(tournament) { activeTournament = tournament; h2hSearch = ''; matchPage = 0; renderStats(); }
 
 export function setOpponentSearch(val) {
   opponentSearch = val.trim().toLowerCase();
