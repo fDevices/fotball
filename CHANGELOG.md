@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-03-22 — Share Page Desktop Layout
+
+- Responsive two-column layout at ≥900px: sticky left sidebar (profile + season/team/tournament filters) + scrollable right content column
+- Mobile layout unchanged (single column, sidebar stacks above stats)
+- Pure CSS grid media query — no JS logic changes
+
+---
+
 ## 2026-03-22 — Share Link Feature
 
 - Players can now generate shareable links in Settings → Del statistikk
