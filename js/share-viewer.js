@@ -133,6 +133,105 @@ function renderProfileCard(profile) {
   '</div>';
 }
 
+// ── Form streak ───────────────────────────────────────────────────────────────
+
+function renderFormStreak(matches) {
+  var last10 = matches.slice(0, 10).reverse();
+  if (last10.length === 0) {
+    return '<div class="stat-row-card form-streak-wrap">' +
+      '<div class="stat-row-title">' + t('form_title') + '</div>' +
+      '<div class="form-streak-empty">' + t('no_matches_yet') + '</div>' +
+    '</div>';
+  }
+  var boxes = last10.map(function(k) {
+    var r = getResult(k);
+    var lbl = r === 'wins' ? t('win_short') : r === 'draw' ? t('draw_short') : t('loss_short');
+    return '<div class="form-streak-box ' + r + '" title="' + esc(k.opponent) + ' ' + k.home_score + '-' + k.away_score + '">' + lbl + '</div>';
+  }).join('');
+  return '<div class="stat-row-card form-streak-wrap">' +
+    '<div class="stat-row-title">' + t('form_title') + ' (' + t('matches_short') + ': ' + last10.length + ')</div>' +
+    '<div class="form-streak-boxes">' + boxes + '</div>' +
+  '</div>';
+}
+
+// ── Home vs Away section ──────────────────────────────────────────────────────
+
+function renderHomeAwaySection(matches) {
+  var homeMatches = matches.filter(function(k) { return k.match_type === 'home'; });
+  var awayMatches = matches.filter(function(k) { return k.match_type !== 'home'; });
+  if (homeMatches.length === 0 && awayMatches.length === 0) return '';
+
+  function cardHTML(label, matchArr, colorClass) {
+    if (matchArr.length === 0) return '<div class="ha-card"><div class="ha-card-title ' + colorClass + '">' + label + '</div><div style="text-align:center;color:var(--muted);font-size:13px;padding:8px 0">' + t('no_matches_card') + '</div></div>';
+    var s = calcWDL(matchArr);
+    var pctW = Math.round((s.w / s.n) * 100);
+    var pctD = Math.round((s.d / s.n) * 100);
+    var pctL = 100 - pctW - pctD;
+    return '<div class="ha-card">' +
+      '<div class="ha-card-title ' + colorClass + '">' + label + ' (' + s.n + ')</div>' +
+      '<div class="ha-nums">' +
+        '<div class="ha-num"><div class="ha-num-val lime">' + s.w + '</div><div class="ha-num-lbl">' + t('win_short') + '</div></div>' +
+        '<div class="ha-num"><div class="ha-num-val gold">' + s.d + '</div><div class="ha-num-lbl">' + t('draw_short') + '</div></div>' +
+        '<div class="ha-num"><div class="ha-num-val danger">' + s.l + '</div><div class="ha-num-lbl">' + t('loss_short') + '</div></div>' +
+      '</div>' +
+      '<div class="ha-mini-bar">' +
+        '<div class="ha-mini-seg" style="width:' + pctW + '%;background:var(--lime)"></div>' +
+        '<div class="ha-mini-seg" style="width:' + pctD + '%;background:var(--gold)"></div>' +
+        '<div class="ha-mini-seg" style="width:' + pctL + '%;background:var(--danger)"></div>' +
+      '</div>' +
+      '<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">' +
+        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--lime)">' + s.g + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_goals') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--gold)">' + s.a + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_assists') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--white)">' + (s.g + s.a) + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">G+A</div></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return '<div class="stat-row-card" style="margin-bottom:8px">' +
+    '<div class="stat-row-title">' + t('home_vs_away') + '</div>' +
+    '<div class="ha-grid">' +
+      cardHTML(t('stat_home'), homeMatches, 'home') +
+      cardHTML(t('stat_away'), awayMatches, 'away') +
+    '</div>' +
+  '</div>';
+}
+
+// ── Tournament breakdown section ──────────────────────────────────────────────
+
+function renderTournamentSection(matches) {
+  var tournamentMap = {};
+  matches.forEach(function(k) {
+    var tn = k.tournament || '\u2014';
+    if (!tournamentMap[tn]) tournamentMap[tn] = [];
+    tournamentMap[tn].push(k);
+  });
+  var tournaments = Object.keys(tournamentMap).sort(function(a, b) {
+    return tournamentMap[b].length - tournamentMap[a].length;
+  });
+  if (tournaments.length <= 1) return '';
+
+  var rows = tournaments.map(function(tn) {
+    var s = calcWDL(tournamentMap[tn]);
+    return '<div class="tournament-stat-row">' +
+      '<div class="tournament-stat-name">' + esc(tn) + ' <span style="color:var(--muted);font-size:12px;font-weight:400">(' + s.n + ' ' + t('matches_short') + ')</span></div>' +
+      '<div class="tournament-stat-badges">' +
+        '<span class="t-badge win">' + s.w + t('win_short') + '</span>' +
+        '<span class="t-badge draw">' + s.d + t('draw_short') + '</span>' +
+        '<span class="t-badge loss">' + s.l + t('loss_short') + '</span>' +
+        '<span class="tournament-wdl-sep"></span>' +
+        '<span class="t-badge goals">\u26BD' + s.g + '</span>' +
+        '<span class="t-badge assist">\u{1F3AF}' + s.a + '</span>' +
+        '<span class="t-badge ga">\u2728' + (s.g + s.a) + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="stat-row-card" style="margin-bottom:8px">' +
+    '<div class="stat-row-title">' + t('per_tournament') + '</div>' +
+    rows +
+  '</div>';
+}
+
 // ── Stats rendering (adapted from stats-overview.js) ─────────────────────────
 
 function renderStats() {
@@ -210,13 +309,14 @@ function renderStats() {
   } else if (_activeView === 'overview') {
     var pct = function(v) { return Math.round((v / n) * 100); };
     statsContent =
+      renderFormStreak(filtered) +
       '<div class="stat-grid">' +
         '<div class="stat-card"><div class="stat-num lime">' + s.w + '</div><div class="stat-lbl">' + t('stat_wins') + '</div></div>' +
         '<div class="stat-card"><div class="stat-num gold">' + s.d + '</div><div class="stat-lbl">' + t('stat_draws') + '</div></div>' +
         '<div class="stat-card"><div class="stat-num danger">' + s.l + '</div><div class="stat-lbl">' + t('stat_losses') + '</div></div>' +
       '</div>' +
       '<div class="stat-row-card">' +
-        '<div class="stat-row-title">' + t('match_dist') + ' – ' + n + ' ' + t('matches_short') + '</div>' +
+        '<div class="stat-row-title">' + t('match_dist') + ' \u2013 ' + n + ' ' + t('matches_short') + '</div>' +
         '<div class="wdl-bar">' +
           '<div class="wdl-seg w" style="width:' + pct(s.w) + '%"></div>' +
           '<div class="wdl-seg d" style="width:' + pct(s.d) + '%"></div>' +
@@ -233,6 +333,14 @@ function renderStats() {
         '<div class="stat-card"><div class="stat-num gold">' + s.a + '</div><div class="stat-lbl">' + t('stat_assists') + '</div></div>' +
         '<div class="stat-card"><div class="stat-num">' + (s.g + s.a) + '</div><div class="stat-lbl">G+A</div></div>' +
       '</div>' +
+      '<div class="stat-row-card">' +
+        '<div class="stat-row-title">' + t('avg_per_match') + '</div>' +
+        '<div class="stat-row"><span class="stat-row-label">' + t('goals_per_match') + '</span><span class="stat-row-value">' + (s.g / n).toFixed(1) + '</span></div>' +
+        '<div class="stat-row"><span class="stat-row-label">' + t('assist_per_match') + '</span><span class="stat-row-value">' + (s.a / n).toFixed(1) + '</span></div>' +
+        '<div class="stat-row"><span class="stat-row-label">' + t('ga_per_match') + '</span><span class="stat-row-value">' + ((s.g + s.a) / n).toFixed(1) + '</span></div>' +
+      '</div>' +
+      renderHomeAwaySection(filtered) +
+      renderTournamentSection(filtered) +
       '<div class="match-list-header">' + t('match_history') + '</div>' +
       renderMatchList(filtered, _matchPage);
   } else {
