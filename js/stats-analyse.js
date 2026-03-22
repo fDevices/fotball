@@ -118,6 +118,41 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
     return;
   }
 
+  var RATING_DIMS = [
+    { key: 'cat_overall',   field: 'rating_overall',   color: CHART_COLORS.lime,   dash: [],    width: 2,   defaultVisible: true },
+    { key: 'cat_effort',    field: 'rating_effort',    color: CHART_COLORS.gold,   dash: [4,3], width: 1.5, defaultVisible: true },
+    { key: 'cat_impact',    field: 'rating_impact',    color: CHART_COLORS.blue,   dash: [2,3], width: 1.5, defaultVisible: true },
+    { key: 'cat_focus',     field: 'rating_focus',     color: CHART_COLORS.purple, dash: [4,3], width: 1.5, defaultVisible: false },
+    { key: 'cat_technique', field: 'rating_technique', color: CHART_COLORS.danger, dash: [2,3], width: 1.5, defaultVisible: false },
+    { key: 'cat_team_play', field: 'rating_team_play', color: CHART_COLORS.teal,   dash: [4,3], width: 1.5, defaultVisible: false }
+  ];
+
+  var ratingMatches = asc.filter(function(k) {
+    return RATING_DIMS.some(function(d) { return k[d.field] != null; });
+  });
+  var ratingCardHTML = '';
+  if (ratingMatches.length > 0) {
+    var pillsHTML = RATING_DIMS.map(function(d, i) {
+      var on = d.defaultVisible;
+      var style = on
+        ? 'background:' + d.color + '22;border-color:' + d.color + '66;color:' + d.color
+        : '';
+      return '<button class="rating-pill' + (on ? ' rating-pill-on' : '') + '"' +
+        ' data-action="toggleRatingLine"' +
+        ' data-dataset-index="' + i + '"' +
+        ' data-color="' + d.color + '"' +
+        ' style="' + style + '">' +
+        t(d.key) +
+      '</button>';
+    }).join('');
+    ratingCardHTML =
+      '<div class="chart-card" id="chart-card-rating">' +
+        '<div class="chart-card-title">' + t('rating_trend_title') + '</div>' +
+        '<div class="chart-canvas-wrap"><canvas id="chart-rating" height="180"></canvas></div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">' + pillsHTML + '</div>' +
+      '</div>';
+  }
+
   container.innerHTML = selectorHTML +
     renderFormStreak(matches) +
     '<div class="chart-card" id="chart-card-winpct">' +
@@ -131,7 +166,8 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
     '<div class="chart-card" id="chart-card-tournament">' +
       '<div class="chart-card-title">' + t('chart_goals_tourn') + '</div>' +
       '<div class="chart-canvas-wrap" id="chart-tournament-wrap"><canvas id="chart-tournament"></canvas></div>' +
-    '</div>';
+    '</div>' +
+    ratingCardHTML;
 
   if (typeof Chart === 'undefined') {
     container.querySelectorAll('.chart-canvas-wrap').forEach(function(el) {
@@ -179,4 +215,41 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
     data: { labels: tournKeys, datasets: [{ label: t('stat_goals'), data: tournKeys.map(function(k) { return tournMap[k].g; }), backgroundColor: 'rgba(168,224,99,0.6)', borderColor: CHART_COLORS.lime, borderWidth: 1, borderRadius: 4 }, { label: t('stat_assists'), data: tournKeys.map(function(k) { return tournMap[k].a; }), backgroundColor: 'rgba(240,192,80,0.5)', borderColor: CHART_COLORS.gold, borderWidth: 1, borderRadius: 4 }] },
     options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Barlow Condensed', weight: '700' }, boxWidth: 12, padding: 12 } } }, scales: { x: { ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
   });
+
+  if (ratingMatches.length > 0 && document.getElementById('chart-rating')) {
+    var ratingLabels = asc.map(function(k) {
+      return fmtDate(k.date, { day: '2-digit', month: 'short' });
+    });
+
+    var ratingDatasets = RATING_DIMS.map(function(d) {
+      var data = asc.map(function(k) { return k[d.field] != null ? k[d.field] : null; });
+      return {
+        label: t(d.key),
+        data: data,
+        borderColor: d.color,
+        backgroundColor: 'transparent',
+        borderWidth: d.width,
+        borderDash: d.dash,
+        pointRadius: asc.length > 20 ? 0 : 3,
+        pointHoverRadius: 5,
+        pointBackgroundColor: d.color,
+        spanGaps: false,
+        hidden: !d.defaultVisible,
+        tension: 0.2
+      };
+    });
+
+    chartInstances['ratingTrend'] = new Chart(document.getElementById('chart-rating'), {
+      type: 'line',
+      data: { labels: ratingLabels, datasets: ratingDatasets },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } },
+          y: { min: 1, max: 5, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }
+        }
+      }
+    });
+  }
 }
