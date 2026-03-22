@@ -1,6 +1,6 @@
 import { fetchKamper } from './supabase.js';
 import { getAllMatches, setAllMatches } from './state.js';
-import { getSettings, getAllSeasons } from './settings.js';
+import { getSettings, getAllSeasons, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { t } from './i18n.js';
 import { esc, getResult, isDevPremium } from './utils.js';
@@ -78,6 +78,66 @@ function renderHomeAwaySection(matches) {
       cardHTML(t('stat_away'), awayMatches, 'away') +
     '</div>' +
   '</div>';
+}
+
+function renderMonthlyBreakdown(matches) {
+  var monthMap = {};
+  matches.forEach(function(k) {
+    var ym = (k.date || '').slice(0, 7);
+    if (!ym) return;
+    if (!monthMap[ym]) monthMap[ym] = [];
+    monthMap[ym].push(k);
+  });
+
+  var keys = Object.keys(monthMap).sort();
+  if (!keys.length) return '';
+
+  var multiYear = new Set(matches.map(function(k) { return (k.date || '').slice(0, 4); })).size > 1;
+
+  function monthLabel(ym) {
+    var d = new Date(ym + '-02');
+    var mon = d.toLocaleDateString(getDateLocale(), { month: 'short' });
+    if (multiYear) {
+      var yr = String(d.getFullYear()).slice(2);
+      return mon + ' ' + yr;
+    }
+    return mon;
+  }
+
+  var rows = keys.map(function(ym) {
+    var s = calcWDL(monthMap[ym]);
+    var pctW = Math.round((s.w / s.n) * 100);
+    var pctD = Math.round((s.d / s.n) * 100);
+    var pctL = 100 - pctW - pctD;
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
+      '<span style="font-size:10px;color:var(--muted);width:40px;flex-shrink:0">' + monthLabel(ym) + '</span>' +
+      '<div class="wdl-bar" style="flex:1;height:14px;margin-bottom:0">' +
+        '<div class="wdl-seg w" style="width:' + pctW + '%"></div>' +
+        '<div class="wdl-seg d" style="width:' + pctD + '%"></div>' +
+        '<div class="wdl-seg l" style="width:' + pctL + '%"></div>' +
+      '</div>' +
+      '<span style="font-size:9px;color:var(--lime);width:28px;text-align:right">\u26BD' + s.g + '</span>' +
+    '</div>';
+  }).join('');
+
+  var inner = '<div class="stat-row-card" style="margin-bottom:8px">' +
+    '<div class="stat-row-title">' + t('monthly_title') + '</div>' +
+    rows +
+  '</div>';
+
+  if (!isDevPremium()) {
+    return '<div class="chart-locked" style="margin-bottom:8px">' +
+      inner +
+      '<div class="chart-locked-overlay">' +
+        '<div class="chart-locked-icon">\u26A1</div>' +
+        '<div class="chart-locked-text">' + t('pro_feature') + '</div>' +
+        '<div class="chart-locked-sub">' + t('pro_upgrade_text') + '</div>' +
+        '<button class="chart-unlock-btn" data-action="showProToast">' + t('pro_unlock_btn') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return inner;
 }
 
 function renderHeadToHead(matches) {
@@ -473,6 +533,7 @@ export function renderStats() {
     renderPerformanceProfile(matches) +
     renderScoringStreaks(matches) +
     renderHeadToHead(matches) +
+    renderMonthlyBreakdown(matches) +
     '<div class="opponent-search-wrap">' +
       '<div class="match-list-header" style="margin-bottom:8px">' + t('match_history') + '</div>' +
       '<div class="opponent-search-field-wrap">' +
