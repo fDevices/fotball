@@ -378,6 +378,15 @@
       </div>
     </div>
 
+    <!-- Share statistics section -->
+    <div class="settings-section">
+      <div class="settings-section-title" id="st-share-title">Del statistikk</div>
+      <div class="settings-section-desc" id="st-share-desc">Del statistikken din med trener, foreldre eller speider via en lenke.</div>
+      <button class="settings-action-btn" data-action="openSharePanel" id="share-manage-btn">
+        Administrer delingslenker
+      </button>
+    </div>
+
     <button class="settings-logout-btn" data-action="logout" data-i18n="auth_logout">Log out</button>
 
     <div class="settings-spacer"></div>
@@ -526,6 +535,37 @@
   <div class="modal-actions">
     <button class="modal-del-btn" data-action="closeAssessmentSheet" id="assess-skip-btn"></button>
     <button class="modal-save-btn" data-action="saveAssessment" id="assess-save-btn"></button>
+  </div>
+</div>
+
+<!-- Share panel -->
+<div id="share-panel-backdrop" class="modal-backdrop"></div>
+<div id="share-panel" class="bottom-sheet" role="dialog" aria-modal="true" aria-label="Del statistikk">
+  <div class="sheet-header">
+    <span class="sheet-title" id="share-panel-title">Del statistikk</span>
+    <button class="sheet-close" data-action="closeSharePanel" aria-label="Lukk">×</button>
+  </div>
+  <div class="sheet-body">
+    <!-- Create new link form -->
+    <div class="share-create-form">
+      <input
+        type="text"
+        id="share-new-label"
+        class="settings-input"
+        maxlength="40"
+        placeholder="F.eks. Trener Hansen"
+        aria-label="Etikett"
+      />
+      <select id="share-new-expiry" class="settings-select">
+        <option value="30">30 dager</option>
+        <option value="90" selected>90 dager</option>
+        <option value="season">Slutten av aktiv sesong</option>
+        <option value="permanent">Permanent</option>
+      </select>
+      <button class="btn-primary" data-action="createShareToken">Opprett lenke</button>
+    </div>
+    <!-- Token list -->
+    <div id="share-panel-list"></div>
   </div>
 </div>
 

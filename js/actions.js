@@ -10,7 +10,8 @@ import { closeAssessmentSheet, saveAssessment, setRating } from './assessment.js
 import { exportCSV, exportPDF } from './export.js';
 import { setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason } from './settings-render.js';
 import { showToast } from './toast.js';
-import { logout } from './auth.js';
+import { logout, isAuthenticated } from './auth.js';
+import { openSharePanel, closeSharePanel, createShareToken, removeShareToken, copyShareLink } from './share-manage.js';
 import { openAuthOverlay, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
 
 export const WRITE_ACTIONS = new Set([
@@ -75,6 +76,17 @@ export const ACTIONS = {
   setRating:                     (e) => { var el = e.target.closest('[data-category]'); if (!el) return; setRating(el.dataset.category, Number(el.dataset.value), el.dataset.context); },
   triggerAvatarUpload:           () => { var i = document.getElementById('avatar-upload'); if (i) i.click(); },
   dismissProfilePrompt:          () => dismissProfilePrompt(),
+  openSharePanel:   function() {
+    if (!isAuthenticated()) {
+      document.dispatchEvent(new CustomEvent('athlytics:requireAuth'));
+      return;
+    }
+    openSharePanel();
+  },
+  closeSharePanel:  function() { closeSharePanel(); },
+  createShareToken: function() { createShareToken(); },
+  deleteShareToken: function(e) { var el = e.target.closest('[data-id]'); if (!el) return; removeShareToken(el.dataset.id); },
+  copyShareLink:    function(e) { var el = e.target.closest('[data-url]'); if (!el) return; copyShareLink(el.dataset.url); },
   logout:              () => logout(),
   openAuthOverlay:     () => openAuthOverlay('login'),
   dismissDemoBanner:   () => dismissDemoBanner(),
