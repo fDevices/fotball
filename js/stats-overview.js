@@ -80,6 +80,53 @@ function renderHomeAwaySection(matches) {
   '</div>';
 }
 
+function renderHeadToHead(matches) {
+  var oppMap = {};
+  matches.forEach(function(k) {
+    var name = k.opponent || '\u2014';
+    if (!oppMap[name]) oppMap[name] = [];
+    oppMap[name].push(k);
+  });
+
+  var opponents = Object.keys(oppMap).sort(function(a, b) {
+    var diff = oppMap[b].length - oppMap[a].length;
+    return diff !== 0 ? diff : a.localeCompare(b);
+  });
+
+  var rows = opponents.map(function(opp) {
+    var s = calcWDL(oppMap[opp]);
+    return '<div class="tournament-stat-row">' +
+      '<div class="tournament-stat-name">' + esc(opp) + ' <span style="color:var(--muted);font-size:11px;font-weight:400">(' + s.n + ')</span></div>' +
+      '<div class="tournament-stat-badges">' +
+        '<span class="t-badge win">' + s.w + t('win_short') + '</span>' +
+        '<span class="t-badge draw">' + s.d + t('draw_short') + '</span>' +
+        '<span class="t-badge loss">' + s.l + t('loss_short') + '</span>' +
+        '<span class="tournament-wdl-sep"></span>' +
+        '<span class="t-badge goals">\u26BD' + s.g + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var inner = '<div class="stat-row-card">' +
+    '<div class="stat-row-title">' + t('h2h_title') + '</div>' +
+    rows +
+  '</div>';
+
+  if (!isDevPremium()) {
+    return '<div class="chart-locked" style="margin-bottom:8px">' +
+      inner +
+      '<div class="chart-locked-overlay">' +
+        '<div class="chart-locked-icon">\u26A1</div>' +
+        '<div class="chart-locked-text">' + t('pro_feature') + '</div>' +
+        '<div class="chart-locked-sub">' + t('pro_upgrade_text') + '</div>' +
+        '<button class="chart-unlock-btn" data-action="showProToast">' + t('pro_unlock_btn') + '</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  return inner;
+}
+
 function calcStreaks(matches) {
   var sorted = matches.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
   var n = sorted.length;
@@ -425,6 +472,7 @@ export function renderStats() {
     renderTournamentSection(matches) +
     renderPerformanceProfile(matches) +
     renderScoringStreaks(matches) +
+    renderHeadToHead(matches) +
     '<div class="opponent-search-wrap">' +
       '<div class="match-list-header" style="margin-bottom:8px">' + t('match_history') + '</div>' +
       '<div class="opponent-search-field-wrap">' +
