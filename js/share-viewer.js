@@ -41,7 +41,7 @@ function showError(msg) {
 var _matches   = [];
 var _settings  = {};  // shape: { activeSeason, seasonFormat, sport }
 var _activeSeason     = '';
-var _activeLang        = 'all';
+var _activeTeam        = 'all';
 var _activeTournament = 'all';
 var _matchPage        = 0;
 var _activeView       = 'overview';
@@ -157,7 +157,7 @@ function renderStats() {
   });
   tournamentValues.sort(function(a, b) { if (!a) return 1; if (!b) return -1; return a.localeCompare(b); });
 
-  var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, _activeLang); });
+  var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, _activeTeam); });
   var filtered = _activeTournament === 'all'
     ? teamMatches
     : teamMatches.filter(function(k) { return (k.tournament || '') === _activeTournament; });
@@ -178,7 +178,7 @@ function renderStats() {
   var teamPills = [{ key: 'all', label: t('alle_lag') }]
     .concat(teamValues.map(function(v) { return { key: v, label: v }; }))
     .map(function(p) {
-      return '<button class="season-pill' + (_activeLang === p.key ? ' active' : '') +
+      return '<button class="season-pill' + (_activeTeam === p.key ? ' active' : '') +
         '" data-action="shareSetTeam" data-team="' + esc(p.key) + '">' + esc(p.label) + '</button>';
     }).join('');
 
@@ -364,10 +364,10 @@ document.addEventListener('click', function(e) {
 
   if (action === 'shareSetSeason') {
     _activeSeason = el.dataset.season;
-    _activeLang = 'all'; _activeTournament = 'all'; _matchPage = 0;
+    _activeTeam = 'all'; _activeTournament = 'all'; _matchPage = 0;
     _destroyCharts(); renderStats();
   } else if (action === 'shareSetTeam') {
-    _activeLang = el.dataset.team;
+    _activeTeam = el.dataset.team;
     _activeTournament = 'all'; _matchPage = 0;
     _destroyCharts(); renderStats();
   } else if (action === 'shareSetTournament') {
@@ -381,7 +381,7 @@ document.addEventListener('click', function(e) {
     // Init charts after DOM update
     if (_activeView === 'analyse') {
       var seasonMatches = _matches.filter(function(k) { return matchesSeason(k, _activeSeason); });
-      var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, _activeLang); });
+      var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, _activeTeam); });
       var filtered = _activeTournament === 'all' ? teamMatches : teamMatches.filter(function(k) { return (k.tournament||'') === _activeTournament; });
       setTimeout(function() { _initCharts(filtered); }, 50);
     }

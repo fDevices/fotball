@@ -19,7 +19,8 @@ export const WRITE_ACTIONS = new Set([
   'addTeamFromProfile', 'addTournament', 'deleteTeam', 'deleteTournament',
   'setFavoriteTeam', 'setFavoriteTournament', 'saveNewTeamFromDropdown',
   'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
-  'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF'
+  'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF',
+  'createShareToken', 'deleteShareToken'
 ]);
 
 export const ACTIONS = {
