@@ -91,11 +91,11 @@
       <div class="date-compact-row">
         <div class="date-left">
           <span class="date-compact-label" id="date-display-label">I dag</span>
-          <button class="date-toggle-btn" id="date-toggle-btn" title="Endre dato"><span class="match-svg-icon match-icon-date"></span></button>
+          <button type="button" class="date-toggle-btn" id="date-toggle-btn" title="Endre dato"><span class="match-svg-icon match-icon-date"></span></button>
         </div>
         <div class="match-type-mini-toggle">
-          <button class="match-type-mini-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="home"><span class="match-svg-icon match-icon-home"></span> <span>Hjemmekamp</span></button>
-          <button class="match-type-mini-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away"><span class="match-svg-icon match-icon-away"></span> <span>Bortekamp</span></button>
+          <button type="button" class="match-type-mini-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="home"><span class="match-svg-icon match-icon-home"></span> <span>Hjemmekamp</span></button>
+          <button type="button" class="match-type-mini-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away"><span class="match-svg-icon match-icon-away"></span> <span>Bortekamp</span></button>
         </div>
       </div>
       <input type="date" id="date" class="date-input-hidden">
@@ -118,7 +118,7 @@
           <div id="team-options-list"></div>
           <div class="team-new-row" id="team-new-row">
             <input class="team-new-input" id="team-new-input" placeholder="Navn på nytt team...">
-            <button class="team-new-save" id="team-new-save-btn" data-action="saveNewTeamFromDropdown">Legg til</button>
+            <button type="button" class="team-new-save" id="team-new-save-btn" data-action="saveNewTeamFromDropdown">Legg til</button>
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@
           <div id="tournament-options-list"></div>
           <div class="team-new-row" id="tournament-new-row">
             <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering...">
-            <button class="team-new-save" id="tournament-new-save-btn" data-action="saveNewTournamentFromDropdown">Legg til</button>
+            <button type="button" class="team-new-save" id="tournament-new-save-btn" data-action="saveNewTournamentFromDropdown">Legg til</button>
           </div>
         </div>
       </div>
@@ -150,15 +150,15 @@
       </div>
       <div class="score-row" role="group" aria-labelledby="label-home">
         <div class="number-control">
-          <button class="num-btn" data-action="adjust" data-type="home" data-delta="-1">−</button>
+          <button type="button" class="num-btn" data-action="adjust" data-type="home" data-delta="-1">−</button>
           <span class="num-display" id="home-display" aria-live="polite">0</span>
-          <button class="num-btn" data-action="adjust" data-type="home" data-delta="1">+</button>
+          <button type="button" class="num-btn" data-action="adjust" data-type="home" data-delta="1">+</button>
         </div>
         <span class="score-separator">–</span>
         <div class="number-control">
-          <button class="num-btn" data-action="adjust" data-type="away" data-delta="-1">−</button>
+          <button type="button" class="num-btn" data-action="adjust" data-type="away" data-delta="-1">−</button>
           <span class="num-display" id="away-display" aria-live="polite">0</span>
-          <button class="num-btn" data-action="adjust" data-type="away" data-delta="1">+</button>
+          <button type="button" class="num-btn" data-action="adjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
     </div>
@@ -172,17 +172,17 @@
         <div>
           <span class="num-label" id="label-goals">Mål</span>
           <div class="number-control">
-            <button class="num-btn" data-action="adjust" data-type="goals" data-delta="-1">−</button>
+            <button type="button" class="num-btn" data-action="adjust" data-type="goals" data-delta="-1">−</button>
             <span class="num-display" id="goals-display" aria-live="polite">0</span>
-            <button class="num-btn" data-action="adjust" data-type="goals" data-delta="1">+</button>
+            <button type="button" class="num-btn" data-action="adjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
         <div>
           <span class="num-label" id="label-assist">Assist</span>
           <div class="number-control">
-            <button class="num-btn" data-action="adjust" data-type="assist" data-delta="-1">−</button>
+            <button type="button" class="num-btn" data-action="adjust" data-type="assist" data-delta="-1">−</button>
             <span class="num-display" id="assist-display" aria-live="polite">0</span>
-            <button class="num-btn" data-action="adjust" data-type="assist" data-delta="1">+</button>
+            <button type="button" class="num-btn" data-action="adjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
       </div>
