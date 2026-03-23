@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-03-23 Stats desktop layout
+
+- Two-column Oversikt + Analyse layout at ≥900px
+- Tab bar stretches full width on desktop
+- Toggle hidden on desktop; both views always visible
+
+---
+
 ## [Unreleased]
 ### Changed
 - Stats Overview: Head-to-Head card replaced with opponent search — type to find an opponent and see W/D/L, goals scored/conceded inline
