@@ -58,11 +58,11 @@ export function renderFormStreak(matches) {
   '</div>';
 }
 
-export function renderAnalyse(matches, activeLag, activeSeason) {
-  destroyCharts();
+export function renderAnalyse(matches, activeLag, activeSeason, containerId, secondary) {
+  if (!secondary) destroyCharts();
   initChartDefaults();
 
-  var container = document.getElementById('stats-content');
+  var container = document.getElementById(containerId || 'stats-content');
   if (!container) return;
 
   var asc = matches.slice().sort(function(a, b) { return a.date < b.date ? -1 : 1; });
@@ -93,11 +93,13 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
 
   var n = matches.length;
   var teamText = lag === 'all' ? t('all_teams_subtitle') : lag;
-  var statsSubEl2 = document.getElementById('stats-sub');
-  if (statsSubEl2) statsSubEl2.textContent = n + ' ' + t('matches_short') + ' \xb7 ' + teamText;
+  if (!secondary) {
+    var statsSubEl2 = document.getElementById('stats-sub');
+    if (statsSubEl2) statsSubEl2.textContent = n + ' ' + t('matches_short') + ' \xb7 ' + teamText;
+  }
 
   if (!isDevPremium()) {
-    container.innerHTML = selectorHTML + renderFormStreak(matches) +
+    container.innerHTML = (secondary ? '' : selectorHTML) + renderFormStreak(matches) +
       '<div class="chart-locked">' +
         '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +
           '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
@@ -114,7 +116,7 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
   }
 
   if (n === 0) {
-    container.innerHTML = selectorHTML + '<div class="loading">' + t('no_matches_season') + '</div>';
+    container.innerHTML = (secondary ? '' : selectorHTML) + '<div class="loading">' + t('no_matches_season') + '</div>';
     return;
   }
 
@@ -153,7 +155,7 @@ export function renderAnalyse(matches, activeLag, activeSeason) {
       '</div>';
   }
 
-  container.innerHTML = selectorHTML +
+  container.innerHTML = (secondary ? '' : selectorHTML) +
     renderFormStreak(matches) +
     '<div class="chart-card" id="chart-card-winpct">' +
       '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
