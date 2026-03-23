@@ -587,13 +587,13 @@ export function renderStats() {
     renderHeadToHead(matches) +
     renderMonthlyBreakdown(matches) +
     '<div class="opponent-search-wrap">' +
-      '<div class="match-list-header" style="margin-bottom:8px">' + t('match_history') + '</div>' +
       '<div class="opponent-search-field-wrap">' +
         '<span class="opponent-search-icon">\u{1F50D}</span>' +
         '<input type="text" id="opponent-search-input" class="opponent-search-input" placeholder="' + t('opponent_search_ph') + '" value="' + esc(opponentSearch) + '" data-action="setOpponentSearch" />' +
         (opponentSearch ? '<button class="opponent-search-clear" data-action="clearOpponentSearch">\u2715</button>' : '') +
       '</div>' +
     '</div>' +
+    '<div class="match-list-header">' + t('match_history') + '</div>' +
     renderMatchListPaged(matches, matchPage);
   if (isDesktop) {
     renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
