@@ -584,8 +584,8 @@ export function renderStats() {
     renderTournamentSection(matches) +
     renderPerformanceProfile(matches) +
     renderScoringStreaks(matches) +
-    renderHeadToHead(matches) +
     renderMonthlyBreakdown(matches) +
+    renderHeadToHead(matches) +
     '<div class="opponent-search-wrap">' +
       '<div class="opponent-search-field-wrap">' +
         '<span class="opponent-search-icon">\u{1F50D}</span>' +
