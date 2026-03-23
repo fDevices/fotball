@@ -4,7 +4,7 @@ import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDro
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { clampStats } from './utils.js';
-import { getDateLocale } from './settings.js';
+import { getDateLocale, getSettings } from './settings.js';
 
 var goals = 0, assist = 0, home = 0, away = 0, matchType = 'home';
 
@@ -106,7 +106,7 @@ export async function saveMatch() {
       resetForm();
       // Assessment sheet only opens if Supabase returns the inserted row (Prefer: return=representation).
       // If the response body is empty, the sheet is silently skipped — match was still saved successfully.
-      if (newMatches && newMatches[0] && newMatches[0].id) {
+      if (newMatches && newMatches[0] && newMatches[0].id && getSettings().assessmentEnabled) {
         document.dispatchEvent(new CustomEvent('athlytics:showAssessment', { detail: { matchId: newMatches[0].id } }));
       }
     } else {
