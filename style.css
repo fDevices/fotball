@@ -979,6 +979,11 @@
   #stats-view-toggle {
     display: none;
   }
+
+  /* Push filter pills to the right */
+  .stats-body .season-selector {
+    justify-content: flex-end;
+  }
 }
 
 .share-error-screen {
