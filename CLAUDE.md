@@ -364,7 +364,7 @@ I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-co
 ### Avatar upload
 Avatar-circle bruker `data-action="triggerAvatarUpload"` → ACTIONS-map kaller `#avatar-upload.click()`. Avatar-input bruker `data-action="uploadImage"` → delegert `change`-event i `main.js`. Ingen `onclick`/`onchange`-attributter og ingen `window._uploadImage` global.
 
-`uploadImage()` lagrer fortsatt base64 for **alle** brukere på `main`. Supabase Storage-implementasjon ligger i `feature/avatar-storage` (ikke merget).
+`uploadImage()` bruker Supabase Storage for autentiserte brukere og base64 for demo-brukere. Merget fra `feature/avatar-storage` 2026-03-21.
 
 ---
 
@@ -406,11 +406,13 @@ Appen er portrait-only. Landscape viser en overlay: "Roter telefonen til ståend
 - Threshold `max-height: 600px` unngår at overlayden vises på desktop-browsere i smalt vindu
 
 ### Desktop (Fase 3/4)
-Desktop-versjon venter til Fase 3/4. Bruksmønster:
-- **Mobil** – logging av kamper, rask sjekk av enkeltstatistikk
-- **Desktop** – full analyse, større grafer, coach/admin-visning
+Stats-tab har responsivt to-kolonne layout på desktop (≥900px): Oversikt + Analyse vises side om side, tab-bar strekker seg full bredde, toggle er skjult. Implementert 2026-03-23.
 
-Desktop kobles naturlig til **Club-planen** (Fase 4). Ved implementering: sidebar-nav istedet for tab-bar, to-kolonne stats-layout, grafer med mer plass og detalj.
+Gjenstående desktop-arbeid venter til Fase 3/4:
+- **Mobil** – logging av kamper, rask sjekk av enkeltstatistikk
+- **Desktop** – sidebar-nav istedet for tab-bar, coach/admin-visning
+
+Desktop kobles naturlig til **Club-planen** (Fase 4).
 
 ---
 
