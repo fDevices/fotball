@@ -980,12 +980,9 @@
     display: none;
   }
 
-  /* Push filter pills to the right, matching column padding */
+  /* Align filter pills with column padding */
   #stats-filters {
     padding: 0 20px;
-  }
-  .stats-body .season-selector {
-    justify-content: flex-end;
   }
 }
 
