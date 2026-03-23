@@ -14,7 +14,7 @@ Add a toggle in the Settings tab that lets users enable or disable the post-matc
 ## Data
 
 - Add `assessmentEnabled: false` to `defaultSettings()` in `settings.js`
-- Validate in `saveSettings()`: must be boolean, defaults to `false` if invalid
+- Validate in `saveSettings()` with: `if (typeof safe.assessmentEnabled !== 'boolean') safe.assessmentEnabled = false;`
 - Stored in localStorage only (no Supabase sync — same tier as `dateFormat` and `extraSeasons`)
 
 ---
@@ -33,28 +33,33 @@ if (getSettings().assessmentEnabled) {
 
 ## Settings UI
 
-New section in `app.html` settings tab, following the existing section pattern:
+New `settings-section` in `app.html` settings tab. Uses the same structure as other settings sections. The `export-premium-badge` class is reused for the premium badge (already styled, acceptable reuse within a `settings-section`):
 
 ```html
 <div class="settings-section">
   <div class="settings-section-title" id="st-assess-title">
-    ⭐ <span id="st-assess-title-text">Selvvurdering</span>
+    <span id="st-assess-title-text">⭐ Selvvurdering</span>
     <span class="export-premium-badge">⭐ Premium</span>
   </div>
-  <div class="settings-desc" id="st-assess-desc">...</div>
+  <div class="settings-desc" id="st-assess-desc">Vis selvvurderingsskjema etter hver kamp.</div>
   <div class="settings-options" id="settings-assess-options"></div>
 </div>
 ```
 
-- Pills rendered by `renderSettings()` using the same On/Off pattern as EU/US date format pills
-- If `!isDevPremium()`: pills rendered with a disabled/lock state (non-interactive, grayed out) — same visual lock approach used in the assessment sheet overlay
+Pills rendered by `renderSettings()` using the same On/Off pattern as EU/US date format pills:
+- `data-action="setAssessmentEnabled"` with `data-value="true"` / `data-value="false"`
+- If `!isDevPremium()`: pills rendered with `disabled` attribute and `opacity: 0.4` inline style (non-interactive, grayed out) — no click handler attached
 
 ---
 
-## New function: `setAssessmentEnabled(val)`
+## `settings-render.js`
 
-In `settings-render.js`:
+**Import addition** — add `isDevPremium` to the existing `utils.js` import:
+```js
+import { isDevPremium } from './utils.js';
+```
 
+**New function:**
 ```js
 export function setAssessmentEnabled(val) {
   if (!isDevPremium()) return; // premium gate
@@ -66,17 +71,50 @@ export function setAssessmentEnabled(val) {
 }
 ```
 
+**In `renderSettings()`** — add a block to render the On/Off pills in `#settings-assess-options`, after the existing `dfEl` date-format block:
+```js
+var assessEl = document.getElementById('settings-assess-options');
+if (assessEl) {
+  assessEl.innerHTML = '';
+  [{ val: true, label: t('on') }, { val: false, label: t('off') }].forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'settings-pill' + (s.assessmentEnabled === opt.val ? ' active' : '');
+    btn.textContent = opt.label;
+    if (isDevPremium()) {
+      btn.dataset.action = 'setAssessmentEnabled';
+      btn.dataset.value = String(opt.val);
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.4';
+    }
+    assessEl.appendChild(btn);
+  });
+}
+```
+
+Also add i18n text refresh in `renderSettings()` (alongside existing `st-*` title/desc updates):
+```js
+var stAssessTitle = document.getElementById('st-assess-title-text');
+if (stAssessTitle) stAssessTitle.textContent = '⭐ ' + t('assess_toggle_title');
+var stAssessDesc = document.getElementById('st-assess-desc');
+if (stAssessDesc) stAssessDesc.textContent = t('assess_toggle_desc');
+```
+
 ---
 
-## Actions
+## `actions.js`
 
-In `actions.js`:
+**Import addition** — add `setAssessmentEnabled` to the existing `settings-render.js` import line:
+```js
+import { setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, setAssessmentEnabled } from './settings-render.js';
+```
 
-- Add `setAssessmentEnabled` to `WRITE_ACTIONS` set (consistent with other settings actions)
-- Add to `ACTIONS` map:
-  ```js
-  setAssessmentEnabled: (e) => { var el = e.target.closest('[data-value]'); if (!el) return; setAssessmentEnabled(el.dataset.value === 'true'); }
-  ```
+**WRITE_ACTIONS** — add `'setAssessmentEnabled'` to the set.
+
+**ACTIONS map** — add:
+```js
+setAssessmentEnabled: (e) => { var el = e.target.closest('[data-value]'); if (!el) return; setAssessmentEnabled(el.dataset.value === 'true'); },
+```
 
 ---
 
@@ -90,6 +128,10 @@ New keys in both `no` and `en`:
 | `assess_toggle_desc` | `Vis selvvurderingsskjema etter hver kamp.` | `Show self-assessment sheet after each match.` |
 | `toast_assess_on` | `✓ Selvvurdering aktivert` | `✓ Self-assessment enabled` |
 | `toast_assess_off` | `✓ Selvvurdering deaktivert` | `✓ Self-assessment disabled` |
+| `on` | `På` | `On` |
+| `off` | `Av` | `Off` |
+
+> Note: check if `on`/`off` keys already exist in `i18n.js` before adding.
 
 ---
 
@@ -97,12 +139,12 @@ New keys in both `no` and `en`:
 
 | File | Change |
 |------|--------|
-| `js/settings.js` | Add `assessmentEnabled: false` to `defaultSettings()`, validate in `saveSettings()` |
-| `js/settings-render.js` | Add `setAssessmentEnabled()`, render new section in `renderSettings()` |
-| `js/actions.js` | Add `setAssessmentEnabled` to ACTIONS and WRITE_ACTIONS |
-| `js/log.js` | Gate `athlytics:showAssessment` dispatch behind `assessmentEnabled` |
-| `js/i18n.js` | Add 4 new keys in `no` and `en` |
-| `app.html` | New settings section HTML |
+| `js/settings.js` | Add `assessmentEnabled: false` to `defaultSettings()`, add boolean type-guard in `saveSettings()` |
+| `js/settings-render.js` | Import `isDevPremium` from `utils.js`; add `setAssessmentEnabled()`; add section rendering in `renderSettings()` |
+| `js/actions.js` | Import `setAssessmentEnabled` from `settings-render.js`; add to ACTIONS map and WRITE_ACTIONS |
+| `js/log.js` | Gate `athlytics:showAssessment` dispatch behind `getSettings().assessmentEnabled` |
+| `js/i18n.js` | Add up to 6 new keys in `no` and `en` (check for existing `on`/`off`) |
+| `app.html` | New `settings-section` HTML for the toggle |
 
 ---
 
