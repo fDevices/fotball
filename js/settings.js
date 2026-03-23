@@ -30,6 +30,8 @@ export function saveSettings(s) {
 }
 
 async function saveSettingsToSupabase(s) {
+  // Note: assessmentEnabled, dateFormat, and extraSeasons are intentionally localStorage-only.
+  // They do not need cross-device sync and require no DB columns.
   try {
     await upsertSettings({
       id: getUserId(),
