@@ -8,7 +8,7 @@ import { adjust, saveMatch, setMatchType } from './log.js';
 import { openEditModal, closeModal, setModalMatchType, modalAdjust, saveEditedMatch, deleteMatch, cancelDeleteMatch, confirmDeleteMatch } from './modal.js';
 import { closeAssessmentSheet, saveAssessment, setRating } from './assessment.js';
 import { exportCSV, exportPDF } from './export.js';
-import { setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason } from './settings-render.js';
+import { setSport, setSeasonFormat, setDateFormat, setActiveSeason, addSeason, setAssessmentEnabled } from './settings-render.js';
 import { showToast } from './toast.js';
 import { logout, isAuthenticated } from './auth.js';
 import { openSharePanel, closeSharePanel, createShareToken, removeShareToken, copyShareLink } from './share-manage.js';
@@ -20,7 +20,7 @@ export const WRITE_ACTIONS = new Set([
   'addTeamFromProfile', 'addTournament', 'deleteTeam', 'deleteTournament',
   'setFavoriteTeam', 'setFavoriteTournament', 'saveNewTeamFromDropdown',
   'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
-  'setDateFormat', 'setActiveSeason', 'saveAssessment', 'exportCSV', 'exportPDF',
+  'setDateFormat', 'setActiveSeason', 'setAssessmentEnabled', 'saveAssessment', 'exportCSV', 'exportPDF',
   'createShareToken', 'deleteShareToken'
 ]);
 
@@ -72,6 +72,7 @@ export const ACTIONS = {
   setSeasonFormat:               (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setSeasonFormat(el.dataset.format); },
   setDateFormat:                 (e) => { var el = e.target.closest('[data-format]'); if (!el) return; setDateFormat(el.dataset.format); },
   setActiveSeason:               (e) => { var el = e.target.closest('[data-season]'); if (!el) return; setActiveSeason(el.dataset.season); },
+  setAssessmentEnabled:          (e) => { var el = e.target.closest('[data-value]'); if (!el) return; setAssessmentEnabled(el.dataset.value === 'true'); },
   showProToast:                  () => showToast('Coming soon – Stripe i Fase 4 🚀', 'success'),
   closeAssessmentSheet:          () => closeAssessmentSheet(),
   saveAssessment:                () => saveAssessment(),
