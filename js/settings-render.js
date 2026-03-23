@@ -1,5 +1,6 @@
 import { getSettings, saveSettings, getAllSeasons } from './settings.js';
 import { getAllMatches } from './state.js';
+import { isDevPremium } from './utils.js';
 
 const ALLOWED_SPORTS = ['fotball', 'orientering', 'ski'];
 
@@ -42,6 +43,10 @@ export function renderSettings() {
   if (stAsTitle) stAsTitle.textContent = t('as_title');
   var stAsDesc = document.getElementById('st-as-desc');
   if (stAsDesc) stAsDesc.textContent = t('as_desc');
+  var stAssessTitle = document.getElementById('st-assess-title-text');
+  if (stAssessTitle) stAssessTitle.textContent = '⭐ ' + t('assess_toggle_title');
+  var stAssessDesc = document.getElementById('st-assess-desc');
+  if (stAssessDesc) stAssessDesc.textContent = t('assess_toggle_desc');
   var addSeasonBtn = document.getElementById('settings-add-season-btn');
   if (addSeasonBtn) addSeasonBtn.textContent = '+ ' + t('add_item');
   var langEl = document.getElementById('settings-lang-options');
@@ -95,6 +100,24 @@ export function renderSettings() {
       btn.dataset.action = 'setDateFormat';
       btn.dataset.format = f.key;
       dfEl.appendChild(btn);
+    });
+  }
+
+  var assessEl = document.getElementById('settings-assess-options');
+  if (assessEl) {
+    assessEl.innerHTML = '';
+    [{ val: true, label: t('on') }, { val: false, label: t('off') }].forEach(function(opt) {
+      var btn = document.createElement('button');
+      btn.className = 'settings-pill' + (s.assessmentEnabled === opt.val ? ' active' : '');
+      btn.textContent = opt.label;
+      if (isDevPremium()) {
+        btn.dataset.action = 'setAssessmentEnabled';
+        btn.dataset.value = String(opt.val);
+      } else {
+        btn.disabled = true;
+        btn.style.opacity = '0.4';
+      }
+      assessEl.appendChild(btn);
     });
   }
 
@@ -175,4 +198,13 @@ export function addSeason() {
   input.value = '';
   renderActiveSeasonPills();
   showToast(t('toast_season_added'), 'success');
+}
+
+export function setAssessmentEnabled(val) {
+  if (!isDevPremium()) return;
+  var s = getSettings();
+  s.assessmentEnabled = val;
+  saveSettings(s);
+  renderSettings();
+  showToast(val ? t('toast_assess_on') : t('toast_assess_off'), 'success');
 }
