@@ -5,7 +5,7 @@ import { upsertSettings } from './supabase.js';
 var _settingsCache = null;
 
 export function defaultSettings() {
-  return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu' };
+  return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu', assessmentEnabled: false };
 }
 
 export function getSettings() {
@@ -23,6 +23,7 @@ export function saveSettings(s) {
   if (!Array.isArray(safe.extraSeasons)) safe.extraSeasons = [];
   if (typeof safe.activeSeason !== 'string') safe.activeSeason = '';
   if (!['eu', 'us'].includes(safe.dateFormat)) safe.dateFormat = 'eu';
+  if (typeof safe.assessmentEnabled !== 'boolean') safe.assessmentEnabled = false;
   _settingsCache = safe;
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(safe));
   saveSettingsToSupabase(safe);
