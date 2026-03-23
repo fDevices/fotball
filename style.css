@@ -940,6 +940,45 @@
     grid-template-columns: 1fr 1fr;
     gap: 0 20px;
   }
+
+  /* Stats screen breaks out of 480px cap */
+  #screen-stats {
+    max-width: none;
+  }
+
+  /* Tab bar stretches to full width */
+  .tab-bar {
+    max-width: none;
+  }
+
+  /* Remove .stats-body horizontal padding — columns control their own */
+  #screen-stats .stats-body {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Two-column grid */
+  #stats-desktop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Oversikt column */
+  #stats-content {
+    border-right: 1px solid var(--border);
+    padding: 0 20px 40px;
+  }
+
+  /* Analyse column — empty on mobile, shown on desktop */
+  #stats-content-analyse {
+    display: block;
+    padding: 0 20px 40px;
+  }
+
+  /* Toggle hidden — both views always shown on desktop */
+  #stats-view-toggle {
+    display: none;
+  }
 }
 
 .share-error-screen {
