@@ -589,7 +589,7 @@ export function renderStats() {
     '<div class="opponent-search-wrap">' +
       '<div class="opponent-search-field-wrap">' +
         '<span class="opponent-search-icon">\u{1F50D}</span>' +
-        '<input type="text" id="opponent-search-input" class="opponent-search-input" placeholder="' + t('opponent_search_ph') + '" value="' + esc(opponentSearch) + '" data-action="setOpponentSearch" />' +
+        '<input type="text" id="opponent-search-input" class="opponent-search-input" placeholder="' + t('opponent_search_ph') + '" value="' + esc(opponentSearch) + '" />' +
         (opponentSearch ? '<button class="opponent-search-clear" data-action="clearOpponentSearch">\u2715</button>' : '') +
       '</div>' +
     '</div>' +

@@ -63,7 +63,6 @@ export const ACTIONS = {
   setTeamFilter:                 (e) => { var el = e.target.closest('[data-team]'); if (!el) return; setTeamFilter(el.dataset.team); },
   setTournamentFilter:           (e) => { var el = e.target.closest('[data-tournament]'); if (!el) return; setTournamentFilter(el.dataset.tournament); },
   setMatchPage:                  (e) => { var el = e.target.closest('[data-page]'); if (!el) return; setMatchPage(Number(el.dataset.page)); },
-  setOpponentSearch:             (e) => setOpponentSearch(e.target.value),
   clearOpponentSearch:           () => { var i = document.getElementById('opponent-search-input'); if (i) i.value = ''; setOpponentSearch(''); },
   exportCSV:                     () => exportCSV(),
   exportPDF:                     () => exportPDF(),
