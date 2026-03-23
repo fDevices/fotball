@@ -636,4 +636,9 @@ export function setOpponentSearch(val) {
   }
 }
 
-export function setH2hSearch(v) { h2hSearch = v; renderStats(); }
+export function setH2hSearch(v) {
+  h2hSearch = v;
+  renderStats();
+  var input = document.getElementById('h2h-search-input');
+  if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
+}
