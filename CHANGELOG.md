@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-03-27
+### Changed
+- Settings: Norwegian enum values renamed to English (`'fotball'`→`'football'`, `'aar'`→`'year'`, `'sesong'`→`'season'`) — includes Supabase SQL migration + localStorage boot migration
+- supabase.js: Norwegian function names renamed to English (`fetchKamper`→`fetchMatches`, `insertKamp`→`insertMatch`, etc.), dead `fetchSettings` deleted
+- Dropdowns: arrow key and Escape keyboard navigation for all four team/tournament dropdowns
+
+---
+
 ## 2026-03-23 Stats desktop layout
 
 - Two-column Oversikt + Analyse layout at ≥900px

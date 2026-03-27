@@ -43,7 +43,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 |---|---|---|
 | Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | ✅ Ferdig — `<main>`, `<section aria-label>`, `<form novalidate>` implementert 2026-03-21 |
 | Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | ✅ Ferdig — ARIA + fokusstyring (save/restore/trap) på alle fire modaler 2026-03-21 |
-| Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | ✅ Delvis ferdig — ARIA (combobox/listbox/option + aria-expanded/aria-selected) implementert 2026-03-21. Keyboard nav (piltaster) utsatt til Fase 3/4 desktop-pass. |
+| Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | ✅ Ferdig — keyboard nav (arrow keys, Enter, Escape) implementert 2026-03-27 |
 
 > Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
 >
@@ -63,14 +63,14 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | Settings er en del av profilraden; vurder rename ved Fase 4-refaktorering |
+| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | ✅ Ferdig — renamed to English (fetchMatches, upsertProfile, etc.) 2026-03-27 |
 | `fetchKamper()` sender ingen user_id-filter i query-strengen | 🟡 Merknad | Riktig arkitektur — klient-side filter er unødvendig når RLS er korrekt konfigurert. **Konsekvens:** datakorrekthet og personvern avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. |
 
 ### settings.js
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | Disse lekker inn i validering, tema-valg og DB-data. Rename krever migrering av eksisterende data; vurder i Fase 3. |
+| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | ✅ Ferdig — renamed to English + localStorage + Supabase migration 2026-03-27 |
 
 ### app.html
 
