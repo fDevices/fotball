@@ -12,15 +12,15 @@ function headers(extra) {
 
 // ── Matches ──────────────────────────────────────────────────────────────────
 
-export async function fetchKamper() {
+export async function fetchMatches() {
   var res = await fetch(SUPABASE_URL + '/rest/v1/matches?select=*&order=date.desc', {
     headers: headers()
   });
-  if (!res.ok) throw new Error('fetchKamper failed: ' + res.status);
+  if (!res.ok) throw new Error('fetchMatches failed: ' + res.status);
   return res.json();
 }
 
-export async function insertKamp(body) {
+export async function insertMatch(body) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/matches', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' }),
@@ -29,7 +29,7 @@ export async function insertKamp(body) {
   return res;
 }
 
-export async function updateKamp(id, body) {
+export async function updateMatch(id, body) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/matches?id=eq.' + id, {
     method: 'PATCH',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }),
@@ -38,7 +38,7 @@ export async function updateKamp(id, body) {
   return res;
 }
 
-export async function deleteKamp(id) {
+export async function deleteMatch(id) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/matches?id=eq.' + id, {
     method: 'DELETE',
     headers: headers()
@@ -48,22 +48,22 @@ export async function deleteKamp(id) {
 
 // ── Profile ──────────────────────────────────────────────────────────────────
 
-export async function fetchProfil(userId) {
+export async function fetchProfile(userId) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=*', {
     headers: headers()
   });
-  if (!res.ok) throw new Error('fetchProfil failed: ' + res.status);
+  if (!res.ok) throw new Error('fetchProfile failed: ' + res.status);
   var data = await res.json();
   return (data && data[0]) ? data[0] : null;
 }
 
-export async function upsertProfil(body) {
+export async function upsertProfile(body) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error('upsertProfil failed: ' + res.status);
+  if (!res.ok) throw new Error('upsertProfile failed: ' + res.status);
 }
 
 export async function uploadAvatar(userId, blob) {
@@ -79,22 +79,13 @@ export async function uploadAvatar(userId, blob) {
 
 // ── Settings ─────────────────────────────────────────────────────────────────
 
-export async function fetchSettings(userId) {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId + '&select=sport,season_format,active_season,lang', {
-    headers: headers()
-  });
-  if (!res.ok) throw new Error('fetchSettings failed: ' + res.status);
-  var data = await res.json();
-  return (data && data[0]) ? data[0] : null;
-}
-
-export async function upsertSettings(body) {
+export async function upsertProfileSettings(body) {
   var res = await fetch(SUPABASE_URL + '/rest/v1/profiles', {
     method: 'POST',
     headers: headers({ 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' }),
     body: JSON.stringify(body)
   });
-  if (!res.ok) throw new Error('upsertSettings failed: ' + res.status);
+  if (!res.ok) throw new Error('upsertProfileSettings failed: ' + res.status);
 }
 
 // ── Share tokens ─────────────────────────────────────────────────────────────
