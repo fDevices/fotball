@@ -70,7 +70,7 @@ Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før app
 
 | Problem | Alvorlighet | Løsning |
 |---|---|---|
-| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | ✅ Ferdig — renamed to English + localStorage + Supabase migration 2026-03-27 |
+| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | ✅ Ferdig — renamed to English + localStorage boot migration 2026-03-27. Supabase-rader verifisert tomme (COUNT=0), ingen SQL-migrasjon nødvendig. |
 
 ### app.html
 

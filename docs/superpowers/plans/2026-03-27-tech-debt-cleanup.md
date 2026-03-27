@@ -33,17 +33,9 @@
 
 ---
 
-## ⚠️ Pre-deploy: Run SQL migration first
+## ✅ Pre-deploy SQL migration — verified not needed
 
-Before deploying any code from Task 1, run these three statements in the Supabase SQL editor (Dashboard → SQL Editor):
-
-```sql
-UPDATE profiles SET sport = 'football' WHERE sport = 'fotball';
-UPDATE profiles SET season_format = 'year' WHERE season_format = 'aar';
-UPDATE profiles SET season_format = 'season' WHERE season_format = 'sesong';
-```
-
-Deploy Task 1 code immediately after. Do not leave a window where the SQL has run but old code is still live (both directions are safe — the code handles migration in both localStorage and the new defaults).
+The following SQL was prepared but verified unnecessary on 2026-03-27: `SELECT COUNT(*) FROM profiles WHERE sport = 'fotball' OR season_format IN ('aar', 'sesong')` returned **0**. No rows needed migrating. The localStorage boot migration in `migrateSettings()` remains in place for any edge cases.
 
 ---
 
