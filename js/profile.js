@@ -74,7 +74,7 @@ export async function fetchProfileFromSupabase() {
       };
       // Legacy cleanup: clear base64 avatars stored before Storage migration.
       // saveProfile_local inside the if-block fires immediately (so cache is clean
-      // even if the upsertProfil network call below fails). The saveProfile_local
+      // even if the upsertProfile network call below fails). The saveProfile_local
       // outside the if-block is the normal-path save — both are intentional.
       if (isAuthenticated() && p.avatar && p.avatar.startsWith('data:')) {
         p.avatar = '';
