@@ -60,7 +60,37 @@ function setupEventDelegation() {
 
   // Keydown: Enter for add-item inputs
   document.addEventListener('keydown', function(e) {
+    var openDd = document.querySelector('.team-dropdown.open');
+
+    // Arrow nav and Escape for open dropdowns
+    if (openDd && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault();
+      var opts = Array.from(openDd.querySelectorAll('.team-option'));
+      var cur = openDd.querySelector('.team-option.dropdown-highlight');
+      var idx = cur ? opts.indexOf(cur) : -1;
+      if (cur) cur.classList.remove('dropdown-highlight');
+      idx = e.key === 'ArrowDown' ? (idx + 1) % opts.length : (idx - 1 + opts.length) % opts.length;
+      opts[idx].classList.add('dropdown-highlight');
+      opts[idx].scrollIntoView({ block: 'nearest' });
+      return;
+    }
+
+    if (openDd && e.key === 'Escape') {
+      e.preventDefault();
+      closeAllDropdowns();
+      return;
+    }
+
     if (e.key !== 'Enter') return;
+
+    // Enter: select highlighted dropdown option first
+    var highlighted = document.querySelector('.team-dropdown.open .team-option.dropdown-highlight');
+    if (highlighted) {
+      e.preventDefault();
+      highlighted.click();
+      return;
+    }
+
     if (!isAuthenticated()) {
       var writeInputIds = ['team-new-input', 'tournament-new-input', 'profile-team-input', 'profile-new-tournament', 'settings-new-season'];
       if (writeInputIds.includes(e.target.id)) {
