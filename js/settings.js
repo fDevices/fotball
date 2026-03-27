@@ -5,21 +5,28 @@ import { upsertSettings } from './supabase.js';
 var _settingsCache = null;
 
 export function defaultSettings() {
-  return { sport: 'fotball', seasonFormat: 'aar', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu', assessmentEnabled: false };
+  return { sport: 'football', seasonFormat: 'year', activeSeason: '', lang: 'no', extraSeasons: [], dateFormat: 'eu', assessmentEnabled: false };
+}
+
+function migrateSettings(s) {
+  if (s.sport === 'fotball') s.sport = 'football';
+  if (s.seasonFormat === 'aar') s.seasonFormat = 'year';
+  if (s.seasonFormat === 'sesong') s.seasonFormat = 'season';
+  return s;
 }
 
 export function getSettings() {
   if (_settingsCache) return _settingsCache;
-  try { _settingsCache = JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaultSettings(); }
+  try { _settingsCache = migrateSettings(JSON.parse(localStorage.getItem(SETTINGS_KEY)) || defaultSettings()); }
   catch(e) { _settingsCache = defaultSettings(); }
   return _settingsCache;
 }
 
 export function saveSettings(s) {
-  var safe = Object.assign({}, defaultSettings(), s);
+  var safe = Object.assign({}, defaultSettings(), migrateSettings(s));
   if (!['no', 'en'].includes(safe.lang)) safe.lang = 'no';
-  if (!['aar', 'sesong'].includes(safe.seasonFormat)) safe.seasonFormat = 'aar';
-  if (!['fotball', 'orientering', 'ski'].includes(safe.sport)) safe.sport = 'fotball';
+  if (!['year', 'season'].includes(safe.seasonFormat)) safe.seasonFormat = 'year';
+  if (!['football', 'orientering', 'ski'].includes(safe.sport)) safe.sport = 'football';
   if (!Array.isArray(safe.extraSeasons)) safe.extraSeasons = [];
   if (typeof safe.activeSeason !== 'string') safe.activeSeason = '';
   if (!['eu', 'us'].includes(safe.dateFormat)) safe.dateFormat = 'eu';
@@ -44,10 +51,10 @@ async function saveSettingsToSupabase(s) {
   } catch(e) { console.warn('saveSettingsToSupabase failed:', e); }
 }
 
-export function buildSeasonLabel(aar, format) {
-  if (!aar) return '';
-  if (format === 'sesong') { var y = parseInt(aar); return y + '\u2013' + (y + 1); }
-  return String(aar);
+export function buildSeasonLabel(year, format) {
+  if (!year) return '';
+  if (format === 'season') { var y = parseInt(year); return y + '\u2013' + (y + 1); }
+  return String(year);
 }
 
 export function getDateLocale() {
@@ -56,20 +63,20 @@ export function getDateLocale() {
 
 export function getAllSeasons(allMatches) {
   var s = getSettings();
-  var ekstra = s.extraSeasons || [];
+  var extra = s.extraSeasons || [];
   var fromMatches = [];
   if (allMatches) {
     allMatches.forEach(function(k) {
-      var aar = k.date ? k.date.substring(0, 4) : null;
-      if (aar && !fromMatches.includes(aar)) fromMatches.push(aar);
+      var year = k.date ? k.date.substring(0, 4) : null;
+      if (year && !fromMatches.includes(year)) fromMatches.push(year);
     });
   }
-  var sett = [];
-  fromMatches.concat(ekstra).forEach(function(aar) {
-    var label = buildSeasonLabel(aar, s.seasonFormat);
-    if (!sett.includes(label)) sett.push(label);
+  var seasons = [];
+  fromMatches.concat(extra).forEach(function(year) {
+    var label = buildSeasonLabel(year, s.seasonFormat);
+    if (!seasons.includes(label)) seasons.push(label);
   });
-  return sett.sort(function(a, b) { return parseInt(a) - parseInt(b); });
+  return seasons.sort(function(a, b) { return parseInt(a) - parseInt(b); });
 }
 
 export function requestRenderSettings() {
