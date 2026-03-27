@@ -9,10 +9,11 @@ export function defaultSettings() {
 }
 
 function migrateSettings(s) {
-  if (s.sport === 'fotball') s.sport = 'football';
-  if (s.seasonFormat === 'aar') s.seasonFormat = 'year';
-  if (s.seasonFormat === 'sesong') s.seasonFormat = 'season';
-  return s;
+  var out = Object.assign({}, s);
+  if (out.sport === 'fotball') out.sport = 'football';
+  if (out.seasonFormat === 'aar') out.seasonFormat = 'year';
+  if (out.seasonFormat === 'sesong') out.seasonFormat = 'season';
+  return out;
 }
 
 export function getSettings() {
