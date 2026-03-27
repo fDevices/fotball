@@ -62,7 +62,7 @@ function setupEventDelegation() {
   document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
     if (!isAuthenticated()) {
-      var writeInputIds = ['team-new-input', 'tournament-new-input', 'profile-team-input', 'profile-new-tournament', 'settings-ny-sesong'];
+      var writeInputIds = ['team-new-input', 'tournament-new-input', 'profile-team-input', 'profile-new-tournament', 'settings-new-season'];
       if (writeInputIds.includes(e.target.id)) {
         document.dispatchEvent(new CustomEvent('athlytics:requireAuth'));
         return;
@@ -72,7 +72,7 @@ function setupEventDelegation() {
     if (e.target.id === 'tournament-new-input') saveNewTournamentFromDropdown();
     if (e.target.id === 'profile-team-input') addTeamFromProfile();
     if (e.target.id === 'profile-new-tournament') addTournament();
-    if (e.target.id === 'settings-ny-sesong') addSeason();
+    if (e.target.id === 'settings-new-season') addSeason();
   });
 
   // Form submit

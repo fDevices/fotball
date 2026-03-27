@@ -36,7 +36,7 @@ export function updateAllText() {
   var ph = {
     'opponent': 'ph_opponent',
     'profil-name': 'ph_navn', 'profil-club': 'ph_klubb', 'profil-posisjon': 'ph_posisjon',
-    'profile-new-tournament': 'ph_add_tournament', 'profile-team-input': 'ph_add_team', 'settings-ny-sesong': 'ph_new_season',
+    'profile-new-tournament': 'ph_add_tournament', 'profile-team-input': 'ph_add_team', 'settings-new-season': 'ph_new_season',
     'team-new-input': 'ph_new_team', 'tournament-new-input': 'ph_new_tournament'
   };
   Object.keys(ph).forEach(function(id) {

@@ -507,8 +507,8 @@ async function init() {
   _matches = matchData || [];
   _settings = {
     activeSeason:  profileData.active_season || String(new Date().getFullYear()),
-    seasonFormat:  profileData.season_format || 'aar',
-    sport:         profileData.sport || 'fotball'
+    seasonFormat:  profileData.season_format || 'year',
+    sport:         profileData.sport || 'football'
   };
   _activeSeason = _settings.activeSeason;
 
