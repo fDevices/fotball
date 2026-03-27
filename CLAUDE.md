@@ -8,7 +8,7 @@
 
 - **Les alltid prosjektfilene ved oppstart** av nye samtaler før du gjør endringer.
 - Prosjektet er splittet i moduler: `app.html`, `style.css`, og `js/`-mappen (se filstruktur nedenfor).
-- **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`). **Unntak:** interne enum-verdier i settings (`'fotball'`, `'aar'`, `'sesong'`) er norske av historiske årsaker og lagres i DB – ikke rename uten datamigrasjon.
+- **All koding skal være på engelsk** – variabelnavn, funksjonsnavn, ID-er, CSS-klasser, kommentarer, Supabase-kolonnenavn, localStorage-nøkler og kode-konstanter. Norsk tekst er OK kun i UI-strenger som vises til bruker (via `t()` i `i18n.js`).
 - **Etter hver fullført oppgave:** oppdater relevante gjeldsposter i `CLAUDE.md` (merk som ✅ Ferdig eller slett hvis utdatert), legg til en kort post i `CHANGELOG.md`, og commit. Vurder om informasjon i `CLAUDE.md` heller bør flyttes til `docs/changelog.md` eller slettes helt når den ikke lenger er relevant som arbeidsreferanse.
 
 ---
@@ -291,8 +291,6 @@ sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/dele
 All kode bruker engelsk for variabelnavn, funksjonsnavn, ID-er, CSS-klasser og Supabase-kolonnenavn – med ett kjent unntak:
 - `teams` (JS) ↔ `team` (DB) — én kjent mapping, se profiles-kontrakten
 
-**Unntak: norske interne enum-verdier.** Deler av settings-laget bruker norske domeneverdier internt: `sport: 'fotball'`, `seasonFormat: 'aar' | 'sesong'`, og DOM-ID-er som `settings-sesong-options`. Disse lagres i localStorage og Supabase og er **ikke** UI-strenger. Rename krever datamigrasjon. Se gjeldstabell i settings.js-seksjonen.
-
 | JS-variabel | Supabase-kolonne |
 |---|---|
 | `k.date` | `date` |
@@ -422,7 +420,7 @@ Desktop kobles naturlig til **Club-planen** (Fase 4).
 
 ```javascript
 const THEMES = {
-  fotball:     { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
+  football:    { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
   orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
   ski:         { grass: '#1a1a3a', lime: '#a0a8e0', card: '#161628' }
 };
