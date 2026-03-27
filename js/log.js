@@ -1,4 +1,4 @@
-import { insertKamp } from './supabase.js';
+import { insertMatch } from './supabase.js';
 import { getAllMatches, setAllMatches, invalidateMatchCache } from './state.js';
 import { getSelectedTeam, getSelectedTournament, selectTournament, renderTeamDropdown } from './teams.js';
 import { t } from './i18n.js';
@@ -84,7 +84,7 @@ export async function saveMatch() {
   var btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = t('saving');
   try {
-    var res = await insertKamp({
+    var res = await insertMatch({
       date:       date,
       opponent:   opponent,
       own_team:   team,

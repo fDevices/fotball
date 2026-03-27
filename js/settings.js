@@ -1,6 +1,6 @@
 import { SETTINGS_KEY } from './config.js';
 import { getUserId } from './auth.js';
-import { upsertSettings } from './supabase.js';
+import { upsertProfileSettings } from './supabase.js';
 
 var _settingsCache = null;
 
@@ -41,7 +41,7 @@ async function saveSettingsToSupabase(s) {
   // Note: assessmentEnabled, dateFormat, and extraSeasons are intentionally localStorage-only.
   // They do not need cross-device sync and require no DB columns.
   try {
-    await upsertSettings({
+    await upsertProfileSettings({
       id: getUserId(),
       sport: s.sport,
       season_format: s.seasonFormat,

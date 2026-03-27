@@ -1,5 +1,5 @@
 import { getAllMatches } from './state.js';
-import { fetchKamper } from './supabase.js';
+import { fetchMatches } from './supabase.js';
 import { getSettings, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
@@ -9,7 +9,7 @@ import { t } from './i18n.js';
 async function getMatchesForExport() {
   if (getAllMatches().length > 0) return getAllMatches();
   try {
-    return await fetchKamper();
+    return await fetchMatches();
   } catch(e) { return []; }
 }
 

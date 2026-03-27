@@ -1,4 +1,4 @@
-import { updateKamp } from './supabase.js';
+import { updateMatch } from './supabase.js';
 import { getAllMatches, setAllMatches } from './state.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
@@ -224,7 +224,7 @@ export async function saveAssessment() {
   var saveBtn = document.getElementById('assess-save-btn');
   if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = t('saving'); }
   try {
-    var res = await updateKamp(_matchId, payload);
+    var res = await updateMatch(_matchId, payload);
     if (res.ok) {
       // Update the match in-memory so edit modal and stats immediately reflect saved data
       var current = getAllMatches();

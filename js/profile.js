@@ -1,6 +1,6 @@
 import { PROFIL_KEY } from './config.js';
 import { getUserId, isAuthenticated } from './auth.js';
-import { fetchProfil, upsertProfil, uploadAvatar } from './supabase.js';
+import { fetchProfile, upsertProfile, uploadAvatar } from './supabase.js';
 import { t } from './i18n.js';
 import { showToast } from './toast.js';
 import { getSettings } from './settings.js';
@@ -61,7 +61,7 @@ export function saveProfile_local(profil) {
 
 export async function fetchProfileFromSupabase() {
   try {
-    var row = await fetchProfil(getUserId());
+    var row = await fetchProfile(getUserId());
     if (row) {
       var p = {
         name: row.name || '',
@@ -79,7 +79,7 @@ export async function fetchProfileFromSupabase() {
       if (isAuthenticated() && p.avatar && p.avatar.startsWith('data:')) {
         p.avatar = '';
         saveProfile_local(p);
-        upsertProfil({ id: getUserId(), avatar_url: '' }).catch(function() {});
+        upsertProfile({ id: getUserId(), avatar_url: '' }).catch(function() {});
       }
       saveProfile_local(p);
       return p;
@@ -90,7 +90,7 @@ export async function fetchProfileFromSupabase() {
 
 export async function saveProfileToSupabase(profil) {
   try {
-    await upsertProfil({
+    await upsertProfile({
       id: getUserId(),
       name: profil.name,
       club: profil.club,

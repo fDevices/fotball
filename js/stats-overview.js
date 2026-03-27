@@ -1,4 +1,4 @@
-import { fetchKamper } from './supabase.js';
+import { fetchMatches } from './supabase.js';
 import { getAllMatches, setAllMatches } from './state.js';
 import { getSettings, getAllSeasons, getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
@@ -469,7 +469,7 @@ export async function loadStats(forceRefresh) {
   var el = document.getElementById('stats-content');
   if (el) el.innerHTML = '<div class="loading"><div class="spinner"></div>' + t('loading_stats') + '</div>';
   try {
-    var data = await fetchKamper();
+    var data = await fetchMatches();
     setAllMatches(data);
     renderStats();
   } catch(e) {
