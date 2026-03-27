@@ -365,6 +365,9 @@ export function toggleModalTournamentDropdown() {
 }
 
 export function closeAllDropdowns() {
+  document.querySelectorAll('.team-option.dropdown-highlight').forEach(function(el) {
+    el.classList.remove('dropdown-highlight');
+  });
   var tdd = document.getElementById('tournament-dropdown');
   if (tdd) tdd.classList.remove('open');
   var tchev = document.getElementById('tournament-chevron');
