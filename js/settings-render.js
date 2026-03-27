@@ -2,16 +2,16 @@ import { getSettings, saveSettings, getAllSeasons } from './settings.js';
 import { getAllMatches } from './state.js';
 import { isDevPremium } from './utils.js';
 
-const ALLOWED_SPORTS = ['fotball', 'orientering', 'ski'];
+const ALLOWED_SPORTS = ['football', 'orientering', 'ski'];
 
 const THEMES = {
-  fotball:     { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
+  football:    { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
   orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
   ski:         { grass: '#1a1a3a', lime: '#a0a8e0', card: '#161628' }
 };
 
 export function applyTheme(sport) {
-  var th = THEMES[sport] || THEMES.fotball;
+  var th = THEMES[sport] || THEMES.football;
   Object.keys(th).forEach(function(k) {
     document.documentElement.style.setProperty('--' + k, th[k]);
   });
@@ -65,7 +65,7 @@ export function renderSettings() {
   var sportEl = document.getElementById('settings-sport-options');
   if (sportEl) {
     sportEl.innerHTML = '';
-    [{ key: 'fotball', label: t('sport_fotball'), soon: false }, { key: 'orientering', label: t('sport_ori'), soon: true }, { key: 'ski', label: t('sport_ski'), soon: true }].forEach(function(sp) {
+    [{ key: 'football', label: t('sport_fotball'), soon: false }, { key: 'orientering', label: t('sport_ori'), soon: true }, { key: 'ski', label: t('sport_ski'), soon: true }].forEach(function(sp) {
       var btn = document.createElement('button');
       btn.className = 'settings-pill' + (sp.soon ? ' soon' : '') + (s.sport === sp.key ? ' active' : '');
       btn.innerHTML = sp.label + (sp.soon ? ' <span style="font-size:10px">(' + t('snart') + ')</span>' : '');
@@ -77,10 +77,10 @@ export function renderSettings() {
     });
   }
 
-  var sfEl = document.getElementById('settings-sesong-options');
+  var sfEl = document.getElementById('settings-season-format-options');
   if (sfEl) {
     sfEl.innerHTML = '';
-    [{ key: 'aar', label: t('format_aar') }, { key: 'sesong', label: t('format_season') }].forEach(function(f) {
+    [{ key: 'year', label: t('format_aar') }, { key: 'season', label: t('format_season') }].forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'settings-pill' + (s.seasonFormat === f.key ? ' active' : '');
       btn.textContent = f.label;
@@ -136,19 +136,19 @@ export function renderSettings() {
 export function renderActiveSeasonPills() {
   var s = getSettings();
   var seasons = getAllSeasons(getAllMatches());
-  var el = document.getElementById('settings-aktiv-sesong-options');
+  var el = document.getElementById('settings-active-season-options');
   if (!el) return;
   el.innerHTML = '';
   if (seasons.length === 0) {
     el.innerHTML = '<span style="font-size:13px;color:var(--muted)">' + t('no_seasons') + '</span>';
     return;
   }
-  seasons.forEach(function(sesong) {
+  seasons.forEach(function(season) {
     var btn = document.createElement('button');
-    btn.className = 'settings-pill' + (s.activeSeason === sesong ? ' active' : '');
-    btn.textContent = sesong;
+    btn.className = 'settings-pill' + (s.activeSeason === season ? ' active' : '');
+    btn.textContent = season;
     btn.dataset.action = 'setActiveSeason';
-    btn.dataset.season = sesong;
+    btn.dataset.season = season;
     el.appendChild(btn);
   });
 }
@@ -177,9 +177,9 @@ export function setSeasonFormat(format) {
   updateLogBadge();
 }
 
-export function setActiveSeason(sesong) {
+export function setActiveSeason(season) {
   var s = getSettings();
-  s.activeSeason = (s.activeSeason === sesong) ? '' : sesong;
+  s.activeSeason = (s.activeSeason === season) ? '' : season;
   saveSettings(s);
   renderActiveSeasonPills();
   updateLogBadge();
@@ -187,7 +187,7 @@ export function setActiveSeason(sesong) {
 }
 
 export function addSeason() {
-  var input = document.getElementById('settings-ny-sesong');
+  var input = document.getElementById('settings-new-season');
   var val = input.value.trim().replace(/[^0-9]/g, '');
   if (!val || val.length !== 4 || !/^\d{4}$/.test(val)) { showToast(t('toast_ugyldig_aar'), 'error'); return; }
   var s = getSettings();
