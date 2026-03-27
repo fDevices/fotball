@@ -66,6 +66,7 @@ function setupEventDelegation() {
     if (openDd && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       e.preventDefault();
       var opts = Array.from(openDd.querySelectorAll('.team-option'));
+      if (!opts.length) return;
       var cur = openDd.querySelector('.team-option.dropdown-highlight');
       var idx = cur ? opts.indexOf(cur) : -1;
       if (cur) cur.classList.remove('dropdown-highlight');
