@@ -277,9 +277,9 @@
   .match-result.loss      { background: rgba(224,85,85,0.2); color: var(--danger); }
   .match-info { flex: 1; min-width: 0; }
   .match-title-row { display: flex; align-items: baseline; gap: 6px; overflow: hidden; }
-  .match-opponent { font-size: 15px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; }
-  .match-team-name { font-size: 15px; font-weight: 500; color: var(--white); white-space: nowrap; flex-shrink: 0; }
-  .match-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .match-opponent { font-size: 15px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 2; min-width: 0; }
+  .match-team-name { font-size: 15px; font-weight: 500; color: var(--white); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 1; min-width: 0; }
+  .match-meta { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .match-score { font-family: 'Barlow Condensed',sans-serif; font-size: 20px; font-weight: 800; color: var(--white); flex-shrink: 0; }
   .match-edit-icon { color: var(--muted); font-size: 14px; flex-shrink: 0; }
 
@@ -959,10 +959,10 @@
     padding-right: 0;
   }
 
-  /* Two-column grid */
+  /* Two-column grid — overview gets more space for match history */
   #stats-desktop-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 1fr;
   }
 
   /* Oversikt column */
@@ -971,11 +971,18 @@
     padding: 0 20px 40px;
   }
 
-  /* Analyse column — empty on mobile, shown on desktop */
+  /* Analyse column — sticky on desktop so charts stay visible while scrolling match history */
   #stats-content-analyse {
     display: block;
     padding: 0 20px 40px;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    max-height: calc(100vh - var(--tab-h));
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  #stats-content-analyse::-webkit-scrollbar { display: none; }
 
   /* Toggle hidden — both views always shown on desktop */
   #stats-view-toggle {
@@ -991,6 +998,12 @@
   .match-list-grid {
     grid-template-columns: 1fr 1fr;
     gap: 0 12px;
+  }
+}
+
+@media (min-width: 1300px) {
+  #screen-stats .match-list-grid {
+    grid-template-columns: 1fr 1fr 1fr;
   }
 }
 
