@@ -96,6 +96,7 @@ export async function confirmDeleteMatches() {
       detail: { msg: t('danger_toast_matches_deleted'), type: 'success' }
     }));
     _resetPanel('matches');
+    document.dispatchEvent(new CustomEvent('athlytics:matchesChanged'));
   } catch(err) {
     document.dispatchEvent(new CustomEvent('athlytics:toast', {
       detail: { msg: t('toast_share_error'), type: 'error' }
