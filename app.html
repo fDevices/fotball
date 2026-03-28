@@ -406,29 +406,29 @@
       <div class="export-title" id="st-danger-title">Danger zone</div>
 
       <div class="danger-item">
-        <button class="danger-btn danger-btn--outline" data-action="toggleDangerPanel" data-type="matches" id="danger-btn-matches">
+        <button type="button" class="danger-btn danger-btn--outline" data-action="toggleDangerPanel" data-type="matches" id="danger-btn-matches">
           Delete match history
         </button>
         <div class="danger-panel" id="danger-panel-matches" hidden>
           <p class="danger-warn" id="danger-warn-matches">This will permanently delete all your match data.</p>
-          <input type="text" class="danger-input" id="danger-input-matches" data-action="dangerInput" data-danger-type="matches" placeholder='type "delete matches" to confirm' autocomplete="off">
+          <input type="text" class="danger-input" id="danger-input-matches" data-action="dangerInput" data-danger-type="matches" placeholder='type "delete matches" to confirm' autocomplete="off" aria-label="Confirmation phrase — type delete matches">
           <div class="danger-panel-actions">
-            <button class="danger-confirm-btn" id="danger-confirm-matches" data-action="confirmDeleteMatches" disabled>Confirm</button>
-            <button class="danger-cancel-link" data-action="toggleDangerPanel" data-type="matches" id="danger-cancel-matches">Cancel</button>
+            <button type="button" class="danger-confirm-btn" id="danger-confirm-matches" data-action="confirmDeleteMatches" disabled>Confirm</button>
+            <button type="button" class="danger-cancel-link" data-action="toggleDangerPanel" data-type="matches" id="danger-cancel-matches">Cancel</button>
           </div>
         </div>
       </div>
 
       <div class="danger-item">
-        <button class="danger-btn danger-btn--solid" data-action="toggleDangerPanel" data-type="account" id="danger-btn-account">
+        <button type="button" class="danger-btn danger-btn--solid" data-action="toggleDangerPanel" data-type="account" id="danger-btn-account">
           Delete account
         </button>
         <div class="danger-panel" id="danger-panel-account" hidden>
           <p class="danger-warn" id="danger-warn-account">This will permanently delete all your data and your account. This cannot be undone.</p>
-          <input type="text" class="danger-input" id="danger-input-account" data-action="dangerInput" data-danger-type="account" placeholder='type "delete my account" to confirm' autocomplete="off">
+          <input type="text" class="danger-input" id="danger-input-account" data-action="dangerInput" data-danger-type="account" placeholder='type "delete my account" to confirm' autocomplete="off" aria-label="Confirmation phrase — type delete my account">
           <div class="danger-panel-actions">
-            <button class="danger-confirm-btn" id="danger-confirm-account" data-action="confirmDeleteAccount" disabled>Confirm</button>
-            <button class="danger-cancel-link" data-action="toggleDangerPanel" data-type="account" id="danger-cancel-account">Cancel</button>
+            <button type="button" class="danger-confirm-btn" id="danger-confirm-account" data-action="confirmDeleteAccount" disabled>Confirm</button>
+            <button type="button" class="danger-cancel-link" data-action="toggleDangerPanel" data-type="account" id="danger-cancel-account">Cancel</button>
           </div>
         </div>
       </div>
