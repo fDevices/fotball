@@ -17,7 +17,10 @@ function _refreshText() {
   if (btnMatches) btnMatches.textContent = t('danger_delete_matches_btn');
 
   var inputMatches = document.getElementById('danger-input-matches');
-  if (inputMatches) inputMatches.placeholder = t('danger_phrase_matches_placeholder');
+  if (inputMatches) {
+    inputMatches.placeholder = t('danger_phrase_matches_placeholder');
+    inputMatches.setAttribute('aria-label', t('danger_phrase_matches_placeholder'));
+  }
 
   var cancelMatches = document.getElementById('danger-cancel-matches');
   if (cancelMatches) cancelMatches.textContent = t('danger_cancel');
@@ -32,7 +35,10 @@ function _refreshText() {
   if (btnAccount) btnAccount.textContent = t('danger_delete_account_btn');
 
   var inputAccount = document.getElementById('danger-input-account');
-  if (inputAccount) inputAccount.placeholder = t('danger_phrase_account_placeholder');
+  if (inputAccount) {
+    inputAccount.placeholder = t('danger_phrase_account_placeholder');
+    inputAccount.setAttribute('aria-label', t('danger_phrase_account_placeholder'));
+  }
 
   var cancelAccount = document.getElementById('danger-cancel-account');
   if (cancelAccount) cancelAccount.textContent = t('danger_cancel');
@@ -99,7 +105,7 @@ export async function confirmDeleteMatches() {
     document.dispatchEvent(new CustomEvent('athlytics:matchesChanged'));
   } catch(err) {
     document.dispatchEvent(new CustomEvent('athlytics:toast', {
-      detail: { msg: t('toast_share_error'), type: 'error' }
+      detail: { msg: t('danger_toast_error'), type: 'error' }
     }));
     if (btn) btn.disabled = false;
   }
@@ -125,7 +131,7 @@ export async function confirmDeleteAccount() {
     window.location.reload();
   } catch(err) {
     document.dispatchEvent(new CustomEvent('athlytics:toast', {
-      detail: { msg: t('toast_share_error'), type: 'error' }
+      detail: { msg: t('danger_toast_error'), type: 'error' }
     }));
     if (btn) btn.disabled = false;
   }

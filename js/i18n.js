@@ -164,7 +164,7 @@ const TEKST = {
     danger_phrase_account:'slett kontoen min',
     danger_phrase_account_placeholder:'skriv \u201eslett kontoen min\u201f for \u00e5 bekrefte',
     danger_toast_matches_deleted:'\u2713 Kamphistorikk slettet',
-    danger_toast_account_deleted:'\u2713 Konto slettet',
+    danger_toast_error:'Noe gikk galt. Prøv igjen.',
     danger_cancel:'Avbryt',
     danger_confirm:'Bekreft',
   },
@@ -322,7 +322,7 @@ const TEKST = {
     danger_phrase_account:'delete my account',
     danger_phrase_account_placeholder:'type \u201cdelete my account\u201d to confirm',
     danger_toast_matches_deleted:'\u2713 Match history deleted',
-    danger_toast_account_deleted:'\u2713 Account deleted',
+    danger_toast_error:'Something went wrong. Try again.',
     danger_cancel:'Cancel',
     danger_confirm:'Confirm',
   }
