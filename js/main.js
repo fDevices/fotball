@@ -12,6 +12,7 @@ import { showToast } from './toast.js';
 import { restoreSession, isAuthenticated } from './auth.js';
 import { openAuthOverlay, updateDemoBanner } from './auth-ui.js';
 import { ACTIONS, WRITE_ACTIONS } from './actions.js';
+import { onDangerInput } from './danger.js';
 
 function setupEventDelegation() {
   document.addEventListener('click', function(e) {
@@ -42,6 +43,9 @@ function setupEventDelegation() {
     }
     if (e.target.dataset && e.target.dataset.action === 'updateAvatar') {
       updateAvatar();
+    }
+    if (e.target.dataset && e.target.dataset.action === 'dangerInput') {
+      onDangerInput(e.target.dataset.dangerType);
     }
   });
 

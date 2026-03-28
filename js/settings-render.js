@@ -1,4 +1,5 @@
 import { getSettings, saveSettings, getAllSeasons } from './settings.js';
+import { initDangerZone } from './danger.js';
 import { getAllMatches } from './state.js';
 import { isDevPremium } from './utils.js';
 
@@ -131,6 +132,7 @@ export function renderSettings() {
   if (sharePanelTitle) sharePanelTitle.textContent = t('share_panel_title');
 
   renderActiveSeasonPills();
+  initDangerZone();
 }
 
 export function renderActiveSeasonPills() {

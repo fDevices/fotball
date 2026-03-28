@@ -14,6 +14,7 @@ import { logout, isAuthenticated } from './auth.js';
 import { openSharePanel, closeSharePanel, createShareToken, removeShareToken, copyShareLink } from './share-manage.js';
 import { openAuthOverlay, dismissDemoBanner, toggleAuthView, handleAuthLogin, handleAuthSignup } from './auth-ui.js';
 import { getChartInstance } from './stats-analyse.js';
+import { toggleDangerPanel, confirmDeleteMatches, confirmDeleteAccount } from './danger.js';
 
 export const WRITE_ACTIONS = new Set([
   'saveMatch', 'saveProfile', 'saveEditedMatch', 'confirmDeleteMatch',
@@ -21,7 +22,8 @@ export const WRITE_ACTIONS = new Set([
   'setFavoriteTeam', 'setFavoriteTournament', 'saveNewTeamFromDropdown',
   'saveNewTournamentFromDropdown', 'addSeason', 'setSport', 'setSeasonFormat',
   'setDateFormat', 'setActiveSeason', 'setAssessmentEnabled', 'saveAssessment', 'exportCSV', 'exportPDF',
-  'createShareToken', 'deleteShareToken'
+  'createShareToken', 'deleteShareToken',
+  'confirmDeleteMatches', 'confirmDeleteAccount',
 ]);
 
 export const ACTIONS = {
@@ -106,4 +108,7 @@ export const ACTIONS = {
   authToggleView:      () => toggleAuthView(),
   authLogin:           () => handleAuthLogin(),
   authSignup:          () => handleAuthSignup(),
+  toggleDangerPanel:    (e) => { var el = e.target.closest('[data-type]'); if (!el) return; toggleDangerPanel(el.dataset.type); },
+  confirmDeleteMatches: () => confirmDeleteMatches(),
+  confirmDeleteAccount: () => confirmDeleteAccount(),
 };
