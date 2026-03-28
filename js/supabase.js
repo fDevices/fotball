@@ -52,6 +52,7 @@ export async function deleteAllMatches() {
     headers: headers()
   });
   if (!res.ok) throw new Error('deleteAllMatches failed: ' + res.status);
+  return res;
 }
 
 // ── Profile ──────────────────────────────────────────────────────────────────
