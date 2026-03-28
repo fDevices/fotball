@@ -103,6 +103,7 @@ export async function deleteProfile(userId) {
     headers: headers()
   });
   if (!res.ok) throw new Error('deleteProfile failed: ' + res.status);
+  return res;
 }
 
 // ── Share tokens ─────────────────────────────────────────────────────────────
@@ -139,4 +140,5 @@ export async function deleteAllShareTokens() {
     headers: headers()
   });
   if (!res.ok) throw new Error('deleteAllShareTokens failed: ' + res.status);
+  return res;
 }
