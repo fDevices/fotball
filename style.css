@@ -664,6 +664,89 @@
 .auth-error.hidden { display: none; }
 .auth-view.hidden { display: none; }
 
+/* ── Danger zone (in Settings tab) ──────────────────────────────────── */
+.danger-zone { margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(224,85,85,0.2); }
+.danger-zone .export-title { color: var(--danger); margin-bottom: 16px; }
+.danger-item { margin-bottom: 12px; }
+.danger-btn {
+  display: block;
+  width: 100%;
+  border-radius: 10px;
+  padding: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.danger-btn--outline {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+.danger-btn--outline:hover { background: rgba(224,85,85,0.08); }
+.danger-btn--solid {
+  background: rgba(224,85,85,0.15);
+  border: 1px solid var(--danger);
+  color: var(--danger);
+}
+.danger-btn--solid:hover { background: rgba(224,85,85,0.25); }
+.danger-panel {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(224,85,85,0.06);
+  border: 1px solid rgba(224,85,85,0.2);
+}
+.danger-warn {
+  font-size: 13px;
+  color: var(--danger);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+.danger-input {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(224,85,85,0.3);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--white);
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+}
+.danger-input:focus { border-color: var(--danger); }
+.danger-input::placeholder { color: var(--muted); }
+.danger-panel-actions { display: flex; align-items: center; gap: 16px; }
+.danger-confirm-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: var(--danger);
+  border: none;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.danger-confirm-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.danger-confirm-btn:not(:disabled):hover { opacity: 0.85; }
+.danger-cancel-link {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.danger-cancel-link:hover { color: var(--white); }
+
 /* ── Logout button (in Settings tab) ─────────────────────────────────── */
 .settings-logout-btn {
   display: block;
