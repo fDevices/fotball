@@ -15,12 +15,14 @@ Deno.serve(async (req: Request) => {
     return new Response('Unauthorized', { status: 401, headers: corsHeaders })
   }
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  if (!supabaseUrl || !serviceRoleKey) {
+    return new Response('Server misconfiguration', { status: 500, headers: corsHeaders })
+  }
 
   // Verify caller identity via their JWT
-  const userClient = createClient(supabaseUrl, anonKey, {
+  const userClient = createClient(supabaseUrl, '', {
     global: { headers: { Authorization: authHeader } }
   })
   const { data: { user }, error: userError } = await userClient.auth.getUser()
