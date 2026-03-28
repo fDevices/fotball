@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-03-28 — Danger zone
+
+- Settings: "Danger zone" section added (visible for authenticated users only)
+- **Delete match history** — inline confirm panel, typed phrase gate (`delete matches` / `slett kamper`), purges all matches from Supabase, invalidates cache + triggers stats re-render
+- **Delete account** — inline confirm panel, typed phrase gate (`delete my account` / `slett kontoen min`), purges matches + share_tokens + profile, deletes auth user via Supabase Edge Function, reloads to auth screen
+- New module: `js/danger.js`
+- New Edge Function: `supabase/functions/delete-account/` (deploy: `supabase functions deploy delete-account`)
+
+---
+
 ## 2026-03-27
 ### Changed
 - Settings: Norwegian enum values renamed to English (`'fotball'`→`'football'`, `'aar'`→`'year'`, `'sesong'`→`'season'`) — includes Supabase SQL migration + localStorage boot migration
