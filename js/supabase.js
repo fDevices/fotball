@@ -46,6 +46,14 @@ export async function deleteMatch(id) {
   return res;
 }
 
+export async function deleteAllMatches() {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/matches', {
+    method: 'DELETE',
+    headers: headers()
+  });
+  if (!res.ok) throw new Error('deleteAllMatches failed: ' + res.status);
+}
+
 // ── Profile ──────────────────────────────────────────────────────────────────
 
 export async function fetchProfile(userId) {
@@ -88,6 +96,14 @@ export async function upsertProfileSettings(body) {
   if (!res.ok) throw new Error('upsertProfileSettings failed: ' + res.status);
 }
 
+export async function deleteProfile(userId) {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?id=eq.' + userId, {
+    method: 'DELETE',
+    headers: headers()
+  });
+  if (!res.ok) throw new Error('deleteProfile failed: ' + res.status);
+}
+
 // ── Share tokens ─────────────────────────────────────────────────────────────
 
 export async function fetchShareTokens() {
@@ -114,4 +130,12 @@ export async function deleteShareToken(id) {
     headers: headers()
   });
   return res;
+}
+
+export async function deleteAllShareTokens() {
+  var res = await fetch(SUPABASE_URL + '/rest/v1/share_tokens', {
+    method: 'DELETE',
+    headers: headers()
+  });
+  if (!res.ok) throw new Error('deleteAllShareTokens failed: ' + res.status);
 }
