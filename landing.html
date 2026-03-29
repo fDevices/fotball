@@ -436,8 +436,9 @@
     var _authFocusSrc = null;
 
     function openLandingAuth(tab) {
-      _authFocusSrc = document.activeElement;
       var overlay = document.getElementById('landing-auth-overlay');
+      if (!overlay.classList.contains('hidden')) return;
+      _authFocusSrc = document.activeElement;
       overlay.classList.remove('hidden');
       showLandingTab(tab || 'login');
       document.addEventListener('keydown', _trapModalFocus);
@@ -605,6 +606,7 @@
 
     document.getElementById('landing-auth-overlay').addEventListener('keydown', function(e) {
       if (e.key !== 'Enter') return;
+      if (e.target.tagName === 'BUTTON') return;
       var loginHidden = document.getElementById('landing-login-view').classList.contains('hidden');
       if (!loginHidden) handleLandingLogin();
       else handleLandingSignup();
