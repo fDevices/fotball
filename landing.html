@@ -387,6 +387,16 @@
           }
         }
       });
+      // Translate new auth elements
+      var loginBtn = document.getElementById('nav-login-btn');
+      if (loginBtn) loginBtn.textContent = lang === 'no' ? 'Logg inn' : 'Log in';
+
+      // Re-render modal title/tabs if modal is currently open
+      var overlay = document.getElementById('landing-auth-overlay');
+      if (overlay && !overlay.classList.contains('hidden')) {
+        var activeTab = document.querySelector('.landing-auth-tab.active');
+        if (activeTab) showLandingTab(activeTab.dataset.tab);
+      }
       document.getElementById('nav-lang-label').textContent = lang === 'no' ? 'EN' : 'NO';
       document.documentElement.lang = lang;
     }
