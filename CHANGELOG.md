@@ -4,6 +4,15 @@
 
 ---
 
+## 2026-03-29 — Housekeeping
+
+- Removed stale worktrees and local branches (`feature/avatar-storage`, `feature/stats-desktop-layout`)
+- `.gitignore`: added `.DS_Store`, `.Rhistory`, `scripts/`
+- Deleted old icon files (`match-away_old.svg`, `tab-settings_old.svg`)
+- Committed stats analysis spec to `docs/superpowers/specs/`
+
+---
+
 ## 2026-03-29 — Pro stats analysis features
 
 - **Performance Profile** (Overview tab, Pro) — avg rating bars for all 6 dimensions; hidden when no ratings exist
