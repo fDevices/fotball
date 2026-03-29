@@ -4,6 +4,19 @@
 
 ---
 
+## 2026-03-29 — Pro stats analysis features
+
+- **Performance Profile** (Overview tab, Pro) — avg rating bars for all 6 dimensions; hidden when no ratings exist
+- **Scoring Streaks** (Overview tab, Pro) — current streak, best streak, longest drought, scoring %
+- **Head-to-Head** (Overview tab, Pro) — search by opponent, shows W/D/L, goals scored/conceded
+- **Monthly Breakdown** (Overview tab, Pro) — WDL mini-bar + goals per month, smart multi-year labels
+- **Rating Trend chart** (Analyse tab, Pro) — line chart with 6 toggleable datasets (overall, effort, impact, focus, technique, team play)
+- Free users see blurred locked cards for all 5 features (conversion teasers)
+- New i18n keys: `perf_profile_title`, `scoring_streaks_title`, `streak_*`, `h2h_*`, `monthly_title`, `rating_trend_title`
+- New CSS: `.rating-pill`, `.rating-avg-*`
+
+---
+
 ## 2026-03-28 — Danger zone
 
 - Settings: "Danger zone" section added (visible for authenticated users only)

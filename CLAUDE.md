@@ -437,6 +437,10 @@ Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat
 ### Fase 2.5 – Deling
 - [x] Share link — player generates shareable URL, third party views stats + profile (no assessments). Foundation for Fase 4 coach dashboard.
 
+### Pro stats analysis (implementert 2026-03-29)
+- [x] Performance Profile, Scoring Streaks, Head-to-Head, Monthly Breakdown (Overview tab, Pro-gated)
+- [x] Rating Trend chart (Analyse tab, Pro-gated)
+
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
 
@@ -452,7 +456,7 @@ Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat
 | Nivå | Innhold | Pris |
 |------|---------|------|
 | Gratis | 1 lag, 1 sesong, basis statistikk, form-streak | kr 0 |
-| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF | ~kr 49/mnd |
+| Pro | Ubegrenset lag/sesonger, analyse-grafer, eksport CSV+PDF, performance profile, scoring streaks, head-to-head, monthly breakdown, rating trend chart | ~kr 49/mnd |
 | Club | Flere brukere, deling, lagadmin | ~kr 199/mnd |
 
 **Uavklart:** Per turnering-statistikk (gratis eller Pro?), multi-sport (Pro-tillegg?), PDF alene vs CSV+PDF samlet
