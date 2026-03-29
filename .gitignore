@@ -1,2 +1,9 @@
 .superpowers/
 .worktrees/
+
+# OS
+.DS_Store
+.Rhistory
+
+# Local dev scripts (may contain real user IDs / test data)
+scripts/
