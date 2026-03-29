@@ -260,6 +260,44 @@
     </div>
   </footer>
 
+  <!-- Auth modal -->
+  <div id="landing-auth-overlay" class="landing-auth-overlay hidden"
+       role="dialog" aria-modal="true" aria-labelledby="landing-auth-title">
+    <div class="landing-auth-modal">
+
+      <div class="landing-auth-brand">
+        <span class="landing-auth-icon">⚽</span>
+        <span class="landing-auth-logo">ATHLYTICS<span>SPORT</span></span>
+        <span class="landing-auth-tagline" id="landing-auth-tagline">Fotballstatistikk<br>for alle nivåer</span>
+      </div>
+
+      <div class="landing-auth-form">
+        <h2 id="landing-auth-title">Logg inn</h2>
+
+        <div class="landing-auth-tabs" role="tablist">
+          <button class="landing-auth-tab active" data-tab="login" role="tab">Logg inn</button>
+          <button class="landing-auth-tab" data-tab="signup" role="tab">Registrer</button>
+        </div>
+
+        <div id="landing-login-view">
+          <input id="landing-login-email" type="email" autocomplete="email" placeholder="E-post">
+          <input id="landing-login-password" type="password" autocomplete="current-password" placeholder="Passord">
+          <div id="landing-login-error" class="landing-auth-error hidden"></div>
+          <button id="landing-login-submit">LOGG INN →</button>
+        </div>
+
+        <div id="landing-signup-view" class="hidden">
+          <input id="landing-signup-email" type="email" autocomplete="email" placeholder="E-post">
+          <input id="landing-signup-password" type="password" autocomplete="new-password" placeholder="Passord">
+          <input id="landing-signup-confirm" type="password" autocomplete="new-password" placeholder="Bekreft passord">
+          <div id="landing-signup-error" class="landing-auth-error hidden"></div>
+          <button id="landing-signup-submit">OPPRETT KONTO →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <script>
     // ── i18n ──
     const TEKST = {
@@ -377,6 +415,152 @@
     }, { threshold: 0.1 });
     document.querySelectorAll('.feature-card, .price-card').forEach(function(el) {
       observer.observe(el);
+    });
+
+    // ── Landing auth modal ──────────────────────────────────────────────────
+    var SUPA_URL = 'https://gjxsebeajcrmseraypyw.supabase.co';
+    var SUPA_KEY = 'sb_publishable_gkIN7XSAzQVKS9lpqj6LYQ_vV8G3VRe';
+    var LAND_SESSION_KEY = 'athlytics_session';
+
+    function openLandingAuth(tab) {
+      var overlay = document.getElementById('landing-auth-overlay');
+      overlay.classList.remove('hidden');
+      showLandingTab(tab || 'login');
+      setTimeout(function() {
+        var first = overlay.querySelector('input');
+        if (first) first.focus();
+      }, 50);
+    }
+
+    function closeLandingAuth() {
+      document.getElementById('landing-auth-overlay').classList.add('hidden');
+      clearLandingErrors();
+    }
+
+    function showLandingTab(tab) {
+      var loginView  = document.getElementById('landing-login-view');
+      var signupView = document.getElementById('landing-signup-view');
+      var title      = document.getElementById('landing-auth-title');
+      var tagline    = document.getElementById('landing-auth-tagline');
+      loginView.classList.toggle('hidden', tab !== 'login');
+      signupView.classList.toggle('hidden', tab !== 'signup');
+      title.textContent = tab === 'login'
+        ? (activeLang === 'no' ? 'Logg inn' : 'Log in')
+        : (activeLang === 'no' ? 'Registrer deg' : 'Create account');
+      tagline.innerHTML = activeLang === 'no'
+        ? 'Fotballstatistikk<br>for alle nivåer'
+        : 'Football stats<br>for every level';
+      document.querySelectorAll('.landing-auth-tab').forEach(function(t) {
+        t.classList.toggle('active', t.dataset.tab === tab);
+        t.textContent = t.dataset.tab === 'login'
+          ? (activeLang === 'no' ? 'Logg inn' : 'Log in')
+          : (activeLang === 'no' ? 'Registrer' : 'Sign up');
+      });
+    }
+
+    function clearLandingErrors() {
+      ['landing-login-error', 'landing-signup-error'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) { el.textContent = ''; el.classList.add('hidden'); }
+      });
+    }
+
+    function showLandingError(id, msg) {
+      var el = document.getElementById(id);
+      if (el) { el.textContent = msg; el.classList.remove('hidden'); }
+    }
+
+    function storeLandingSession(data) {
+      localStorage.setItem(LAND_SESSION_KEY, JSON.stringify({
+        accessToken:  data.access_token,
+        refreshToken: data.refresh_token,
+        userId:       data.user.id,
+        email:        data.user.email,
+        expiresAt:    Date.now() + (data.expires_in * 1000)
+      }));
+    }
+
+    async function handleLandingLogin() {
+      clearLandingErrors();
+      var email    = document.getElementById('landing-login-email').value.trim();
+      var password = document.getElementById('landing-login-password').value;
+      try {
+        var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await res.json();
+        if (!res.ok) {
+          showLandingError('landing-login-error', data.error_description || data.message || (activeLang === 'no' ? 'Innlogging feilet' : 'Login failed'));
+          return;
+        }
+        storeLandingSession(data);
+        window.location.replace('/app');
+      } catch(e) {
+        showLandingError('landing-login-error', e.message);
+      }
+    }
+
+    async function handleLandingSignup() {
+      clearLandingErrors();
+      var email    = document.getElementById('landing-signup-email').value.trim();
+      var password = document.getElementById('landing-signup-password').value;
+      var confirm  = document.getElementById('landing-signup-confirm').value;
+      if (password !== confirm) {
+        showLandingError('landing-signup-error', activeLang === 'no' ? 'Passordene stemmer ikke overens' : 'Passwords do not match');
+        return;
+      }
+      try {
+        var res = await fetch(SUPA_URL + '/auth/v1/signup', {
+          method: 'POST',
+          headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, password: password })
+        });
+        var data = await res.json();
+        if (!res.ok) {
+          showLandingError('landing-signup-error', data.error_description || data.message || (activeLang === 'no' ? 'Registrering feilet' : 'Signup failed'));
+          return;
+        }
+        if (!data.access_token) {
+          showLandingError('landing-signup-error', activeLang === 'no' ? 'Sjekk e-posten din for bekreftelse' : 'Check your email to confirm');
+          return;
+        }
+        storeLandingSession(data);
+        window.location.replace('/app');
+      } catch(e) {
+        showLandingError('landing-signup-error', e.message);
+      }
+    }
+
+    // ── Wire modal events ──
+    document.getElementById('nav-login-btn').addEventListener('click', function() {
+      openLandingAuth('login');
+    });
+
+    document.getElementById('landing-auth-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeLandingAuth();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        var overlay = document.getElementById('landing-auth-overlay');
+        if (!overlay.classList.contains('hidden')) closeLandingAuth();
+      }
+    });
+
+    document.querySelectorAll('.landing-auth-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() { showLandingTab(this.dataset.tab); });
+    });
+
+    document.getElementById('landing-login-submit').addEventListener('click', handleLandingLogin);
+    document.getElementById('landing-signup-submit').addEventListener('click', handleLandingSignup);
+
+    document.getElementById('landing-auth-overlay').addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var loginHidden = document.getElementById('landing-login-view').classList.contains('hidden');
+      if (!loginHidden) handleLandingLogin();
+      else handleLandingSignup();
     });
   </script>
 </body>
