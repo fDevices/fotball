@@ -272,6 +272,7 @@
       </div>
 
       <div class="landing-auth-form">
+        <button class="landing-auth-close" id="landing-auth-close" aria-label="Lukk">&times;</button>
         <h2 id="landing-auth-title">Logg inn</h2>
 
         <div class="landing-auth-tabs" role="tablist">
@@ -422,10 +423,14 @@
     var SUPA_KEY = 'sb_publishable_gkIN7XSAzQVKS9lpqj6LYQ_vV8G3VRe';
     var LAND_SESSION_KEY = 'athlytics_session';
 
+    var _authFocusSrc = null;
+
     function openLandingAuth(tab) {
+      _authFocusSrc = document.activeElement;
       var overlay = document.getElementById('landing-auth-overlay');
       overlay.classList.remove('hidden');
       showLandingTab(tab || 'login');
+      document.addEventListener('keydown', _trapModalFocus);
       setTimeout(function() {
         var first = overlay.querySelector('input');
         if (first) first.focus();
@@ -435,6 +440,12 @@
     function closeLandingAuth() {
       document.getElementById('landing-auth-overlay').classList.add('hidden');
       clearLandingErrors();
+      ['landing-login-email','landing-login-password','landing-signup-email','landing-signup-password','landing-signup-confirm'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      document.removeEventListener('keydown', _trapModalFocus);
+      if (_authFocusSrc) { _authFocusSrc.focus(); _authFocusSrc = null; }
     }
 
     function showLandingTab(tab) {
@@ -482,6 +493,8 @@
 
     async function handleLandingLogin() {
       clearLandingErrors();
+      var btn = document.getElementById('landing-login-submit');
+      btn.disabled = true;
       var email    = document.getElementById('landing-login-email').value.trim();
       var password = document.getElementById('landing-login-password').value;
       try {
@@ -493,22 +506,27 @@
         var data = await res.json();
         if (!res.ok) {
           showLandingError('landing-login-error', data.error_description || data.message || (activeLang === 'no' ? 'Innlogging feilet' : 'Login failed'));
+          btn.disabled = false;
           return;
         }
         storeLandingSession(data);
         window.location.replace('/app');
       } catch(e) {
         showLandingError('landing-login-error', e.message);
+        btn.disabled = false;
       }
     }
 
     async function handleLandingSignup() {
       clearLandingErrors();
+      var btn = document.getElementById('landing-signup-submit');
+      btn.disabled = true;
       var email    = document.getElementById('landing-signup-email').value.trim();
       var password = document.getElementById('landing-signup-password').value;
       var confirm  = document.getElementById('landing-signup-confirm').value;
       if (password !== confirm) {
         showLandingError('landing-signup-error', activeLang === 'no' ? 'Passordene stemmer ikke overens' : 'Passwords do not match');
+        btn.disabled = false;
         return;
       }
       try {
@@ -520,20 +538,39 @@
         var data = await res.json();
         if (!res.ok) {
           showLandingError('landing-signup-error', data.error_description || data.message || (activeLang === 'no' ? 'Registrering feilet' : 'Signup failed'));
+          btn.disabled = false;
           return;
         }
         if (!data.access_token) {
           showLandingError('landing-signup-error', activeLang === 'no' ? 'Sjekk e-posten din for bekreftelse' : 'Check your email to confirm');
+          btn.disabled = false;
           return;
         }
         storeLandingSession(data);
         window.location.replace('/app');
       } catch(e) {
         showLandingError('landing-signup-error', e.message);
+        btn.disabled = false;
+      }
+    }
+
+    function _trapModalFocus(e) {
+      if (e.key !== 'Tab') return;
+      var modal = document.querySelector('.landing-auth-modal');
+      var focusable = Array.from(modal.querySelectorAll('button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'));
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
     }
 
     // ── Wire modal events ──
+    document.getElementById('landing-auth-close').addEventListener('click', closeLandingAuth);
+
     document.getElementById('nav-login-btn').addEventListener('click', function() {
       openLandingAuth('login');
     });
