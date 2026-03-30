@@ -4,6 +4,17 @@
 
 ---
 
+## 2026-03-30 — Landing page auth flow
+
+- **Auto-redirect**: logged-in users visiting `/` are immediately sent to `/app` (no flash of landing page)
+- **"Logg inn" nav button**: lime outlined button added to landing page nav, opens login modal directly on the landing page
+- **Split-card login/signup modal**: brand panel (left) + form panel (right) with tabbed Logg inn / Registrer. On success redirects to `/app` with session stored in `athlytics_session` (same key/shape as `js/auth.js`)
+- Modal is fully accessible: `role="dialog"`, `aria-modal`, focus trap, focus restoration, close button, Enter-safe on button focus, double-submit prevention, input clearing on close
+- i18n: "Logg inn" / "Log in" toggle supported in nav button and open modal
+- All changes in `landing.html` + `landing.css` only — no changes to `app.html` or `js/`
+
+---
+
 ## 2026-03-29 — Housekeeping
 
 - Removed stale worktrees and local branches (`feature/avatar-storage`, `feature/stats-desktop-layout`)

@@ -20,7 +20,7 @@
 | **Live URL** | https://athlyticsport.app og https://www.athlyticsport.app |
 | **GitHub** | https://github.com/fDevices/fotball (public, `main` branch) |
 | **Hosting** | Vercel – prosjekt: `fdevices-projects/fotball` |
-| **Routing** | `vercel.json`: `/` → `landing.html` (marketing/entrypoint), `/app` → `app.html` (appskall). To-entry-modell: `landing.html` er permanent markedsføringsside; `app.html` er selve appen. Begge må deployeres ved releaser. |
+| **Routing** | `vercel.json`: `/` → `landing.html` (marketing/entrypoint), `/app` → `app.html` (appskall). To-entry-modell: `landing.html` er permanent markedsføringsside; `app.html` er selve appen. Begge må deployeres ved releaser. `landing.html` redirecter automatisk til `/app` hvis `athlytics_session` er gyldig (sjekkes i `<head>` før render). |
 | **Database** | Supabase – URL og service keys settes via Vercel env vars. Anon key (`sb_publishable_`) er hardkodet i `js/config.js` — dette er design by intent; nøkkelen er offentlig og RLS beskytter data. Rotér ved mistanke om misbruk. |
 | **E-post** | Resend – ⚠️ **Husk å gjenopprette e-postkonfigurasjon etter testing er fullført** |
 | **Edge Functions** | `supabase/functions/delete-account/` — deployed via `supabase functions deploy delete-account`. Requires `SUPABASE_SERVICE_ROLE_KEY` set in Supabase project secrets. |
