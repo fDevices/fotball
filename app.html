@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="no" class="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -11,9 +11,47 @@
 <title>Athlytics Sport</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface":                   "#10141a",
+          "surface-container-lowest":  "#0a0e14",
+          "surface-container-low":     "#181c22",
+          "surface-container":         "#1c2026",
+          "surface-container-high":    "#262a31",
+          "surface-container-highest": "#31353c",
+          "surface-bright":            "#353940",
+          "primary":                   "#e1fdff",
+          "primary-container":         "#00f2ff",
+          "primary-fixed-dim":         "#00dbe7",
+          "on-primary":                "#00363a",
+          "on-surface":                "#dfe2eb",
+          "on-surface-variant":        "#b9cacb",
+          "outline-variant":           "#3a494b",
+          "tertiary-fixed":            "#ffe173",
+          "error":                     "#ffb4ab",
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk", "sans-serif"],
+          "body":     ["Inter", "sans-serif"],
+        },
+        borderRadius: {
+          DEFAULT: "0.5rem",
+          lg:      "0.5rem",
+          xl:      "0.75rem",
+          full:    "9999px",
+        },
+      },
+    },
+  }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js" defer></script>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
