@@ -4,6 +4,15 @@
 
 ---
 
+## 2026-03-31 — Kinetic Velocity redesign (in progress, worktree: redesign/kinetic-velocity)
+
+- **Spec + plan**: Full design spec and 14-task implementation plan committed to `docs/superpowers/specs/` and `docs/superpowers/plans/` on `main`
+- **Tailwind CDN foundation** (Task 2): `app.html` `<head>` replaced — Google Fonts (Space Grotesk + Inter), 16 Kinetic Velocity color tokens in `tailwind.config`, Tailwind CDN script, Chart.js CDN kept
+- **style.css rewrite** (Task 3): 1188 lines → ~200 lines — SVG mask-image icon coloring, keyframe animations, body grid texture, JS-toggled state classes (`.wins/.draw/.loss`, `.open`, `.active`), JS-rendered component styles (stat-grid, WDL bar, match-row, t-badge, season/team pills, form-streak, pro-gate, desktop two-column layout)
+- **Class alias fix**: Added `.stat-num.lime`/`.stat-num.danger` and `.t-badge.goals`/`.t-badge.ga` aliases so existing JS output maps to new tokens without JS changes
+
+---
+
 ## 2026-03-30 — Landing page auth flow
 
 - **Auto-redirect**: logged-in users visiting `/` are immediately sent to `/app` (no flash of landing page)

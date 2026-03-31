@@ -385,9 +385,16 @@ export function t(key) { ... }
 
 ## Design
 
-- Font: **Barlow Condensed** (overskrifter) + **Barlow** (brødtekst)
-- Farger: `--grass: #1a3a1f` · `--lime: #a8e063` · `--card: #162b1a` · `--danger: #e05555` · `--gold: #f0c050`
-- Mørk grønn estetikk, grid-mønster bakgrunn, max-width 480px sentrert
+**⚠️ This branch is mid-redesign to Kinetic Velocity. The old green system is replaced.**
+
+- Font: **Space Grotesk** (headlines/labels) + **Inter** (body)
+- Primary accent: `#00f2ff` (cyan) — replaces `#a8e063` (lime)
+- Surface tokens: `#10141a` bg · `#1c2026` cards · `#262a31` elevated · `#31353c` nav
+- Text: `#dfe2eb` primary · `#b9cacb` muted
+- Gold/Pro: `#ffe173` · Error/loss: `#ffb4ab`
+- Glassmorphic top nav: `#31353c` @ 60% opacity + `backdrop-filter: blur(20px)`
+- Grid texture: `body::before` radial-gradient dots, 40px spacing
+- Tailwind CDN (no build step) — tokens in `tailwind.config` block in `app.html`
 - Chart.js via CDN: `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` (defer i `<head>`)
 
 ---
