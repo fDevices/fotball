@@ -121,10 +121,10 @@ canvas { max-width: 100%; }
 .stat-card { background: #1c2026; border-radius: 8px; padding: 14px 10px; text-align: center; border: 1px solid rgba(58,73,75,0.4); }
 .stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; line-height: 1; }
 .stat-lbl { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b9cacb; margin-top: 4px; display: block; }
-.stat-num.cyan  { color: #00f2ff; }
-.stat-num.gold  { color: #ffe173; }
-.stat-num.white { color: #dfe2eb; }
-.stat-num.red   { color: #ffb4ab; }
+.stat-num.cyan,  .stat-num.lime   { color: #00f2ff; }
+.stat-num.gold                    { color: #ffe173; }
+.stat-num.white                   { color: #dfe2eb; }
+.stat-num.red,   .stat-num.danger { color: #ffb4ab; }
 
 .wdl-bar { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
 .wdl-bar-w { background: #00f2ff; }
@@ -146,8 +146,8 @@ canvas { max-width: 100%; }
 .t-badge.win    { background: rgba(0,242,255,0.1); color: #00f2ff; }
 .t-badge.draw   { background: rgba(255,225,115,0.1); color: #ffe173; }
 .t-badge.loss   { background: rgba(255,180,171,0.1); color: #ffb4ab; }
-.t-badge.goal   { background: rgba(0,242,255,0.1); color: #00f2ff; }
-.t-badge.assist { background: rgba(0,242,255,0.06); color: #b9cacb; }
+.t-badge.goal, .t-badge.goals { background: rgba(0,242,255,0.1); color: #00f2ff; }
+.t-badge.assist, .t-badge.ga  { background: rgba(0,242,255,0.06); color: #b9cacb; }
 
 .season-pill { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; padding: 5px 14px; border-radius: 9999px; border: 1.5px solid rgba(58,73,75,0.5); background: transparent; color: #b9cacb; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
 .season-pill:hover { border-color: #00f2ff; color: #00f2ff; }
