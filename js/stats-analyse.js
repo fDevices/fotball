@@ -98,8 +98,10 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
     if (statsSubEl2) statsSubEl2.textContent = n + ' ' + t('matches_short') + ' \xb7 ' + teamText;
   }
 
+  var colHeader = secondary ? '<div class="analyse-col-header">' + t('stats_analyse') + '</div>' : selectorHTML;
+
   if (!isDevPremium()) {
-    container.innerHTML = (secondary ? '' : selectorHTML) +
+    container.innerHTML = colHeader +
       '<div class="chart-locked">' +
         '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +
           '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
@@ -116,7 +118,7 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   }
 
   if (n === 0) {
-    container.innerHTML = (secondary ? '' : selectorHTML) + '<div class="loading">' + t('no_matches_season') + '</div>';
+    container.innerHTML = colHeader + '<div class="loading">' + t('no_matches_season') + '</div>';
     return;
   }
 
@@ -155,7 +157,7 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
       '</div>';
   }
 
-  container.innerHTML = (secondary ? '' : selectorHTML) +
+  container.innerHTML = colHeader +
     '<div class="chart-card" id="chart-card-winpct">' +
       '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
       '<div class="chart-canvas-wrap"><canvas id="chart-winpct" height="180"></canvas></div>' +
