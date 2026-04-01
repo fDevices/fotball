@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-04-01 — Log tab result control + stats desktop fix
+
+- **Result segment control** (`app.html`, `js/log.js`, `js/i18n.js`, `style.css`): Replaced single result display with a three-segment VICTORY / DRAW / LOSS track. Active segment fills solid with the result color (cyan/gold/red) plus a glow. Labels are i18n'd (`seg_win`/`seg_draw`/`seg_loss`). Section label updated to "Final Outcome" / "Sluttresultat".
+- **Stats toggle hidden on desktop** (`style.css`): Added `!important` to `.stats-view-toggle { display: none }` in the ≥900px media query — Tailwind CDN injects its stylesheet after `style.css`, so `.flex` was overriding the `display: none` and the toggle remained visible; clicking it re-rendered the same two-column layout making both tabs appear identical.
+- **Analysis column header** (`js/stats-analyse.js`, `style.css`): Desktop analysis column now shows a subtle "Analyse / Analysis" heading at the top so the two-column layout is clearly labelled. Also added `align-items: start` to the desktop grid so columns don't stretch to equal height.
+
+---
+
 ## 2026-04-01 — Kinetic Velocity post-merge fixes
 
 - **Tailwind config order** (`landing.html` + `app.html`): Moved `<script src="cdn.tailwindcss.com">` before `tailwind.config = {...}` — the assignment threw a `ReferenceError` when CDN wasn't loaded yet, causing all custom color tokens to fail and text to render black on dark backgrounds

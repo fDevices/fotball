@@ -395,6 +395,7 @@ export function t(key) { ... }
 - Glassmorphic top nav: `#31353c` @ 60% opacity + `backdrop-filter: blur(20px)`
 - Grid texture: `body::before` radial-gradient dots, 40px spacing
 - Tailwind CDN (no build step) — tokens in `tailwind.config` block in `app.html`. **⚠️ CDN `<script>` must come BEFORE `tailwind.config = {...}`** — assigning config before the CDN loads throws a `ReferenceError` and all custom color tokens silently fail.
+- **⚠️ Tailwind cascade override** — Tailwind CDN injects its `<style>` tag at runtime, AFTER `style.css` loads. For equal-specificity rules (e.g. `.some-class { display: flex }`), Tailwind wins. Use `!important` in `style.css` when a rule must override a Tailwind utility (e.g. `display: none !important` in media queries, `display: block !important` for forced visibility).
 - Chart.js via CDN: `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` (defer i `<head>`)
 - **CSS `:root` variables** — JS files use `var(--lime)`, `var(--gold)`, `var(--danger)`, `var(--muted)`, `var(--white)`, `var(--border)` in dynamically-rendered HTML. These are defined in `style.css :root`. Tailwind classes do NOT cover these; they must stay in `:root`.
 - **Share page** (`share.html` + `js/share-viewer.js`) uses plain CSS from `style.css` — no Tailwind. Share page classes are prefixed `.share-*` and `.match-*`.
