@@ -4,12 +4,22 @@
 
 ---
 
-## 2026-03-31 — Kinetic Velocity redesign (in progress, worktree: redesign/kinetic-velocity)
+## 2026-03-31 — Kinetic Velocity redesign (complete, branch: redesign/kinetic-velocity)
 
 - **Spec + plan**: Full design spec and 14-task implementation plan committed to `docs/superpowers/specs/` and `docs/superpowers/plans/` on `main`
 - **Tailwind CDN foundation** (Task 2): `app.html` `<head>` replaced — Google Fonts (Space Grotesk + Inter), 16 Kinetic Velocity color tokens in `tailwind.config`, Tailwind CDN script, Chart.js CDN kept
 - **style.css rewrite** (Task 3): 1188 lines → ~200 lines — SVG mask-image icon coloring, keyframe animations, body grid texture, JS-toggled state classes (`.wins/.draw/.loss`, `.open`, `.active`), JS-rendered component styles (stat-grid, WDL bar, match-row, t-badge, season/team pills, form-streak, pro-gate, desktop two-column layout)
 - **Class alias fix**: Added `.stat-num.lime`/`.stat-num.danger` and `.t-badge.goals`/`.t-badge.ga` aliases so existing JS output maps to new tokens without JS changes
+- **Global top nav + app shell** (Task 4): Glassmorphic header with logo, lang picker, avatar; demo banner; auth overlay all restyled in Kinetic Velocity
+- **Bottom tab bar** (Task 5): Full-width nav with cyan active state, Space Grotesk labels
+- **Log tab** (Task 6): Full Tailwind restyle — score controls, match type toggle, opponent/team dropdowns, result indicator
+- **Stats tab** (Task 7): Tailwind shell with view toggle, filter pills, desktop grid preserved
+- **Profile tab** (Task 8): Avatar circle, player info, teams/tournaments cards, save button
+- **Settings tab** (Task 9): All settings sections, danger zone, logout button
+- **Modals + overlays** (Task 10): Edit modal, assessment sheet, share panel, delete confirm dialog, toast
+- **Chart colors** (Task 11): `js/stats-analyse.js` — CHART_COLORS updated to cyan/gold/red, font to Space Grotesk, `initChartDefaults()` updated
+- **JS-rendered component styles** (Task 12): `style.css` — stat-grid, WDL bar, match-row/chip, t-badge, season/settings pills, team-item, form-streak, pro-gate, pagination, opponent-search, section headers
+- **landing.html rewrite** (Task 13): Full Kinetic Velocity redesign — glassmorphic nav, cyan hero, features grid, pricing cards, CTA, footer. Tailwind CDN + Space Grotesk + grid texture. Old `landing.css`-based design replaced entirely.
 
 ---
 
