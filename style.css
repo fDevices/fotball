@@ -259,6 +259,24 @@ canvas { max-width: 100%; }
 
 .stats-section-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #b9cacb; margin-bottom: 8px; margin-top: 16px; }
 
+/* ── TEAM / TOURNAMENT LIST (profile tab) ── */
+.team-list-empty { font-size: 13px; color: #b9cacb; padding: 4px 0 8px; }
+.team-list-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #181c22; border-radius: 8px; margin-bottom: 6px; }
+.team-star { background: none; border: none; font-size: 16px; color: #b9cacb; cursor: pointer; padding: 0 2px; line-height: 1; transition: color 0.15s; flex-shrink: 0; }
+.team-star.active { color: #ffe173; }
+.team-list-name { flex: 1; font-family: 'Inter', sans-serif; font-size: 14px; color: #dfe2eb; }
+.team-list-name.favoritt { color: #00f2ff; }
+.team-fav-badge { margin-left: 6px; font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; background: rgba(0,242,255,0.1); color: #00f2ff; border-radius: 4px; padding: 1px 6px; vertical-align: middle; }
+.team-list-del { background: none; border: none; color: #b9cacb; cursor: pointer; font-size: 18px; padding: 0 2px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0; }
+.team-list-del:hover { color: #ffb4ab; }
+
+/* ── TEAM DROPDOWN OPTIONS ── */
+.team-option { padding: 10px 14px; font-family: 'Inter', sans-serif; font-size: 14px; color: #dfe2eb; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.12s; }
+.team-option:hover { background: rgba(0,242,255,0.06); }
+.team-option.selected { color: #00f2ff; }
+.team-option-add { color: #b9cacb; font-style: italic; border-top: 1px solid rgba(58,73,75,0.4); margin-top: 2px; }
+.team-option-add:hover { background: rgba(0,242,255,0.06); color: #00f2ff; }
+
 /* ── DESKTOP TWO-COLUMN STATS ── */
 @media (min-width: 900px) {
   .screen { max-width: 1080px; }
