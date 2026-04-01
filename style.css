@@ -1,3 +1,13 @@
+/* ── DESIGN TOKENS (used by JS inline styles) ── */
+:root {
+  --lime:   #00f2ff;
+  --gold:   #ffe173;
+  --danger: #ffb4ab;
+  --muted:  #b9cacb;
+  --white:  #dfe2eb;
+  --border: rgba(58,73,75,0.4);
+}
+
 /* ── RESET & BASE ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; }
@@ -167,6 +177,67 @@ canvas { max-width: 100%; }
 .streak-dot.w { background: rgba(0,242,255,0.2); color: #00f2ff; }
 .streak-dot.d { background: rgba(255,225,115,0.2); color: #ffe173; }
 .streak-dot.l { background: rgba(255,180,171,0.2); color: #ffb4ab; }
+
+/* ── STAT ROW CARD ── */
+.stat-row-card { background: #1c2026; border-radius: 8px; padding: 14px 16px; margin-bottom: 8px; border: 1px solid rgba(58,73,75,0.4); }
+.stat-row-title { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b9cacb; margin-bottom: 10px; }
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; }
+.stat-row-label { font-size: 13px; color: #b9cacb; }
+.stat-row-value { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #dfe2eb; }
+
+/* ── FORM STREAK BOXES ── */
+.form-streak-boxes { display: flex; gap: 4px; flex-wrap: wrap; }
+.form-streak-box { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; }
+.form-streak-box.wins { background: rgba(0,242,255,0.2); color: #00f2ff; }
+.form-streak-box.draw { background: rgba(255,225,115,0.2); color: #ffe173; }
+.form-streak-box.loss { background: rgba(255,180,171,0.2); color: #ffb4ab; }
+
+/* ── WDL BAR SEGMENTS ── */
+.wdl-seg { height: 100%; }
+.wdl-seg.w { background: #00f2ff; }
+.wdl-seg.d { background: #ffe173; }
+.wdl-seg.l { background: #ffb4ab; }
+
+/* ── HOME / AWAY SECTION ── */
+.ha-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ha-card { background: #262a31; border-radius: 8px; padding: 12px; border: 1px solid rgba(58,73,75,0.4); }
+.ha-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.ha-card-title.home { color: #00f2ff; }
+.ha-card-title.away { color: #ffe173; }
+.ha-nums { display: flex; justify-content: space-around; margin-bottom: 10px; }
+.ha-num { text-align: center; }
+.ha-num-val { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; line-height: 1; }
+.ha-num-val.lime   { color: #00f2ff; }
+.ha-num-val.gold   { color: #ffe173; }
+.ha-num-val.danger { color: #ffb4ab; }
+.ha-num-lbl { font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #b9cacb; margin-top: 2px; }
+.ha-mini-bar { display: flex; height: 4px; border-radius: 2px; overflow: hidden; gap: 1px; }
+.ha-mini-seg { height: 100%; }
+
+/* ── TOURNAMENT SECTION ── */
+.tournament-stat-row { padding: 8px 0; border-bottom: 1px solid rgba(58,73,75,0.4); }
+.tournament-stat-row:last-child { border-bottom: none; }
+.tournament-stat-name { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #dfe2eb; margin-bottom: 6px; }
+.tournament-stat-badges { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.tournament-wdl-sep { width: 1px; height: 16px; background: rgba(58,73,75,0.6); margin: 0 2px; }
+
+/* ── OPPONENT SEARCH ── */
+.opponent-search-wrap { margin-bottom: 8px; }
+.opponent-search-field-wrap { position: relative; display: flex; align-items: center; }
+.opponent-search-icon { position: absolute; left: 12px; color: #b9cacb; font-size: 14px; pointer-events: none; }
+.opponent-search-input { width: 100%; background: #1c2026; border: 1px solid rgba(58,73,75,0.4); border-radius: 8px; padding: 10px 36px; color: #dfe2eb; font-family: 'Inter', sans-serif; font-size: 14px; outline: none; }
+.opponent-search-input:focus { border-color: #00f2ff; }
+.opponent-search-input::placeholder { color: #b9cacb; }
+.opponent-search-clear { position: absolute; right: 10px; background: none; border: none; color: #b9cacb; cursor: pointer; font-size: 14px; padding: 4px; }
+.opponent-search-clear:hover { color: #dfe2eb; }
+.opponent-search-row { padding: 8px 0; border-bottom: 1px solid rgba(58,73,75,0.4); }
+.opponent-search-row:last-child { border-bottom: none; }
+.opponent-search-name { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #dfe2eb; margin-bottom: 6px; }
+.opponent-search-count { color: #b9cacb; font-size: 12px; font-weight: 400; }
+.opponent-search-badges { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+/* ── MATCH LIST HEADER ── */
+.match-list-header { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b9cacb; margin: 16px 0 8px; }
 
 .pro-gate { position: relative; overflow: hidden; }
 .pro-gate-blur { filter: blur(4px); pointer-events: none; user-select: none; }
