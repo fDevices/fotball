@@ -1,616 +1,249 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="no" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Athlytics Sport – Logg kamper, følg statistikk og analyser sesongen din. For spillere, foreldre og trenere.">
-  <title>Athlytics Sport – Din fotballstatistikk</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="landing.css">
-  <script>
-    (function() {
-      try {
-        var s = JSON.parse(localStorage.getItem('athlytics_session'));
-        if (s && s.accessToken && s.expiresAt > Date.now()) {
-          window.location.replace('/app');
-        }
-      } catch(e) {}
-    })();
-  </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athlytics Sport — Log. Analyse. Win.</title>
+<meta name="description" content="Track football matches, analyse performance, and improve your game with Athlytics Sport.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface":                   "#10141a",
+          "surface-container-lowest":  "#0a0e14",
+          "surface-container-low":     "#181c22",
+          "surface-container":         "#1c2026",
+          "surface-container-high":    "#262a31",
+          "surface-container-highest": "#31353c",
+          "primary-container":         "#00f2ff",
+          "primary-fixed-dim":         "#00dbe7",
+          "on-primary":                "#00363a",
+          "on-surface":                "#dfe2eb",
+          "on-surface-variant":        "#b9cacb",
+          "outline-variant":           "#3a494b",
+          "tertiary-fixed":            "#ffe173",
+          "error":                     "#ffb4ab",
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk", "sans-serif"],
+          "body":     ["Inter", "sans-serif"],
+        },
+      },
+    },
+  }
+</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body {
+    background-color: #10141a;
+    background-image: radial-gradient(#1c2026 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .glass-nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(49,53,60,0.6);
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .fade-up { animation: fadeUp 0.6s ease forwards; }
+  .hero-glow {
+    background: radial-gradient(ellipse 60% 40% at 50% 60%, rgba(0,242,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+</style>
 </head>
-<body>
+<body class="min-h-screen text-on-surface font-body">
 
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <div class="nav-inner">
-      <a href="/" class="nav-logo">
-        <span class="nav-logo-icon">⚽</span>
-        <span class="nav-logo-text">ATHLYTICS<span class="nav-logo-accent">SPORT</span></span>
-      </a>
-      <div class="nav-actions">
-        <button class="nav-lang" id="nav-lang-toggle" aria-label="Bytt språk">
-          <span id="nav-lang-label">EN</span>
-        </button>
-        <button class="btn-nav-login" id="nav-login-btn">Logg inn</button>
-        <a href="/app" class="btn-nav-cta" data-i18n="nav_cta">Åpne appen</a>
+  <!-- ── NAV ── -->
+  <nav class="glass-nav fixed top-0 inset-x-0 z-50 border-b border-outline-variant/30">
+    <div class="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-primary-container rounded-sm"></span>
+        <span class="font-headline font-bold text-xs tracking-[0.2em] text-on-surface uppercase">Athlytics</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="#pricing" class="text-on-surface-variant text-sm hover:text-on-surface transition-colors hidden sm:block">Pricing</a>
+        <a href="/app" class="text-on-surface-variant text-sm hover:text-on-surface transition-colors hidden sm:block" id="nav-login-btn">Log in</a>
+        <a href="/app" class="px-4 py-2 bg-primary-container text-on-primary font-headline font-semibold text-sm rounded-lg hover:bg-primary-fixed-dim transition-colors">Get started</a>
       </div>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-bg-grid"></div>
-    <div class="hero-bg-glow"></div>
-    <div class="container">
-      <div class="hero-eyebrow">
-        <span class="eyebrow-dot"></span>
-        <span data-i18n="hero_eyebrow">Fotballstatistikk for alle nivåer</span>
+  <!-- ── HERO ── -->
+  <section class="relative pt-32 pb-20 px-6 overflow-hidden">
+    <div class="hero-glow absolute inset-0"></div>
+    <div class="max-w-2xl mx-auto text-center relative">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary-container text-xs font-headline font-semibold mb-6 uppercase tracking-wider">
+        <span class="w-1.5 h-1.5 bg-primary-container rounded-full"></span>
+        Football performance tracking
       </div>
-      <h1 class="hero-title">
-        <span class="hero-title-line1" data-i18n="hero_line1">LOGG.</span>
-        <span class="hero-title-line2" data-i18n="hero_line2">ANALYSER.</span>
-        <span class="hero-title-line3" data-i18n="hero_line3">VINN MER.</span>
+      <h1 class="font-headline font-bold text-5xl sm:text-7xl text-on-surface leading-[1.05] mb-6 fade-up">
+        LOG.<br><span class="text-primary-container">ANALYSE.</span><br>WIN.
       </h1>
-      <p class="hero-sub" data-i18n="hero_sub">
-        Den enkleste måten å holde oversikt over kamper, mål, assist og sesongstatistikk – rett i mobilnettleseren.
+      <p class="text-on-surface-variant text-lg sm:text-xl font-body max-w-lg mx-auto mb-8">
+        Track every match. Analyse your form. Understand your performance — for free.
       </p>
-      <div class="hero-ctas">
-        <a href="/app" class="btn-primary" data-i18n="hero_cta_primary">Prøv gratis</a>
-        <a href="#features" class="btn-secondary" data-i18n="hero_cta_secondary">Se features ↓</a>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12">
+        <a href="/app" class="px-8 py-3.5 bg-primary-container text-on-primary font-headline font-bold text-base rounded-lg hover:bg-primary-fixed-dim transition-colors">Start for free →</a>
+        <a href="#features" class="px-8 py-3.5 border border-outline-variant/60 text-on-surface font-headline font-semibold text-base rounded-lg hover:border-primary-container/60 transition-colors">See features</a>
       </div>
-      <div class="hero-proof">
-        <div class="proof-item">
-          <span class="proof-num">51</span>
-          <span class="proof-label" data-i18n="proof_matches">kamper logget</span>
+      <!-- Social proof -->
+      <div class="flex justify-center gap-8 text-center">
+        <div>
+          <div class="font-headline font-bold text-3xl text-primary-container">500+</div>
+          <div class="text-on-surface-variant text-xs uppercase tracking-wider mt-1">Players</div>
         </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-          <span class="proof-num">100%</span>
-          <span class="proof-label" data-i18n="proof_free">gratis å starte</span>
+        <div class="w-px bg-outline-variant/40"></div>
+        <div>
+          <div class="font-headline font-bold text-3xl text-on-surface">1,200+</div>
+          <div class="text-on-surface-variant text-xs uppercase tracking-wider mt-1">Matches logged</div>
         </div>
-        <div class="proof-divider"></div>
-        <div class="proof-item">
-          <span class="proof-num">0</span>
-          <span class="proof-label" data-i18n="proof_install">apper å installere</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mock phone -->
-    <div class="hero-phone-wrap">
-      <div class="hero-phone">
-        <div class="phone-screen">
-          <div class="mock-header">
-            <div class="mock-badge">⚽ 2025</div>
-            <div class="mock-title">KAMP<span>LOGGER</span></div>
-            <div class="mock-sub">Klar til å logge kamp 🟢</div>
-          </div>
-          <div class="mock-stat-row">
-            <div class="mock-stat wins">
-              <div class="mock-stat-num">37</div>
-              <div class="mock-stat-label">SEIER</div>
-            </div>
-            <div class="mock-stat draw">
-              <div class="mock-stat-num">3</div>
-              <div class="mock-stat-label">UAVGJORT</div>
-            </div>
-            <div class="mock-stat loss">
-              <div class="mock-stat-num">11</div>
-              <div class="mock-stat-label">TAP</div>
-            </div>
-          </div>
-          <div class="mock-bar-wrap">
-            <div class="mock-bar-label">72% S · 6% U · 22% T</div>
-            <div class="mock-bar">
-              <div class="mock-bar-fill wins" style="width:72%"></div>
-              <div class="mock-bar-fill draw" style="width:6%"></div>
-              <div class="mock-bar-fill loss" style="width:22%"></div>
-            </div>
-          </div>
-          <div class="mock-goals-row">
-            <div class="mock-goals-item">
-              <div class="mock-goals-num lime">141</div>
-              <div class="mock-goals-lbl">MÅL</div>
-            </div>
-            <div class="mock-goals-item">
-              <div class="mock-goals-num gold">110</div>
-              <div class="mock-goals-lbl">ASSIST</div>
-            </div>
-            <div class="mock-goals-item">
-              <div class="mock-goals-num white">251</div>
-              <div class="mock-goals-lbl">G+A</div>
-            </div>
-          </div>
+        <div class="w-px bg-outline-variant/40"></div>
+        <div>
+          <div class="font-headline font-bold text-3xl text-on-surface">98.2%</div>
+          <div class="text-on-surface-variant text-xs uppercase tracking-wider mt-1">Satisfaction</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="container">
-      <div class="section-label" data-i18n="features_label">FEATURES</div>
-      <h2 class="section-title" data-i18n="features_title">Alt du trenger.<br>Ingenting du ikke trenger.</h2>
-      <div class="features-grid">
+  <!-- ── FEATURES ── -->
+  <section id="features" class="py-20 px-6">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-center text-[10px] font-headline font-semibold uppercase tracking-[0.2em] text-primary-container mb-2">Features</p>
+      <h2 class="text-center font-headline font-bold text-3xl sm:text-4xl text-on-surface mb-12">Elite capabilities</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-        <div class="feature-card feature-card--large">
-          <div class="feature-icon">📋</div>
-          <h3 data-i18n="feat1_title">Kamplogger</h3>
-          <p data-i18n="feat1_desc">Logg hjemme- og bortekamper med score, mål, assist og turnering. Automatisk resultatkalkulator basert på kamptype.</p>
-          <div class="feature-tag" data-i18n="feat1_tag">Gratis</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">📊</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2">Match Logging</h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Log every match in seconds — score, goals, assists, and match type. Date auto-fills to today.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3 data-i18n="feat2_title">Sesongstatistikk</h3>
-          <p data-i18n="feat2_desc">W/D/L-oversikt, mål per kamp, hjemme vs borte, per turnering – alt på ett sted.</p>
-          <div class="feature-tag" data-i18n="feat2_tag">Gratis</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">📈</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2">Performance Analysis</h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Win/draw/loss trends, form streaks, goals per game, home vs away breakdowns. Know your game.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">📈</div>
-          <h3 data-i18n="feat3_title">Analysegrafer</h3>
-          <p data-i18n="feat3_desc">Kumulativ seiersprosent, mål/assist-trend og mål per turnering visualisert med Chart.js.</p>
-          <div class="feature-tag pro" data-i18n="feat3_tag">Pro</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">⭐</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2">Self Assessment</h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Rate your effort, focus, technique, and team play after each match. Track your growth over time.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">🏆</div>
-          <h3 data-i18n="feat4_title">Flere lag og turneringer</h3>
-          <p data-i18n="feat4_desc">Spiller du på flere lag? Legg til alle og filtrer statistikk per lag og sesong.</p>
-          <div class="feature-tag" data-i18n="feat4_tag">Gratis</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">🏆</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2">Multi-Season</h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Organise data across seasons and teams. Filter stats by team, tournament, or season in seconds.</p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-icon">💾</div>
-          <h3 data-i18n="feat5_title">Eksport</h3>
-          <p data-i18n="feat5_desc">Last ned kamphistorikken din som CSV eller PDF-rapport.</p>
-          <div class="feature-tag pro" data-i18n="feat5_tag">Pro</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">📤</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2 flex items-center gap-2">Export <span class="text-[10px] px-2 py-0.5 rounded-full bg-tertiary-fixed/10 text-tertiary-fixed border border-tertiary-fixed/30 font-semibold">Pro</span></h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Download full match history as CSV or a formatted PDF report. Share with coaches or scouts.</p>
         </div>
 
-        <div class="feature-card feature-card--coming">
-          <div class="feature-icon">🎿</div>
-          <h3 data-i18n="feat6_title">Multi-sport</h3>
-          <p data-i18n="feat6_desc">Orientering og ski kommer snart – samme app, tilpasset din sport.</p>
-          <div class="feature-tag coming" data-i18n="feat6_tag">Kommer snart</div>
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40">
+          <div class="text-2xl mb-3">🔗</div>
+          <h3 class="font-headline font-semibold text-on-surface text-lg mb-2 flex items-center gap-2">Share Stats <span class="text-[10px] px-2 py-0.5 rounded-full bg-tertiary-fixed/10 text-tertiary-fixed border border-tertiary-fixed/30 font-semibold">Pro</span></h3>
+          <p class="text-on-surface-variant text-sm font-body leading-relaxed">Generate a shareable link for coaches, parents, or scouts. Control who sees your data.</p>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- PRICING -->
-  <section class="pricing" id="pricing">
-    <div class="container">
-      <div class="section-label" data-i18n="pricing_label">PRISER</div>
-      <h2 class="section-title" data-i18n="pricing_title">Start gratis.<br>Oppgrader når du er klar.</h2>
-      <div class="pricing-grid">
+  <!-- ── PRICING ── -->
+  <section id="pricing" class="py-20 px-6 bg-surface-container-lowest/50">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-center text-[10px] font-headline font-semibold uppercase tracking-[0.2em] text-primary-container mb-2">Pricing</p>
+      <h2 class="text-center font-headline font-bold text-3xl sm:text-4xl text-on-surface mb-12">Select your rank</h2>
+      <div class="grid sm:grid-cols-3 gap-4">
 
-        <div class="price-card">
-          <div class="price-tier" data-i18n="tier_free_name">Gratis</div>
-          <div class="price-amount">
-            <span class="price-num">0</span>
-            <span class="price-currency">kr</span>
-          </div>
-          <div class="price-period" data-i18n="price_forever">for alltid</div>
-          <ul class="price-features">
-            <li data-i18n="free_f1">✓ 1 lag, 1 sesong</li>
-            <li data-i18n="free_f2">✓ Ubegrenset kamplogging</li>
-            <li data-i18n="free_f3">✓ Basis statistikk</li>
-            <li data-i18n="free_f4">✓ Form-streak (siste 10 kamper)</li>
-            <li class="dim" data-i18n="free_f5">– Analysegrafer</li>
-            <li class="dim" data-i18n="free_f6">– Eksport CSV / PDF</li>
+        <!-- Free -->
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40 flex flex-col">
+          <div class="font-headline font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-3">Free</div>
+          <div class="font-headline font-bold text-4xl text-on-surface mb-1">$0</div>
+          <div class="text-on-surface-variant text-xs font-body mb-5">Forever free</div>
+          <ul class="text-on-surface-variant text-sm font-body space-y-2 mb-6 flex-1">
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> 1 team, 1 season</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Full match logging</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Basic stats overview</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Form streak</li>
           </ul>
-          <a href="/app" class="btn-price-secondary" data-i18n="free_cta">Kom i gang</a>
+          <a href="/app" class="block text-center py-2.5 border border-outline-variant/60 rounded-lg text-on-surface font-headline font-semibold text-sm hover:border-primary-container/60 transition-colors">Get started</a>
         </div>
 
-        <div class="price-card price-card--pro">
-          <div class="price-popular" data-i18n="popular_label">MEST POPULÆR</div>
-          <div class="price-tier" data-i18n="tier_pro_name">Pro</div>
-          <div class="price-amount">
-            <span class="price-num">49</span>
-            <span class="price-currency">kr</span>
-          </div>
-          <div class="price-period" data-i18n="price_per_month">per måned</div>
-          <ul class="price-features">
-            <li data-i18n="pro_f1">✓ Ubegrenset lag og sesonger</li>
-            <li data-i18n="pro_f2">✓ Alle gratisfunksjoner</li>
-            <li data-i18n="pro_f3">✓ Analysegrafer</li>
-            <li data-i18n="pro_f4">✓ Eksport CSV og PDF</li>
-            <li data-i18n="pro_f5">✓ Motstanderstatistikk</li>
-            <li data-i18n="pro_f6">✓ Per turnering-analyse</li>
+        <!-- Pro -->
+        <div class="bg-surface-container rounded-xl p-6 border-2 border-primary-container flex flex-col relative">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-primary-container text-on-primary font-headline font-bold text-xs rounded-full uppercase tracking-wider">Most popular</div>
+          <div class="font-headline font-bold text-xs uppercase tracking-wider text-primary-container mb-3">Pro</div>
+          <div class="font-headline font-bold text-4xl text-on-surface mb-1">$29</div>
+          <div class="text-on-surface-variant text-xs font-body mb-5">per year</div>
+          <ul class="text-on-surface-variant text-sm font-body space-y-2 mb-6 flex-1">
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Everything in Free</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Unlimited teams + seasons</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Advanced analytics</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> CSV + PDF export</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Share links</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Self-assessment</li>
           </ul>
-          <a href="/app" class="btn-price-primary" data-i18n="pro_cta">Prøv Pro</a>
+          <a href="/app" class="block text-center py-2.5 bg-primary-container text-on-primary rounded-lg font-headline font-bold text-sm hover:bg-primary-fixed-dim transition-colors">Start Pro →</a>
         </div>
 
-        <div class="price-card">
-          <div class="price-tier" data-i18n="tier_club_name">Club</div>
-          <div class="price-amount">
-            <span class="price-num">199</span>
-            <span class="price-currency">kr</span>
-          </div>
-          <div class="price-period" data-i18n="price_per_month">per måned</div>
-          <ul class="price-features">
-            <li data-i18n="club_f1">✓ Alt i Pro</li>
-            <li data-i18n="club_f2">✓ Flere brukere</li>
-            <li data-i18n="club_f3">✓ Lagdeling og admin</li>
-            <li data-i18n="club_f4">✓ Desktop-visning</li>
-            <li class="dim coming-soon" data-i18n="club_f5">⏳ Kommer i Fase 4</li>
+        <!-- Club -->
+        <div class="bg-surface-container rounded-xl p-6 border border-outline-variant/40 flex flex-col">
+          <div class="font-headline font-bold text-xs uppercase tracking-wider text-on-surface-variant mb-3">Club</div>
+          <div class="font-headline font-bold text-4xl text-on-surface mb-1">$79</div>
+          <div class="text-on-surface-variant text-xs font-body mb-5">per year</div>
+          <ul class="text-on-surface-variant text-sm font-body space-y-2 mb-6 flex-1">
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Everything in Pro</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Multiple players</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Coach dashboard</li>
+            <li class="flex items-center gap-2"><span class="text-primary-container">✓</span> Team admin</li>
           </ul>
-          <a href="#" class="btn-price-secondary disabled" data-i18n="club_cta">Kommer snart</a>
+          <a href="/app" class="block text-center py-2.5 border border-outline-variant/60 rounded-lg text-on-surface font-headline font-semibold text-sm hover:border-primary-container/60 transition-colors">Contact us</a>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-logo">
-          <span>⚽</span>
-          <span>ATHLYTICS SPORT</span>
-        </div>
-        <p class="footer-copy" data-i18n="footer_copy">© 2026 Athlytics Sport. Alle rettigheter forbeholdt.</p>
-        <a href="/app" class="footer-app-link" data-i18n="footer_app_link">Åpne appen →</a>
+  <!-- ── CTA ── -->
+  <section class="py-24 px-6 text-center">
+    <div class="max-w-xl mx-auto">
+      <h2 class="font-headline font-bold text-4xl sm:text-5xl text-on-surface mb-4">Ready to dominate<br><span class="text-primary-container">the pitch?</span></h2>
+      <p class="text-on-surface-variant text-lg font-body mb-8">Join hundreds of players tracking their performance with Athlytics Sport.</p>
+      <a href="/app" class="inline-block px-10 py-4 bg-primary-container text-on-primary font-headline font-bold text-base rounded-lg hover:bg-primary-fixed-dim transition-colors">Start for free →</a>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="border-t border-outline-variant/30 py-8 px-6">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 bg-primary-container rounded-sm"></span>
+        <span class="font-headline font-bold text-xs tracking-[0.2em] text-on-surface-variant uppercase">Athlytics Sport</span>
+      </div>
+      <p class="text-on-surface-variant text-xs font-body">© 2026 Athlytics Sport. Track. Analyse. Win.</p>
+      <div class="flex gap-4">
+        <a href="/app" class="text-on-surface-variant text-xs hover:text-on-surface transition-colors">App</a>
+        <a href="#pricing" class="text-on-surface-variant text-xs hover:text-on-surface transition-colors">Pricing</a>
       </div>
     </div>
   </footer>
 
-  <!-- Auth modal -->
-  <div id="landing-auth-overlay" class="landing-auth-overlay hidden"
-       role="dialog" aria-modal="true" aria-labelledby="landing-auth-title">
-    <div class="landing-auth-modal">
-
-      <div class="landing-auth-brand">
-        <span class="landing-auth-icon">⚽</span>
-        <span class="landing-auth-logo">ATHLYTICS<span>SPORT</span></span>
-        <span class="landing-auth-tagline" id="landing-auth-tagline">Fotballstatistikk<br>for alle nivåer</span>
-      </div>
-
-      <div class="landing-auth-form">
-        <button class="landing-auth-close" id="landing-auth-close" aria-label="Lukk">&times;</button>
-        <h2 id="landing-auth-title">Logg inn</h2>
-
-        <div class="landing-auth-tabs" role="tablist">
-          <button class="landing-auth-tab active" data-tab="login" role="tab">Logg inn</button>
-          <button class="landing-auth-tab" data-tab="signup" role="tab">Registrer</button>
-        </div>
-
-        <div id="landing-login-view">
-          <input id="landing-login-email" type="email" autocomplete="email" placeholder="E-post">
-          <input id="landing-login-password" type="password" autocomplete="current-password" placeholder="Passord">
-          <div id="landing-login-error" class="landing-auth-error hidden"></div>
-          <button id="landing-login-submit">LOGG INN →</button>
-        </div>
-
-        <div id="landing-signup-view" class="hidden">
-          <input id="landing-signup-email" type="email" autocomplete="email" placeholder="E-post">
-          <input id="landing-signup-password" type="password" autocomplete="new-password" placeholder="Passord">
-          <input id="landing-signup-confirm" type="password" autocomplete="new-password" placeholder="Bekreft passord">
-          <div id="landing-signup-error" class="landing-auth-error hidden"></div>
-          <button id="landing-signup-submit">OPPRETT KONTO →</button>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
   <script>
-    // ── i18n ──
-    const TEKST = {
-      no: {
-        nav_cta: 'Åpne appen',
-        hero_eyebrow: 'Fotballstatistikk for alle nivåer',
-        hero_line1: 'LOGG.',
-        hero_line2: 'ANALYSER.',
-        hero_line3: 'VINN MER.',
-        hero_sub: 'Den enkleste måten å holde oversikt over kamper, mål, assist og sesongstatistikk – rett i mobilnettleseren.',
-        hero_cta_primary: 'Prøv gratis',
-        hero_cta_secondary: 'Se features ↓',
-        proof_matches: 'kamper logget',
-        proof_free: 'gratis å starte',
-        proof_install: 'apper å installere',
-        features_label: 'FEATURES',
-        features_title: 'Alt du trenger.<br>Ingenting du ikke trenger.',
-        feat1_title: 'Kamplogger', feat1_desc: 'Logg hjemme- og bortekamper med score, mål, assist og turnering. Automatisk resultatkalkulator basert på kamptype.', feat1_tag: 'Gratis',
-        feat2_title: 'Sesongstatistikk', feat2_desc: 'W/D/L-oversikt, mål per kamp, hjemme vs borte, per turnering – alt på ett sted.', feat2_tag: 'Gratis',
-        feat3_title: 'Analysegrafer', feat3_desc: 'Kumulativ seiersprosent, mål/assist-trend og mål per turnering visualisert med Chart.js.', feat3_tag: 'Pro',
-        feat4_title: 'Flere lag og turneringer', feat4_desc: 'Spiller du på flere lag? Legg til alle og filtrer statistikk per lag og sesong.', feat4_tag: 'Gratis',
-        feat5_title: 'Eksport', feat5_desc: 'Last ned kamphistorikken din som CSV eller PDF-rapport.', feat5_tag: 'Pro',
-        feat6_title: 'Multi-sport', feat6_desc: 'Orientering og ski kommer snart – samme app, tilpasset din sport.', feat6_tag: 'Kommer snart',
-        pricing_label: 'PRISER',
-        pricing_title: 'Start gratis.<br>Oppgrader når du er klar.',
-        popular_label: 'MEST POPULÆR',
-        tier_free_name: 'Gratis', tier_pro_name: 'Pro', tier_club_name: 'Club',
-        price_forever: 'for alltid', price_per_month: 'per måned',
-        free_f1: '✓ 1 lag, 1 sesong', free_f2: '✓ Ubegrenset kamplogging', free_f3: '✓ Basis statistikk', free_f4: '✓ Form-streak (siste 10 kamper)', free_f5: '– Analysegrafer', free_f6: '– Eksport CSV / PDF',
-        free_cta: 'Kom i gang',
-        pro_f1: '✓ Ubegrenset lag og sesonger', pro_f2: '✓ Alle gratisfunksjoner', pro_f3: '✓ Analysegrafer', pro_f4: '✓ Eksport CSV og PDF', pro_f5: '✓ Motstanderstatistikk', pro_f6: '✓ Per turnering-analyse',
-        pro_cta: 'Prøv Pro',
-        club_f1: '✓ Alt i Pro', club_f2: '✓ Flere brukere', club_f3: '✓ Lagdeling og admin', club_f4: '✓ Desktop-visning', club_f5: '⏳ Kommer i Fase 4',
-        club_cta: 'Kommer snart',
-        footer_copy: '© 2026 Athlytics Sport. Alle rettigheter forbeholdt.',
-        footer_app_link: 'Åpne appen →',
-      },
-      en: {
-        nav_cta: 'Open app',
-        hero_eyebrow: 'Football stats for every level',
-        hero_line1: 'LOG.',
-        hero_line2: 'ANALYSE.',
-        hero_line3: 'WIN MORE.',
-        hero_sub: 'The simplest way to track matches, goals, assists and season stats – right in your mobile browser.',
-        hero_cta_primary: 'Try for free',
-        hero_cta_secondary: 'See features ↓',
-        proof_matches: 'matches logged',
-        proof_free: 'free to start',
-        proof_install: 'apps to install',
-        features_label: 'FEATURES',
-        features_title: 'Everything you need.<br>Nothing you don\'t.',
-        feat1_title: 'Match Logger', feat1_desc: 'Log home and away matches with score, goals, assists and tournament. Automatic result calculator based on match type.', feat1_tag: 'Free',
-        feat2_title: 'Season Stats', feat2_desc: 'W/D/L overview, goals per match, home vs away, per tournament – all in one place.', feat2_tag: 'Free',
-        feat3_title: 'Analysis Charts', feat3_desc: 'Cumulative win rate, goals/assist trend and goals per tournament visualised with Chart.js.', feat3_tag: 'Pro',
-        feat4_title: 'Multiple teams & tournaments', feat4_desc: 'Playing on multiple teams? Add them all and filter stats by team and season.', feat4_tag: 'Free',
-        feat5_title: 'Export', feat5_desc: 'Download your match history as CSV or PDF report.', feat5_tag: 'Pro',
-        feat6_title: 'Multi-sport', feat6_desc: 'Orienteering and skiing coming soon – same app, adapted to your sport.', feat6_tag: 'Coming soon',
-        pricing_label: 'PRICING',
-        pricing_title: 'Start free.<br>Upgrade when you\'re ready.',
-        popular_label: 'MOST POPULAR',
-        tier_free_name: 'Free', tier_pro_name: 'Pro', tier_club_name: 'Club',
-        price_forever: 'forever', price_per_month: 'per month',
-        free_f1: '✓ 1 team, 1 season', free_f2: '✓ Unlimited match logging', free_f3: '✓ Basic statistics', free_f4: '✓ Form streak (last 10 matches)', free_f5: '– Analysis charts', free_f6: '– Export CSV / PDF',
-        free_cta: 'Get started',
-        pro_f1: '✓ Unlimited teams & seasons', pro_f2: '✓ All free features', pro_f3: '✓ Analysis charts', pro_f4: '✓ Export CSV and PDF', pro_f5: '✓ Opponent statistics', pro_f6: '✓ Per tournament analysis',
-        pro_cta: 'Try Pro',
-        club_f1: '✓ Everything in Pro', club_f2: '✓ Multiple users', club_f3: '✓ Team sharing & admin', club_f4: '✓ Desktop view', club_f5: '⏳ Coming in Phase 4',
-        club_cta: 'Coming soon',
-        footer_copy: '© 2026 Athlytics Sport. All rights reserved.',
-        footer_app_link: 'Open app →',
-      }
-    };
-
-    var activeLang = 'no';
-
-    function applyLang(lang) {
-      activeLang = lang;
-      var t = TEKST[lang];
-      document.querySelectorAll('[data-i18n]').forEach(function(el) {
-        var key = el.dataset.i18n;
-        if (t[key] !== undefined) {
-          if (key === 'features_title' || key === 'pricing_title') {
-            el.innerHTML = t[key];
-          } else {
-            el.textContent = t[key];
-          }
-        }
-      });
-      // Translate new auth elements
-      var loginBtn = document.getElementById('nav-login-btn');
-      if (loginBtn) loginBtn.textContent = lang === 'no' ? 'Logg inn' : 'Log in';
-
-      // Re-render modal title/tabs if modal is currently open
-      var overlay = document.getElementById('landing-auth-overlay');
-      if (overlay && !overlay.classList.contains('hidden')) {
-        var activeTab = document.querySelector('.landing-auth-tab.active');
-        if (activeTab) showLandingTab(activeTab.dataset.tab);
-      }
-      document.getElementById('nav-lang-label').textContent = lang === 'no' ? 'EN' : 'NO';
-      document.documentElement.lang = lang;
+    // Redirect to /app if already logged in
+    if (sessionStorage.getItem('athlytics_session') || localStorage.getItem('athlytics_session')) {
+      document.getElementById('nav-login-btn').textContent = 'Open app';
     }
-
-    document.getElementById('nav-lang-toggle').addEventListener('click', function() {
-      applyLang(activeLang === 'no' ? 'en' : 'no');
-    });
-
-    // ── Scroll-triggered nav shadow ──
-    window.addEventListener('scroll', function() {
-      document.getElementById('nav').classList.toggle('nav--scrolled', window.scrollY > 20);
-    });
-
-    // ── Smooth scroll for anchor links ──
-    document.querySelectorAll('a[href^="#"]').forEach(function(a) {
-      a.addEventListener('click', function(e) {
-        var target = document.querySelector(this.getAttribute('href'));
-        if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
-      });
-    });
-
-    // ── Intersection observer for card reveal ──
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) { entry.target.classList.add('visible'); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.feature-card, .price-card').forEach(function(el) {
-      observer.observe(el);
-    });
-
-    // ── Landing auth modal ──────────────────────────────────────────────────
-    var SUPA_URL = 'https://gjxsebeajcrmseraypyw.supabase.co';
-    var SUPA_KEY = 'sb_publishable_gkIN7XSAzQVKS9lpqj6LYQ_vV8G3VRe';
-    var LAND_SESSION_KEY = 'athlytics_session';
-
-    var _authFocusSrc = null;
-
-    function openLandingAuth(tab) {
-      var overlay = document.getElementById('landing-auth-overlay');
-      if (!overlay.classList.contains('hidden')) return;
-      _authFocusSrc = document.activeElement;
-      overlay.classList.remove('hidden');
-      showLandingTab(tab || 'login');
-      document.addEventListener('keydown', _trapModalFocus);
-      setTimeout(function() {
-        var first = overlay.querySelector('input');
-        if (first) first.focus();
-      }, 50);
-    }
-
-    function closeLandingAuth() {
-      document.getElementById('landing-auth-overlay').classList.add('hidden');
-      clearLandingErrors();
-      ['landing-login-email','landing-login-password','landing-signup-email','landing-signup-password','landing-signup-confirm'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      document.removeEventListener('keydown', _trapModalFocus);
-      if (_authFocusSrc) { _authFocusSrc.focus(); _authFocusSrc = null; }
-    }
-
-    function showLandingTab(tab) {
-      var loginView  = document.getElementById('landing-login-view');
-      var signupView = document.getElementById('landing-signup-view');
-      var title      = document.getElementById('landing-auth-title');
-      var tagline    = document.getElementById('landing-auth-tagline');
-      loginView.classList.toggle('hidden', tab !== 'login');
-      signupView.classList.toggle('hidden', tab !== 'signup');
-      title.textContent = tab === 'login'
-        ? (activeLang === 'no' ? 'Logg inn' : 'Log in')
-        : (activeLang === 'no' ? 'Registrer deg' : 'Create account');
-      tagline.innerHTML = activeLang === 'no'
-        ? 'Fotballstatistikk<br>for alle nivåer'
-        : 'Football stats<br>for every level';
-      document.querySelectorAll('.landing-auth-tab').forEach(function(t) {
-        t.classList.toggle('active', t.dataset.tab === tab);
-        t.textContent = t.dataset.tab === 'login'
-          ? (activeLang === 'no' ? 'Logg inn' : 'Log in')
-          : (activeLang === 'no' ? 'Registrer' : 'Sign up');
-      });
-    }
-
-    function clearLandingErrors() {
-      ['landing-login-error', 'landing-signup-error'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) { el.textContent = ''; el.classList.add('hidden'); }
-      });
-    }
-
-    function showLandingError(id, msg) {
-      var el = document.getElementById(id);
-      if (el) { el.textContent = msg; el.classList.remove('hidden'); }
-    }
-
-    function storeLandingSession(data) {
-      localStorage.setItem(LAND_SESSION_KEY, JSON.stringify({
-        accessToken:  data.access_token,
-        refreshToken: data.refresh_token,
-        userId:       data.user.id,
-        email:        data.user.email,
-        expiresAt:    Date.now() + (data.expires_in * 1000)
-      }));
-    }
-
-    async function handleLandingLogin() {
-      clearLandingErrors();
-      var btn = document.getElementById('landing-login-submit');
-      btn.disabled = true;
-      var email    = document.getElementById('landing-login-email').value.trim();
-      var password = document.getElementById('landing-login-password').value;
-      try {
-        var res = await fetch(SUPA_URL + '/auth/v1/token?grant_type=password', {
-          method: 'POST',
-          headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email, password: password })
-        });
-        var data = await res.json();
-        if (!res.ok) {
-          showLandingError('landing-login-error', data.error_description || data.message || (activeLang === 'no' ? 'Innlogging feilet' : 'Login failed'));
-          btn.disabled = false;
-          return;
-        }
-        storeLandingSession(data);
-        window.location.replace('/app');
-      } catch(e) {
-        showLandingError('landing-login-error', e.message);
-        btn.disabled = false;
-      }
-    }
-
-    async function handleLandingSignup() {
-      clearLandingErrors();
-      var btn = document.getElementById('landing-signup-submit');
-      btn.disabled = true;
-      var email    = document.getElementById('landing-signup-email').value.trim();
-      var password = document.getElementById('landing-signup-password').value;
-      var confirm  = document.getElementById('landing-signup-confirm').value;
-      if (password !== confirm) {
-        showLandingError('landing-signup-error', activeLang === 'no' ? 'Passordene stemmer ikke overens' : 'Passwords do not match');
-        btn.disabled = false;
-        return;
-      }
-      try {
-        var res = await fetch(SUPA_URL + '/auth/v1/signup', {
-          method: 'POST',
-          headers: { 'apikey': SUPA_KEY, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email, password: password })
-        });
-        var data = await res.json();
-        if (!res.ok) {
-          showLandingError('landing-signup-error', data.error_description || data.message || (activeLang === 'no' ? 'Registrering feilet' : 'Signup failed'));
-          btn.disabled = false;
-          return;
-        }
-        if (!data.access_token) {
-          showLandingError('landing-signup-error', activeLang === 'no' ? 'Sjekk e-posten din for bekreftelse' : 'Check your email to confirm');
-          btn.disabled = false;
-          return;
-        }
-        storeLandingSession(data);
-        window.location.replace('/app');
-      } catch(e) {
-        showLandingError('landing-signup-error', e.message);
-        btn.disabled = false;
-      }
-    }
-
-    function _trapModalFocus(e) {
-      if (e.key !== 'Tab') return;
-      var modal = document.querySelector('.landing-auth-modal');
-      var focusable = Array.from(modal.querySelectorAll('button:not([disabled]), input, [tabindex]:not([tabindex="-1"])'));
-      if (!focusable.length) return;
-      var first = focusable[0];
-      var last  = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    }
-
-    // ── Wire modal events ──
-    document.getElementById('landing-auth-close').addEventListener('click', closeLandingAuth);
-
-    document.getElementById('nav-login-btn').addEventListener('click', function() {
-      openLandingAuth('login');
-    });
-
-    document.getElementById('landing-auth-overlay').addEventListener('click', function(e) {
-      if (e.target === this) closeLandingAuth();
-    });
-
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape') {
-        var overlay = document.getElementById('landing-auth-overlay');
-        if (!overlay.classList.contains('hidden')) closeLandingAuth();
-      }
-    });
-
-    document.querySelectorAll('.landing-auth-tab').forEach(function(btn) {
-      btn.addEventListener('click', function() { showLandingTab(this.dataset.tab); });
-    });
-
-    document.getElementById('landing-login-submit').addEventListener('click', handleLandingLogin);
-    document.getElementById('landing-signup-submit').addEventListener('click', handleLandingSignup);
-
-    document.getElementById('landing-auth-overlay').addEventListener('keydown', function(e) {
-      if (e.key !== 'Enter') return;
-      if (e.target.tagName === 'BUTTON') return;
-      var loginHidden = document.getElementById('landing-login-view').classList.contains('hidden');
-      if (!loginHidden) handleLandingLogin();
-      else handleLandingSignup();
-    });
   </script>
 </body>
 </html>
