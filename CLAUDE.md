@@ -36,88 +36,21 @@
 
 ---
 
-## ⛔ MVP-gjeld – løs før skalering
+## ⚠️ Sikkerhetsposisjon – auth.js
 
-Følgende er kjent teknisk og sikkerhetsmessig gjeld som **må** løses før appen åpnes for flere brukere:
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| Semantisk HTML mangler (`main`, `section`, `form`, `fieldset`, `dialog`) | 🟡 Medium | ✅ Ferdig — `<main>`, `<section aria-label>`, `<form novalidate>` implementert 2026-03-21 |
-| Modaler mangler ARIA (`role="dialog"`, `aria-modal`, fokusstyring) | 🟡 Medium | ✅ Ferdig — ARIA + fokusstyring (save/restore/trap) på alle fire modaler 2026-03-21 |
-| Custom dropdowns mangler keyboard/ARIA-støtte | 🟡 Medium | ✅ Ferdig — keyboard nav (arrow keys, Enter, Escape) implementert 2026-03-27 |
-
-> Auth og RLS er implementert (Fase 4). Nye features kan nå avhenge av brukerdata.
->
-> **Sikkerhetsposisjon auth.js (MVP):** Access- og refresh-token lagres i `localStorage`. Dette er standard browser-praksis for SPA-er uten backend, men betyr at XSS gir full session-kompromittering. Risikoen dempes av systematisk escaping i render-stier. Akseptabelt for MVP – vurder `httpOnly`-cookie-basert session ved hardening. `logout()` gjør `window.location.reload()` for å nullstille all app-state; dette er en bevisst forenkling og fungerer godt i en liten app. Token-refresh skjer expiry-drevet (5 min buffer).
+Access- og refresh-token lagres i `localStorage`. Standard SPA-praksis, men XSS gir full session-kompromittering. Risikoen dempes av systematisk escaping i alle render-stier. Akseptabelt for MVP – vurder `httpOnly`-cookie-basert session ved hardening. `logout()` gjør `window.location.reload()` for å nullstille app-state. Token-refresh skjer expiry-drevet (5 min buffer).
 
 ---
 
-## 🔧 Teknisk gjeld – kode
+## 🔧 Åpen teknisk gjeld
 
-### main.js / app.html
-
-| Problem | Fil | Alvorlighet | Løsning |
-|---|---|---|---|
-| `main.js` er blitt et god-object: eier routing, auth-overlay, demo-banner, dato-toggle, cache og bootstrap | `main.js` | 🟡 Medium | ✅ Ferdig | auth-ui.js ekstrahert 2026-03-20. ACTIONS-map → actions.js, dato-toggle → log.js 2026-03-21. |
-
-### supabase.js
-
-| Problem | Alvorlighet | Løsning |
+| Område | Problem | Alvorlighet |
 |---|---|---|
-| `fetchSettings()` / `upsertSettings()` peker mot `profiler`-tabellen, men navngivingen antyder egen tabell | 🟡 Medium | ✅ Ferdig — renamed to English (fetchMatches, upsertProfile, etc.) 2026-03-27 |
-| `fetchKamper()` sender ingen user_id-filter i query-strengen | 🟡 Merknad | Riktig arkitektur — klient-side filter er unødvendig når RLS er korrekt konfigurert. **Konsekvens:** datakorrekthet og personvern avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. |
-
-### settings.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| Domain-verdier bruker norsk: `sport='fotball'`, `seasonFormat='aar'`/`'sesong'` – lagres i localStorage og Supabase | 🟡 Medium | ✅ Ferdig — renamed to English + localStorage boot migration 2026-03-27. Supabase-rader verifisert tomme (COUNT=0), ingen SQL-migrasjon nødvendig. |
-
-### app.html
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `app.html` inneholder norske standardstrenger (placeholders, settings-tekst) som overskrives etter load | 🟢 Lav | Bevisst valg: `updateAllText()` og `renderSettings()` kjøres ved bootstrap. Skjørt hvis render-syklusen feiler. Vurder nøytralt / tom HTML ved Fase 3-redesign. |
-
-### profile.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `uploadImage()` lagrer base64 i localStorage – risiko for quota-feil ved store bilder | 🟡 Nesten ferdig | ✅ Ferdig – merget `feature/avatar-storage` 2026-03-21. Supabase Storage for autentiserte brukere. |
-| `saveProfile()` avhenger av remote state ved lagring: fetcher Supabase for å bevare arrays/avatar, tar bare tekstfelt fra skjema | 🟡 Medium | ✅ Ferdig – bruker `Object.assign({}, getProfile(), { name, club })`. Cache er autoritativ; ingen nettverksroundtrip ved lagring. |
-
-### modal.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `closeModal()` resetter mange felt manuelt – korrekt i dag, men kostbart å utvide | 🟡 Medium | ✅ Ferdig – `mState`-objekt + `Object.assign(mState, MODAL_DEFAULTS)` ved lukking. |
-
-> **Kritisk invariant:** `modalAdjust()` og `adjust()` **må** alltid ha identisk clamp-logikk. Endre aldri én uten den andre.
-
-### assessment.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| Premium-gate bruker `isDevPremium()` som alltid returnerer `true` – er dev-toggle, ikke ekte entitlement | 🟡 Medium | Assessment-funksjonen er tilgjengelig for alle i praksis. Kobles til Stripe/ekte abonnement i Fase 4. Ikke endre `isDevPremium()` til `false` uten at betalingsflyt er på plass. |
-| `saveAssessment()` blander DOM-reads, API-kall, state-mutasjon, toast og knapp-state i én funksjon | 🟢 Lav | Akseptabelt nå; stopp videre vekst i samme retning. |
-
-### navigation.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `updateLogBadge()` hardkoder sport-til-ikon-mapping inline | 🟢 Lav | Flytt til `SPORT_META`-map ved Fase 3 multi-sport |
-
-### stats-overview.js / stats-analyse.js / stats-search.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| `innerHTML` med store HTML-strenger – risiko for glemte escapes | 🟡 Medium | ✅ Auditert 2026-03-21 – all brukerdata escapes med `esc()`. Ingen hull funnet. |
-
-### export.js
-
-| Problem | Alvorlighet | Løsning |
-|---|---|---|
-| PDF-implementasjon er `window.open + print()` – kan blokkeres av popup-blokkering | 🟡 Medium | ✅ Ferdig – bruker skjult `<iframe>` istedet for `window.open()`; aldri blokkert av popup-blokkering. |
+| `supabase.js` | `fetchMatches()` sender ingen `user_id`-filter — datakorrekthet avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. | 🟡 Arkitekturmerknad |
+| `app.html` | Inneholder norske standardstrenger som overskrives av `updateAllText()` ved bootstrap. Skjørt hvis render-syklusen feiler. | 🟢 Lav |
+| `assessment.js` | `isDevPremium()` returnerer alltid `true` — ikke ekte entitlement. Ikke sett til `false` før Stripe-flyt er på plass. | 🟡 Medium |
+| `assessment.js` | `saveAssessment()` blander DOM-reads, API-kall, state-mutasjon, toast og knapp-state. | 🟢 Lav |
+| `navigation.js` | `updateLogBadge()` hardkoder sport-til-ikon-mapping. Flytt til `SPORT_META`-map ved Fase 3 multi-sport. | 🟢 Lav |
 
 ---
 
