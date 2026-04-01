@@ -9,6 +9,10 @@
 - **Tailwind config order** (`landing.html` + `app.html`): Moved `<script src="cdn.tailwindcss.com">` before `tailwind.config = {...}` — the assignment threw a `ReferenceError` when CDN wasn't loaded yet, causing all custom color tokens to fail and text to render black on dark backgrounds
 - **Result row** (`style.css`): Removed `background` from `.wins/.draw/.loss` — semi-transparent tint over the dark page background rendered as muddy olive; border + text color alone is sufficient
 - **Stray score separator** (`app.html`): Removed `–` span between HOME/AWAY score boxes — it was invisible before the Tailwind fix and rendered as a floating minus button after
+- **CSS root variables** (`style.css`): Added `:root` block with `--lime`, `--gold`, `--danger`, `--muted`, `--white`, `--border` — JS files use these via `var(--lime)` etc. in dynamically-rendered HTML; they were missing from the redesigned stylesheet
+- **Missing CSS classes** (`style.css`): Re-added all component classes dropped during style.css rewrite but still referenced by JS renderers: `stat-row-card`, `form-streak-box`, `wdl-seg`, `ha-grid/ha-card/ha-nums/ha-num/ha-mini-bar`, `tournament-stat-row`, `team-list-item`, `chart-card/chart-locked/rating-pill`, `opponent-search`, `match-list-header`, `season-selector/season-pill`, and others
+- **Analysis tab** (`js/stats-analyse.js`): Removed `renderFormStreak()` call from `renderAnalyse()` — Overview and Analysis tabs were rendering identical content at the top; form streak belongs only in Overview
+- **Share page** (`share.html`, `js/share-viewer.js`, `style.css`): Updated fonts from Barlow to Space Grotesk + Inter; updated chart colors and font to Kinetic Velocity tokens (`#00f2ff` cyan, `#ffe173` gold, Space Grotesk); added all share-specific CSS classes (`.share-viewer-body`, `.share-desktop-layout`, `.share-sidebar`, `.share-main`, `.share-profile-*`, `.match-item`, `.chart-section`, etc.)
 
 ---
 

@@ -385,7 +385,7 @@ export function t(key) { ... }
 
 ## Design
 
-**⚠️ This branch is mid-redesign to Kinetic Velocity. The old green system is replaced.**
+**Kinetic Velocity design system (live on main as of 2026-03-31)**
 
 - Font: **Space Grotesk** (headlines/labels) + **Inter** (body)
 - Primary accent: `#00f2ff` (cyan) — replaces `#a8e063` (lime)
@@ -396,6 +396,8 @@ export function t(key) { ... }
 - Grid texture: `body::before` radial-gradient dots, 40px spacing
 - Tailwind CDN (no build step) — tokens in `tailwind.config` block in `app.html`. **⚠️ CDN `<script>` must come BEFORE `tailwind.config = {...}`** — assigning config before the CDN loads throws a `ReferenceError` and all custom color tokens silently fail.
 - Chart.js via CDN: `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` (defer i `<head>`)
+- **CSS `:root` variables** — JS files use `var(--lime)`, `var(--gold)`, `var(--danger)`, `var(--muted)`, `var(--white)`, `var(--border)` in dynamically-rendered HTML. These are defined in `style.css :root`. Tailwind classes do NOT cover these; they must stay in `:root`.
+- **Share page** (`share.html` + `js/share-viewer.js`) uses plain CSS from `style.css` — no Tailwind. Share page classes are prefixed `.share-*` and `.match-*`.
 
 ---
 
