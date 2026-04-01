@@ -418,9 +418,9 @@ function _renderAnalyse(matches) {
   if (typeof Chart === 'undefined') return '<div class="loading">' + t('loading_charts') + '</div>';
   if (matches.length === 0) return '<div class="loading">' + t('no_matches_season') + '</div>';
 
-  Chart.defaults.color = '#8a9a80';
-  Chart.defaults.borderColor = 'rgba(168,224,99,0.08)';
-  Chart.defaults.font.family = 'Barlow Condensed';
+  Chart.defaults.color = '#b9cacb';
+  Chart.defaults.borderColor = 'rgba(58,73,75,0.4)';
+  Chart.defaults.font.family = 'Space Grotesk';
 
   return '<div class="chart-section">' +
            '<div class="chart-section-title">' + t('chart_win_pct') + '</div>' +
@@ -450,7 +450,7 @@ function _initCharts(matches) {
     });
     _chartInstances.winpct = new Chart(canvasWin, {
       type: 'line',
-      data: { labels: labels, datasets: [{ label: t('chart_win_pct'), data: data, borderColor: '#a8e063', tension: 0.3 }] },
+      data: { labels: labels, datasets: [{ label: t('chart_win_pct'), data: data, borderColor: '#00f2ff', backgroundColor: 'rgba(0,242,255,0.08)', tension: 0.3, fill: true }] },
       options: { responsive: true, plugins: { legend: { display: false } } }
     });
   }
@@ -463,8 +463,8 @@ function _initCharts(matches) {
       data: {
         labels: sorted.map(function(k) { return k.date || ''; }),
         datasets: [
-          { label: t('stat_goals'), data: sorted.map(function(k) { return k.goals || 0; }), backgroundColor: '#a8e063' },
-          { label: t('stat_assists'), data: sorted.map(function(k) { return k.assists || 0; }), backgroundColor: '#f0c050' }
+          { label: t('stat_goals'), data: sorted.map(function(k) { return k.goals || 0; }), backgroundColor: 'rgba(0,242,255,0.7)' },
+          { label: t('stat_assists'), data: sorted.map(function(k) { return k.assists || 0; }), backgroundColor: 'rgba(255,225,115,0.7)' }
         ]
       },
       options: { responsive: true, scales: { x: { stacked: false }, y: { stacked: false, beginAtZero: true } } }
