@@ -79,7 +79,7 @@
 </header>
 
   <!-- Demo banner — visible when unauthenticated -->
-  <div class="demo-banner fixed top-0 inset-x-0 z-50 items-center justify-between gap-2 px-4 py-2 bg-surface-container-high border-b border-outline-variant/40 text-sm" id="demo-banner">
+  <div class="demo-banner fixed top-[52px] inset-x-0 z-40 items-center justify-between gap-2 px-4 py-2 bg-surface-container-high border-b border-outline-variant/40 text-sm" id="demo-banner">
     <span class="text-on-surface-variant" data-i18n="demo_banner_text">You're viewing demo data — create a free account to track your own</span>
     <div class="flex items-center gap-2 shrink-0">
       <button class="px-3 py-1 rounded-full bg-primary-container text-on-primary text-xs font-headline font-semibold" data-action="openAuthOverlay" data-i18n="demo_banner_signup">Sign up free</button>
@@ -179,7 +179,7 @@
           <div class="team-selected flex items-center justify-between bg-surface-container border border-outline-variant/40 rounded-lg px-4 py-2.5 cursor-pointer"
                id="team-selected" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-dropdown" data-action="toggleTeamDropdown">
             <span class="team-selected-text text-on-surface-variant font-body text-sm" id="team-selected-text" data-i18n="placeholder_select_team">Select team...</span>
-            <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform">▼</span>
+            <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform" id="team-chevron">▼</span>
           </div>
           <div class="team-dropdown absolute top-full left-0 right-0 mt-1 bg-surface-container-low border border-primary-container rounded-lg z-50 overflow-hidden shadow-lg" id="team-dropdown" role="listbox">
             <div id="team-options-list"></div>
@@ -272,7 +272,7 @@
   <!-- Screen title -->
   <div class="px-6 pt-5 pb-3">
     <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="stats_screen_label">Performance Analytics</p>
-    <h1 class="font-headline font-bold text-2xl text-on-surface" id="stats-heading">My <span class="text-primary-container" data-i18n="tab_stats">Stats</span></h1>
+    <h1 class="font-headline font-bold text-2xl text-on-surface" id="stats-heading">My <span class="text-primary-container" data-i18n="tab_stats">Stats</span><span id="stats-heading-season" class="text-on-surface-variant text-lg font-normal"></span></h1>
     <p class="text-xs text-on-surface-variant mt-1" id="stats-sub"></p>
   </div>
 
@@ -320,6 +320,7 @@
   <div class="px-6 pt-5 pb-3">
     <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="profile_screen_label">Player Identity</p>
     <h1 class="font-headline font-bold text-2xl text-on-surface" id="profil-title">My <span class="text-primary-container" data-i18n="tab_profile">Profile</span></h1>
+    <p class="text-xs text-on-surface-variant mt-1" id="profil-sub"></p>
   </div>
 
   <!-- Soft prompt banner -->
