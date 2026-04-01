@@ -5,13 +5,13 @@ import { getResult, esc, isDevPremium } from './utils.js';
 import { t } from './i18n.js';
 
 var CHART_COLORS = {
-  lime:     '#a8e063',
-  gold:     '#f0c050',
-  danger:   '#e05555',
-  muted:    '#8a9a80',
-  card:     '#162b1a',
-  border:   'rgba(168,224,99,0.15)',
-  gridLine: 'rgba(168,224,99,0.08)',
+  lime:     '#00f2ff',
+  gold:     '#ffe173',
+  danger:   '#ffb4ab',
+  muted:    '#b9cacb',
+  card:     '#1c2026',
+  border:   'rgba(0,242,255,0.15)',
+  gridLine: 'rgba(58,73,75,0.4)',
   blue:     '#63b8e0',
   purple:   '#b08ae0',
   teal:     '#50d0a0'
@@ -34,9 +34,9 @@ export function destroyCharts() {
 
 export function initChartDefaults() {
   if (typeof Chart === 'undefined') return;
-  Chart.defaults.color = CHART_COLORS.muted;
-  Chart.defaults.borderColor = CHART_COLORS.gridLine;
-  Chart.defaults.font.family = 'Barlow Condensed';
+  Chart.defaults.color = '#b9cacb';
+  Chart.defaults.borderColor = 'rgba(58,73,75,0.4)';
+  Chart.defaults.font.family = 'Space Grotesk';
 }
 
 export function renderFormStreak(matches) {
@@ -103,7 +103,7 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
       '<div class="chart-locked">' +
         '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +
           '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
-          '<div class="chart-canvas-wrap" style="height:160px;background:rgba(168,224,99,0.04);border-radius:8px"></div>' +
+          '<div class="chart-canvas-wrap" style="height:160px;background:rgba(0,242,255,0.04);border-radius:8px"></div>' +
         '</div>' +
         '<div class="chart-locked-overlay">' +
           '<div class="chart-locked-icon">\u{1F512}</div>' +
@@ -186,7 +186,7 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   });
   chartInstances['winpct'] = new Chart(document.getElementById('chart-winpct'), {
     type: 'line',
-    data: { labels: labels1, datasets: [{ label: t('chart_win_pct'), data: winPctData, borderColor: CHART_COLORS.lime, backgroundColor: 'rgba(168,224,99,0.08)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.lime, fill: true, tension: 0.3 }] },
+    data: { labels: labels1, datasets: [{ label: t('chart_win_pct'), data: winPctData, borderColor: CHART_COLORS.lime, backgroundColor: 'rgba(0,242,255,0.08)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.lime, fill: true, tension: 0.3 }] },
     options: { responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ctx.parsed.y + '%'; } } } }, scales: { x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { min: 0, max: 100, ticks: { callback: function(v) { return v + '%'; }, stepSize: 25, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } } } }
   });
 
@@ -198,8 +198,8 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   });
   chartInstances['goals'] = new Chart(document.getElementById('chart-goals'), {
     type: 'line',
-    data: { labels: labels2, datasets: [{ label: t('stat_goals'), data: goalData, borderColor: CHART_COLORS.lime, backgroundColor: 'rgba(168,224,99,0.08)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.lime, fill: true, tension: 0.2 }, { label: t('stat_assists'), data: assistData, borderColor: CHART_COLORS.gold, backgroundColor: 'rgba(240,192,80,0.06)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.gold, fill: true, tension: 0.2 }] },
-    options: { responsive: true, plugins: { legend: { display: true, labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Barlow Condensed', weight: '700' }, boxWidth: 12, padding: 12 } } }, scales: { x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { min: 0, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } } } }
+    data: { labels: labels2, datasets: [{ label: t('stat_goals'), data: goalData, borderColor: CHART_COLORS.lime, backgroundColor: 'rgba(0,242,255,0.08)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.lime, fill: true, tension: 0.2 }, { label: t('stat_assists'), data: assistData, borderColor: CHART_COLORS.gold, backgroundColor: 'rgba(255,225,115,0.06)', borderWidth: 2, pointRadius: asc.length > 20 ? 0 : 3, pointHoverRadius: 5, pointBackgroundColor: CHART_COLORS.gold, fill: true, tension: 0.2 }] },
+    options: { responsive: true, plugins: { legend: { display: true, labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Space Grotesk', weight: '700' }, boxWidth: 12, padding: 12 } } }, scales: { x: { ticks: { maxRotation: 0, maxTicksLimit: 6, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { min: 0, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } } } }
   });
 
   var tournMap = {};
@@ -214,8 +214,8 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   document.getElementById('chart-tournament-wrap').style.height = barHeight + 'px';
   chartInstances['tournament'] = new Chart(document.getElementById('chart-tournament'), {
     type: 'bar',
-    data: { labels: tournKeys, datasets: [{ label: t('stat_goals'), data: tournKeys.map(function(k) { return tournMap[k].g; }), backgroundColor: 'rgba(168,224,99,0.6)', borderColor: CHART_COLORS.lime, borderWidth: 1, borderRadius: 4 }, { label: t('stat_assists'), data: tournKeys.map(function(k) { return tournMap[k].a; }), backgroundColor: 'rgba(240,192,80,0.5)', borderColor: CHART_COLORS.gold, borderWidth: 1, borderRadius: 4 }] },
-    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Barlow Condensed', weight: '700' }, boxWidth: 12, padding: 12 } } }, scales: { x: { ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
+    data: { labels: tournKeys, datasets: [{ label: t('stat_goals'), data: tournKeys.map(function(k) { return tournMap[k].g; }), backgroundColor: 'rgba(0,242,255,0.6)', borderColor: CHART_COLORS.lime, borderWidth: 1, borderRadius: 4 }, { label: t('stat_assists'), data: tournKeys.map(function(k) { return tournMap[k].a; }), backgroundColor: 'rgba(255,225,115,0.5)', borderColor: CHART_COLORS.gold, borderWidth: 1, borderRadius: 4 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, labels: { color: CHART_COLORS.muted, font: { size: 11, family: 'Space Grotesk', weight: '700' }, boxWidth: 12, padding: 12 } } }, scales: { x: { ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: CHART_COLORS.gridLine } }, y: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
   });
 
   if (ratingMatches.length > 0 && document.getElementById('chart-rating')) {
