@@ -55,448 +55,488 @@
 </head>
 <body>
 
+<header class="fixed top-0 inset-x-0 z-50 bg-surface-container-highest/60 backdrop-blur-xl border-b border-outline-variant/30" style="backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
+  <div class="flex items-center justify-between px-4 h-[52px] max-w-[480px] mx-auto">
+    <!-- Logo -->
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 bg-primary-container rounded-sm inline-block"></span>
+      <span class="font-headline font-bold text-xs tracking-[0.2em] text-on-surface uppercase">Athlytics</span>
+    </div>
+    <!-- Right: lang picker + avatar -->
+    <div class="flex items-center gap-3">
+      <div class="lang-picker-wrap relative">
+        <button class="lang-flag-btn text-xl p-1 rounded" id="lang-flag-btn-global" data-action="toggleLangPicker" title="Change language"></button>
+        <div class="lang-picker-dropdown hidden absolute right-0 top-9 bg-surface-container border border-outline-variant/40 rounded-xl overflow-hidden z-50 shadow-lg min-w-[140px]" id="lang-picker-dropdown-global">
+          <button class="flex items-center gap-2 w-full px-4 py-3 text-on-surface font-body text-sm hover:bg-primary-container/10 text-left" data-action="setLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>
+          <button class="flex items-center gap-2 w-full px-4 py-3 text-on-surface font-body text-sm hover:bg-primary-container/10 text-left" data-action="setLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>
+        </div>
+      </div>
+      <button class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/40 flex items-center justify-center text-sm" data-action="switchTab" data-tab="profil" aria-label="Profile">
+        <span id="nav-avatar-emoji">👤</span>
+      </button>
+    </div>
+  </div>
+</header>
+
   <!-- Demo banner — visible when unauthenticated -->
-  <div class="demo-banner hidden" id="demo-banner">
-    <span data-i18n="demo_banner_text">You're viewing demo data — create a free account to track your own</span>
-    <button class="demo-banner-signup" data-action="openAuthOverlay" data-i18n="demo_banner_signup">Sign up free</button>
-    <button class="demo-banner-dismiss" data-action="dismissDemoBanner" aria-label="Dismiss">✕</button>
+  <div class="demo-banner fixed top-0 inset-x-0 z-50 items-center justify-between gap-2 px-4 py-2 bg-surface-container-high border-b border-outline-variant/40 text-sm" id="demo-banner">
+    <span class="text-on-surface-variant" data-i18n="demo_banner_text">You're viewing demo data — create a free account to track your own</span>
+    <div class="flex items-center gap-2 shrink-0">
+      <button class="px-3 py-1 rounded-full bg-primary-container text-on-primary text-xs font-headline font-semibold" data-action="openAuthOverlay" data-i18n="demo_banner_signup">Sign up free</button>
+      <button class="text-on-surface-variant hover:text-on-surface" data-action="dismissDemoBanner" aria-label="Dismiss">✕</button>
+    </div>
   </div>
 
   <!-- Auth overlay — full-screen, hidden by default -->
-  <div class="auth-overlay hidden" id="auth-overlay">
-    <div class="auth-modal" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-dialog-title">
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="bg-surface-container rounded-xl w-full max-w-sm mx-4 p-6 border border-outline-variant/40" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-dialog-title">
       <h2 id="auth-dialog-title" class="sr-only"></h2>
 
       <!-- Login view -->
       <div class="auth-view" id="auth-login-view">
-        <h2 class="auth-title" data-i18n="auth_login_title">Log in</h2>
-        <div class="auth-error hidden" id="auth-login-error"></div>
-        <form novalidate>
-          <input type="email" id="auth-login-email" class="auth-input"
+        <h2 class="font-headline font-semibold text-2xl text-on-surface mb-5" data-i18n="auth_login_title">Log in</h2>
+        <div class="hidden text-error text-sm mb-3 p-3 bg-error/10 rounded-lg" id="auth-login-error"></div>
+        <form novalidate class="flex flex-col gap-3">
+          <input type="email" id="auth-login-email"
+                 class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
                  placeholder="Email" autocomplete="email">
-          <input type="password" id="auth-login-password" class="auth-input"
+          <input type="password" id="auth-login-password"
+                 class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
                  placeholder="Password" autocomplete="current-password">
-          <button class="auth-btn-primary" data-action="authLogin" data-i18n="auth_login_btn">Log in</button>
+          <button class="w-full py-3 bg-primary-container text-on-primary font-headline font-semibold rounded-lg mt-1" data-action="authLogin" data-i18n="auth_login_btn">Log in</button>
         </form>
-        <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_signup">Don't have an account? Sign up</button>
+        <button class="w-full mt-3 text-on-surface-variant text-sm hover:text-primary-container" data-action="authToggleView" data-i18n="auth_to_signup">Don't have an account? Sign up</button>
       </div>
 
       <!-- Signup view -->
       <div class="auth-view hidden" id="auth-signup-view">
-        <h2 class="auth-title" data-i18n="auth_signup_title">Create account</h2>
-        <div class="auth-error hidden" id="auth-signup-error"></div>
-        <form novalidate>
-          <input type="email" id="auth-signup-email" class="auth-input"
+        <h2 class="font-headline font-semibold text-2xl text-on-surface mb-5" data-i18n="auth_signup_title">Create account</h2>
+        <div class="hidden text-error text-sm mb-3 p-3 bg-error/10 rounded-lg" id="auth-signup-error"></div>
+        <form novalidate class="flex flex-col gap-3">
+          <input type="email" id="auth-signup-email"
+                 class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
                  placeholder="Email" autocomplete="email">
-          <input type="password" id="auth-signup-password" class="auth-input"
+          <input type="password" id="auth-signup-password"
+                 class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
                  placeholder="Password" autocomplete="new-password">
-          <input type="password" id="auth-signup-confirm" class="auth-input"
+          <input type="password" id="auth-signup-confirm"
+                 class="w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-3 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
                  placeholder="Confirm password" autocomplete="new-password">
-          <button class="auth-btn-primary" data-action="authSignup" data-i18n="auth_signup_btn">Create account</button>
+          <button class="w-full py-3 bg-primary-container text-on-primary font-headline font-semibold rounded-lg mt-1" data-action="authSignup" data-i18n="auth_signup_btn">Create account</button>
         </form>
-        <button class="auth-btn-link" data-action="authToggleView" data-i18n="auth_to_login">Already have an account? Log in</button>
+        <button class="w-full mt-3 text-on-surface-variant text-sm hover:text-primary-container" data-action="authToggleView" data-i18n="auth_to_login">Already have an account? Log in</button>
       </div>
-
     </div>
   </div>
 
 <div class="landscape-block">
-  <div class="landscape-block-inner">
-    <div class="landscape-block-icon">📱</div>
-    <div class="landscape-block-text">Roter telefonen til stående modus</div>
-  </div>
+  <div class="text-4xl mb-3">📱</div>
+  <p class="font-headline font-semibold text-on-surface-variant text-sm uppercase tracking-widest" data-i18n="landscape_rotate">Rotate to portrait</p>
 </div>
 
 <!-- ══════════════════════════════════ LOGG ══════════════════════════════════ -->
-<main>
+<main class="pt-[52px]">
 <section class="screen active" id="screen-log" aria-label="Match log">
-  <div class="header">
-    <div class="header-title-row">
-      <h1>Match<span> log</span></h1>
-      <div class="header-badge" id="log-badge">⚽ Sesong 2025</div>
-      <div class="lang-picker-wrap">
-        <button class="lang-flag-btn" id="lang-flag-btn-log" data-action="toggleLangPicker" title="Change language"></button>
-        <div class="lang-picker-dropdown" id="lang-picker-dropdown-log">
-          <button data-action="setLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>
-          <button data-action="setLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>
-        </div>
-      </div>
-    </div>
-    <p class="header-sub" id="log-sub"></p>
+  <!-- Screen title -->
+  <div class="px-6 pt-5 pb-3">
+    <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="log_screen_label">Performance Data Entry</p>
+    <h1 class="font-headline font-bold text-2xl text-on-surface" id="log-heading">Match <span class="text-primary-container" data-i18n="tab_log">Log</span></h1>
+    <p class="text-xs text-on-surface-variant mt-1" id="log-sub"></p>
   </div>
-  <form class="form-body" id="log-form" novalidate>
-    <div class="form-section date-compact-section">
-      <div class="date-compact-row">
-        <div class="date-left">
-          <span class="date-compact-label" id="date-display-label">I dag</span>
-          <button type="button" class="date-toggle-btn" id="date-toggle-btn" title="Endre dato"><span class="match-svg-icon match-icon-date"></span></button>
+
+  <form class="px-6 pb-6 flex flex-col gap-3" id="log-form" novalidate>
+
+    <!-- Date + match type row -->
+    <div class="date-compact-section">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-headline font-semibold text-on-surface text-base" id="date-display-label">Today</span>
+          <button type="button" class="text-on-surface-variant p-1 rounded" id="date-toggle-btn" title="Change date"><span class="match-svg-icon match-icon-date"></span></button>
         </div>
-        <div class="match-type-mini-toggle">
-          <button type="button" class="match-type-mini-btn active" id="btn-home-toggle" data-action="setMatchType" data-match-type="home"><span class="match-svg-icon match-icon-home"></span> <span>Hjemmekamp</span></button>
-          <button type="button" class="match-type-mini-btn" id="btn-away-toggle" data-action="setMatchType" data-match-type="away"><span class="match-svg-icon match-icon-away"></span> <span>Bortekamp</span></button>
+        <div class="flex gap-2 match-type-mini-toggle">
+          <button type="button" class="match-type-mini-btn active flex items-center gap-1.5 px-3 h-9 rounded-lg border border-outline-variant/40 bg-surface-container text-on-surface-variant font-headline font-semibold text-sm" id="btn-home-toggle" data-action="setMatchType" data-match-type="home">
+            <span class="match-svg-icon match-icon-home"></span> <span data-i18n="home_match">Home</span>
+          </button>
+          <button type="button" class="match-type-mini-btn flex items-center gap-1.5 px-3 h-9 rounded-lg border border-outline-variant/40 bg-surface-container text-on-surface-variant font-headline font-semibold text-sm" id="btn-away-toggle" data-action="setMatchType" data-match-type="away">
+            <span class="match-svg-icon match-icon-away"></span> <span data-i18n="away_match">Away</span>
+          </button>
         </div>
       </div>
       <input type="date" id="date" class="date-input-hidden">
     </div>
-    <div class="form-inline-pair">
-    <div class="form-section">
-      <label class="form-label" id="label-opponent" for="opponent">Motstanderlag</label>
-      <input type="text" id="opponent" placeholder="F.eks. Brann IL" autocomplete="off">
-    </div>
 
-    <!-- Lag dropdown -->
-    <div class="form-section">
-      <label class="form-label" id="label-egetlag">Eget team / tropp</label>
-      <div class="team-selector-wrap">
-        <div class="team-selected" id="team-selected" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-dropdown" data-action="toggleTeamDropdown">
-          <span class="team-selected-text placeholder" id="team-selected-text">Velg team...</span>
-          <span class="team-chevron" id="team-chevron">▼</span>
-        </div>
-        <div class="team-dropdown" id="team-dropdown" role="listbox">
-          <div id="team-options-list"></div>
-          <div class="team-new-row" id="team-new-row">
-            <input class="team-new-input" id="team-new-input" placeholder="Navn på nytt team...">
-            <button type="button" class="team-new-save" id="team-new-save-btn" data-action="saveNewTeamFromDropdown">Legg til</button>
+    <!-- Opponent + Team (2-col) -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" id="label-opponent" for="opponent" data-i18n="label_opponent">Opponent</label>
+        <input type="text" id="opponent"
+               class="w-full bg-surface-container border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+               placeholder="e.g. Brann IL" autocomplete="off">
+      </div>
+      <div>
+        <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" id="label-egetlag" data-i18n="label_own_team">Own team</label>
+        <div class="team-selector-wrap relative">
+          <div class="team-selected flex items-center justify-between bg-surface-container border border-outline-variant/40 rounded-lg px-4 py-2.5 cursor-pointer"
+               id="team-selected" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="team-dropdown" data-action="toggleTeamDropdown">
+            <span class="team-selected-text text-on-surface-variant font-body text-sm" id="team-selected-text" data-i18n="placeholder_select_team">Select team...</span>
+            <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform">▼</span>
+          </div>
+          <div class="team-dropdown absolute top-full left-0 right-0 mt-1 bg-surface-container-low border border-primary-container rounded-lg z-50 overflow-hidden shadow-lg" id="team-dropdown" role="listbox">
+            <div id="team-options-list"></div>
+            <div class="flex gap-2 p-2 border-t border-outline-variant/40" id="team-new-row">
+              <input class="flex-1 bg-surface-container border border-outline-variant/40 rounded px-3 py-2 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant" id="team-new-input" placeholder="New team name...">
+              <button type="button" class="shrink-0 bg-primary-container text-on-primary font-headline font-semibold text-xs px-3 py-2 rounded" id="team-new-save-btn" data-action="saveNewTeamFromDropdown" data-i18n="btn_add">Add</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    </div><!-- /.form-inline-pair -->
 
-    <div class="form-section">
-      <label class="form-label" id="label-turnering">Turnering / serie</label>
-      <div class="team-selector-wrap" id="tournament-selector-wrap">
-        <div class="team-selected" id="tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="tournament-dropdown" data-action="toggleTournamentDropdown">
-          <span class="team-selected-text placeholder" id="tournament-selected-text">— Velg turnering —</span>
-          <span class="team-chevron" id="tournament-chevron">▼</span>
+    <!-- Tournament -->
+    <div>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" id="label-turnering" data-i18n="label_tournament">Tournament / League</label>
+      <div class="team-selector-wrap relative" id="tournament-selector-wrap">
+        <div class="team-selected flex items-center justify-between bg-surface-container border border-outline-variant/40 rounded-lg px-4 py-2.5 cursor-pointer"
+             id="tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="tournament-dropdown" data-action="toggleTournamentDropdown">
+          <span class="team-selected-text text-on-surface-variant font-body text-sm" id="tournament-selected-text" data-i18n="placeholder_select_tournament">— Select tournament —</span>
+          <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform" id="tournament-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="tournament-dropdown" role="listbox">
+        <div class="team-dropdown absolute top-full left-0 right-0 mt-1 bg-surface-container-low border border-primary-container rounded-lg z-50 overflow-hidden shadow-lg" id="tournament-dropdown" role="listbox">
           <div id="tournament-options-list"></div>
-          <div class="team-new-row" id="tournament-new-row">
-            <input class="team-new-input" id="tournament-new-input" placeholder="Navn på turnering...">
-            <button type="button" class="team-new-save" id="tournament-new-save-btn" data-action="saveNewTournamentFromDropdown">Legg til</button>
+          <div class="flex gap-2 p-2 border-t border-outline-variant/40" id="tournament-new-row">
+            <input class="flex-1 bg-surface-container border border-outline-variant/40 rounded px-3 py-2 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant" id="tournament-new-input" placeholder="Tournament name...">
+            <button type="button" class="shrink-0 bg-primary-container text-on-primary font-headline font-semibold text-xs px-3 py-2 rounded" id="tournament-new-save-btn" data-action="saveNewTournamentFromDropdown" data-i18n="btn_add">Add</button>
           </div>
         </div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="form-section">
-      <div class="score-team-labels">
-        <span class="score-team-label highlight" id="label-home">Hjemmelag</span>
-        <span class="score-team-label sep-spacer">–</span>
-        <span class="score-team-label" id="label-away">Bortelag</span>
-      </div>
-      <div class="score-row" role="group" aria-labelledby="label-home">
-        <div class="number-control">
-          <button type="button" class="num-btn" data-action="adjust" data-type="home" data-delta="-1">−</button>
-          <span class="num-display" id="home-display" aria-live="polite">0</span>
-          <button type="button" class="num-btn" data-action="adjust" data-type="home" data-delta="1">+</button>
-        </div>
-        <span class="score-separator">–</span>
-        <div class="number-control">
-          <button type="button" class="num-btn" data-action="adjust" data-type="away" data-delta="-1">−</button>
-          <span class="num-display" id="away-display" aria-live="polite">0</span>
-          <button type="button" class="num-btn" data-action="adjust" data-type="away" data-delta="1">+</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-section">
-      <label class="form-label" id="label-result">Resultat</label>
-      <div id="result-display" class="result-auto">–</div>
-    </div>
-    <div class="divider"></div>
-    <div class="form-section">
-      <div class="number-row" role="group" aria-labelledby="label-goals">
+
+    <!-- Score row -->
+    <div class="bg-surface-container rounded-xl p-4">
+      <p class="text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant text-center mb-3" data-i18n="label_score">Score</p>
+      <div class="flex items-center justify-center gap-4">
         <div>
-          <span class="num-label" id="label-goals">Mål</span>
-          <div class="number-control">
-            <button type="button" class="num-btn" data-action="adjust" data-type="goals" data-delta="-1">−</button>
-            <span class="num-display" id="goals-display" aria-live="polite">0</span>
-            <button type="button" class="num-btn" data-action="adjust" data-type="goals" data-delta="1">+</button>
+          <p class="score-team-label highlight text-[9px] font-headline font-bold uppercase tracking-wider text-primary-container text-center mb-1" id="label-home" data-i18n="home_team">Home</p>
+          <div class="number-control flex items-center bg-surface-container-high rounded-lg overflow-hidden border border-outline-variant/40" role="group" aria-labelledby="label-home">
+            <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="home" data-delta="-1">−</button>
+            <span class="num-display w-10 text-center font-headline font-bold text-2xl text-on-surface" id="home-display" aria-live="polite">0</span>
+            <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="home" data-delta="1">+</button>
           </div>
         </div>
+        <span class="font-headline font-bold text-2xl text-on-surface-variant">–</span>
         <div>
-          <span class="num-label" id="label-assist">Assist</span>
-          <div class="number-control">
-            <button type="button" class="num-btn" data-action="adjust" data-type="assist" data-delta="-1">−</button>
-            <span class="num-display" id="assist-display" aria-live="polite">0</span>
-            <button type="button" class="num-btn" data-action="adjust" data-type="assist" data-delta="1">+</button>
+          <p class="score-team-label text-[9px] font-headline font-bold uppercase tracking-wider text-on-surface-variant text-center mb-1" id="label-away" data-i18n="away_team">Away</p>
+          <div class="number-control flex items-center bg-surface-container-high rounded-lg overflow-hidden border border-outline-variant/40">
+            <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="away" data-delta="-1">−</button>
+            <span class="num-display w-10 text-center font-headline font-bold text-2xl text-on-surface" id="away-display" aria-live="polite">0</span>
+            <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="away" data-delta="1">+</button>
           </div>
         </div>
       </div>
     </div>
-    <button class="submit-btn" id="submit-btn" type="submit" data-action="saveMatch">Lagre kamp</button>
+
+    <!-- Goals + Assists -->
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <span class="num-label block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant text-center mb-1.5" id="label-goals" data-i18n="label_goals">Goals</span>
+        <div class="number-control flex items-center bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden">
+          <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="goals" data-delta="-1">−</button>
+          <span class="num-display flex-1 text-center font-headline font-bold text-xl text-on-surface" id="goals-display" aria-live="polite">0</span>
+          <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="goals" data-delta="1">+</button>
+        </div>
+      </div>
+      <div>
+        <span class="num-label block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant text-center mb-1.5" id="label-assist" data-i18n="label_assist">Assists</span>
+        <div class="number-control flex items-center bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden">
+          <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="assist" data-delta="-1">−</button>
+          <span class="num-display flex-1 text-center font-headline font-bold text-xl text-on-surface" id="assist-display" aria-live="polite">0</span>
+          <button type="button" class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="adjust" data-type="assist" data-delta="1">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" id="label-result" data-i18n="label_result">Result</label>
+      <div id="result-display" class="result-auto text-center font-headline font-bold text-lg py-3 rounded-lg border border-outline-variant/40 bg-surface-container text-on-surface-variant">–</div>
+    </div>
+
+    <!-- Submit -->
+    <button class="submit-btn w-full py-4 bg-primary-container text-on-primary font-headline font-bold text-base uppercase tracking-wider rounded-lg mt-1 active:scale-[0.98] transition-transform" id="submit-btn" type="submit" data-action="saveMatch" data-i18n="btn_save_match">Save Match</button>
+    <div class="hidden-badge" id="log-badge" style="display:none"></div>
   </form>
 </section>
 
 <!-- ══════════════════════════════════ STATS ══════════════════════════════════ -->
 <section class="screen" id="screen-stats" aria-label="Statistics">
-  <div class="header">
-    <div class="header-top-row">
-      <div class="header-badge" id="stats-header-badge">📊 Statistikk</div>
-      <div class="lang-picker-wrap">
-        <button class="lang-flag-btn" id="lang-flag-btn-stats" data-action="toggleLangPicker" title="Change language"></button>
-        <div class="lang-picker-dropdown" id="lang-picker-dropdown-stats">
-          <button data-action="setLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>
-          <button data-action="setLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>
-        </div>
-      </div>
-    </div>
-    <h1 id="stats-heading">Sesongen<span id="stats-heading-season"> 2025</span></h1>
-    <p class="header-sub" id="stats-sub">Laster data...</p>
+  <!-- Screen title -->
+  <div class="px-6 pt-5 pb-3">
+    <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="stats_screen_label">Performance Analytics</p>
+    <h1 class="font-headline font-bold text-2xl text-on-surface" id="stats-heading">My <span class="text-primary-container" data-i18n="tab_stats">Stats</span></h1>
+    <p class="text-xs text-on-surface-variant mt-1" id="stats-sub"></p>
   </div>
-  <div class="stats-body">
-    <div class="form-section">
-      <div class="stats-view-toggle" id="stats-view-toggle">
-        <button class="stats-view-btn active" id="stats-view-btn-overview" data-action="switchStatsView" data-view="overview">Oversikt</button>
-        <button class="stats-view-btn" id="stats-view-btn-analyse" data-action="switchStatsView" data-view="analyse"><span id="stats-analyse-text">Analyse</span> <span class="premium-star">⭐</span></button>
+
+  <div class="stats-body px-6 pb-6">
+    <!-- View toggle -->
+    <div class="form-section mb-3">
+      <div class="stats-view-toggle flex bg-surface-container-low rounded-lg p-1 gap-1" id="stats-view-toggle">
+        <button class="stats-view-btn active flex-1 py-2 rounded font-headline font-semibold text-sm text-on-surface-variant transition-colors" id="stats-view-btn-overview" data-action="switchStatsView" data-view="overview" data-i18n="stats_overview">Overview</button>
+        <button class="stats-view-btn flex-1 py-2 rounded font-headline font-semibold text-sm text-on-surface-variant transition-colors" id="stats-view-btn-analyse" data-action="switchStatsView" data-view="analyse"><span id="stats-analyse-text" data-i18n="stats_analyse">Analyse</span> <span class="premium-star text-tertiary-fixed">⭐</span></button>
       </div>
     </div>
+
+    <!-- Filters -->
     <div id="stats-filters">
-      <div class="form-section">
-        <div class="season-selector" id="season-selector"></div>
+      <div class="mb-2">
+        <div class="season-selector flex gap-2 overflow-x-auto pb-1" id="season-selector"></div>
       </div>
-      <div class="form-section team-filter-row">
-        <div class="season-selector" id="team-filter-selector"></div>
+      <div class="mb-2 team-filter-row">
+        <div class="season-selector flex gap-2 overflow-x-auto pb-1" id="team-filter-selector"></div>
       </div>
-      <div class="form-section tournament-filter-row">
-        <div class="season-selector" id="tournament-filter-selector"></div>
+      <div class="mb-3 tournament-filter-row">
+        <div class="season-selector flex gap-2 overflow-x-auto pb-1" id="tournament-filter-selector"></div>
       </div>
     </div>
+
+    <!-- Content areas -->
     <div id="stats-desktop-grid">
       <div id="stats-content">
-        <div class="loading"><div class="spinner"></div>Henter statistikk...</div>
+        <div class="loading flex flex-col items-center gap-3 py-12 text-on-surface-variant">
+          <div class="spinner"></div>
+          <span class="text-sm font-body" data-i18n="loading_stats">Loading stats...</span>
+        </div>
       </div>
       <div id="stats-content-analyse"></div>
     </div>
   </div>
+
+  <!-- Hidden badge for JS -->
+  <div id="stats-header-badge" style="display:none"></div>
 </section>
 
 <!-- ══════════════════════════════════ PROFIL ══════════════════════════════════ -->
 <section class="screen" id="screen-profil" aria-label="Profile">
-  <div class="header">
-    <div class="header-title-row">
-      <h1 id="profil-title">Min<span> profil</span></h1>
-      <div class="lang-picker-wrap">
-        <button class="lang-flag-btn" id="lang-flag-btn-profil" data-action="toggleLangPicker" title="Change language"></button>
-        <div class="lang-picker-dropdown" id="lang-picker-dropdown-profil">
-          <button data-action="setLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>
-          <button data-action="setLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>
-        </div>
-      </div>
-    </div>
-    <p class="header-sub" id="profil-sub">Innstillinger og team</p>
-  </div>
-  <!-- Soft prompt banner (hidden once name is filled in) -->
-  <div class="profile-prompt hidden" id="profile-prompt">
-    <div class="profile-prompt-top">
-      <div class="profile-prompt-icon">👋</div>
-      <div class="profile-prompt-text">
-        <h3 id="profile-prompt-title"></h3>
-        <p id="profile-prompt-desc"></p>
-      </div>
-    </div>
-    <div class="profile-prompt-actions">
-      <button class="profile-prompt-btn-skip" data-action="dismissProfilePrompt" id="profile-prompt-skip"></button>
-    </div>
+  <!-- Screen title -->
+  <div class="px-6 pt-5 pb-3">
+    <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="profile_screen_label">Player Identity</p>
+    <h1 class="font-headline font-bold text-2xl text-on-surface" id="profil-title">My <span class="text-primary-container" data-i18n="tab_profile">Profile</span></h1>
   </div>
 
-  <div class="profil-body">
+  <!-- Soft prompt banner -->
+  <div class="hidden mx-6 mb-4 bg-surface-container border border-outline-variant/40 rounded-xl p-4" id="profile-prompt">
+    <div class="flex items-start gap-3 mb-3">
+      <div class="text-2xl" id="profile-prompt-icon">👋</div>
+      <div>
+        <h3 class="font-headline font-semibold text-on-surface text-sm mb-1" id="profile-prompt-title"></h3>
+        <p class="text-on-surface-variant text-xs font-body" id="profile-prompt-desc"></p>
+      </div>
+    </div>
+    <button class="text-on-surface-variant text-xs underline" data-action="dismissProfilePrompt" id="profile-prompt-skip"></button>
+  </div>
 
-    <!-- Avatar preview -->
-    <div class="profil-avatar">
-      <div class="avatar-circle" id="avatar-icon" data-action="triggerAvatarUpload" title="Endre bilde">
+  <div class="profil-body px-6 pb-6 flex flex-col gap-4">
+
+    <!-- Avatar -->
+    <div class="flex items-center gap-4">
+      <div class="avatar-circle relative w-16 h-16 rounded-full bg-surface-container-high border-2 border-primary-container/40 flex items-center justify-center text-2xl cursor-pointer shrink-0"
+           id="avatar-icon" data-action="triggerAvatarUpload" title="Change photo">
         <img id="avatar-img" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:50%;">
         <span id="avatar-emoji">⚽</span>
       </div>
       <input type="file" id="avatar-upload" accept="image/*" style="display:none" data-action="uploadImage">
-      <div class="avatar-info">
-        <div class="avatar-name" id="avatar-name"></div>
-        <div class="avatar-club" id="avatar-club"></div>
-        <div class="avatar-upload-hint" id="avatar-upload-hint">Trykk for å laste opp bilde</div>
+      <div>
+        <div class="font-headline font-semibold text-on-surface text-base" id="avatar-name"></div>
+        <div class="text-on-surface-variant text-sm font-body" id="avatar-club"></div>
+        <div class="text-primary-container text-xs mt-1 cursor-pointer" id="avatar-upload-hint" data-i18n="avatar_upload_hint">Tap to upload photo</div>
       </div>
     </div>
 
-    <!-- Info fields -->
-    <div class="profil-card">
-      <div class="profil-card-title" id="profil-card-spillerinfo">Spillerinfo</div>
-      <div class="profil-field">
-        <span class="profil-field-label" id="profil-label-name">Navn</span>
-        <input class="profil-field-input" id="profil-name" type="text" placeholder="Fullt navn" autocomplete="off" data-action="updateAvatar">
-      </div>
-      <div class="profil-field">
-        <span class="profil-field-label" id="profil-label-club">Klubb</span>
-        <input class="profil-field-input" id="profil-club" type="text" placeholder="F.eks. Stabæk" autocomplete="off" data-action="updateAvatar">
-      </div>
-
-    </div>
-
-    <!-- Turnering liste -->
-    <div class="profil-card">
-      <div class="profil-card-title" id="profil-card-tournaments">🏆 Mine turneringer / serier</div>
-      <div class="team-list" id="profile-tournament-list" style="margin-bottom:10px;"></div>
-      <div class="add-team-row">
-        <input class="add-team-input" id="profile-new-tournament" placeholder="Legg til turnering..." autocomplete="off">
-        <button class="add-team-btn" data-action="addTournament">＋</button>
+    <!-- Player info -->
+    <div class="bg-surface-container rounded-xl p-4">
+      <h3 class="profil-card-title font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-3" id="profil-card-spillerinfo" data-i18n="profile_player_info">Player Info</h3>
+      <div class="flex flex-col gap-3">
+        <div class="profil-field">
+          <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1" id="profil-label-name" for="profil-name" data-i18n="label_name">Name</label>
+          <input class="profil-field-input w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+                 id="profil-name" type="text" placeholder="Full name" autocomplete="off" data-action="updateAvatar">
+        </div>
+        <div class="profil-field">
+          <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1" id="profil-label-club" for="profil-club" data-i18n="label_club">Club</label>
+          <input class="profil-field-input w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+                 id="profil-club" type="text" placeholder="e.g. Stabæk" autocomplete="off" data-action="updateAvatar">
+        </div>
       </div>
     </div>
 
-    <!-- Lag liste -->
-    <div class="profil-card">
-      <div class="profil-card-title" id="profil-card-teams">Mine team / tropper</div>
-      <div class="team-list" id="profile-team-list"></div>
-      <div class="add-team-row">
-        <input class="add-team-input" id="profile-team-input" placeholder="Legg til team...">
-        <button class="add-team-btn" data-action="addTeamFromProfile">＋</button>
+    <!-- Tournaments -->
+    <div class="bg-surface-container rounded-xl p-4">
+      <h3 class="profil-card-title font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-3" id="profil-card-tournaments" data-i18n="profile_tournaments">🏆 My Tournaments</h3>
+      <div class="team-list mb-3" id="profile-tournament-list"></div>
+      <div class="add-team-row flex gap-2">
+        <input class="add-team-input flex-1 bg-surface-container-low border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+               id="profile-new-tournament" placeholder="Add tournament..." autocomplete="off">
+        <button class="add-team-btn shrink-0 w-9 h-9 bg-primary-container text-on-primary rounded-lg font-headline font-bold text-lg flex items-center justify-center" data-action="addTournament">＋</button>
       </div>
     </div>
 
-    <button class="profil-save-btn" id="btn-save-profil" data-action="saveProfile">Lagre profil</button>
-    <div class="profil-saved" id="profil-saved">✓ Lagret</div>
+    <!-- Teams -->
+    <div class="bg-surface-container rounded-xl p-4">
+      <h3 class="profil-card-title font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-3" id="profil-card-teams" data-i18n="profile_teams">My Teams</h3>
+      <div class="team-list mb-3" id="profile-team-list"></div>
+      <div class="add-team-row flex gap-2">
+        <input class="add-team-input flex-1 bg-surface-container-low border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+               id="profile-team-input" placeholder="Add team...">
+        <button class="add-team-btn shrink-0 w-9 h-9 bg-primary-container text-on-primary rounded-lg font-headline font-bold text-lg flex items-center justify-center" data-action="addTeamFromProfile">＋</button>
+      </div>
+    </div>
+
+    <button class="profil-save-btn w-full py-3.5 bg-primary-container text-on-primary font-headline font-bold text-sm uppercase tracking-wider rounded-lg" id="btn-save-profil" data-action="saveProfile" data-i18n="btn_save_profile">Save Profile</button>
+    <div class="profil-saved hidden text-center text-primary-container text-sm font-headline font-semibold" id="profil-saved">✓ Saved</div>
   </div>
 </section>
 
 <!-- ══════════════════════════════════ TAB BAR ══════════════════════════════════ -->
 <!-- ══════════════════ SETTINGS ══════════════════ -->
 <section class="screen" id="screen-settings" aria-label="Settings">
-  <div class="header">
-    <div class="header-top-row">
-      <div class="header-badge">⚙️ Innstillinger</div>
-      <div class="lang-picker-wrap">
-        <button class="lang-flag-btn" id="lang-flag-btn-settings" data-action="toggleLangPicker" title="Change language"></button>
-        <div class="lang-picker-dropdown" id="lang-picker-dropdown-settings">
-          <button data-action="setLang" data-lang="no"><img src="/icons/flag-no.svg" alt="" class="flag-svg-icon"> Norsk</button>
-          <button data-action="setLang" data-lang="en"><img src="/icons/flag-en.svg" alt="" class="flag-svg-icon"> English</button>
-        </div>
-      </div>
-    </div>
-    <h1>Innstil<span>linger</span></h1>
-    <p class="header-sub" id="settings-sub">Tilpass Athlytics Sport</p>
+  <!-- Screen title -->
+  <div class="px-6 pt-5 pb-3">
+    <p class="text-[10px] font-headline font-semibold uppercase tracking-[0.15em] text-on-surface-variant mb-1" data-i18n="settings_screen_label">Global Preferences</p>
+    <h1 class="font-headline font-bold text-2xl text-on-surface">Set<span class="text-primary-container" data-i18n="tab_settings">tings</span></h1>
+    <p class="text-xs text-on-surface-variant mt-1" id="settings-sub" data-i18n="settings_sub">Customise Athlytics Sport</p>
   </div>
-  <div class="pad">
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-lang-title">🌍 Språk</div>
-      <div class="settings-desc" id="st-lang-desc">Velg språk for appen.</div>
-      <div class="settings-options" id="settings-lang-options"></div>
+  <div class="px-6 pb-6 flex flex-col gap-4">
+
+    <!-- Language -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-2" id="st-lang-title" data-i18n="st_lang_title">🌍 Language</h3>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-lang-desc" data-i18n="st_lang_desc">Choose app language.</p>
+      <div class="settings-options flex flex-wrap gap-2" id="settings-lang-options"></div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-sport-title">🏅 Sport</div>
-      <div class="settings-desc" id="st-sport-desc">Velg hvilken sport du primært tracker. Flere sporter kommer snart.</div>
-      <div class="settings-options" id="settings-sport-options"></div>
+    <!-- Sport -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-2" id="st-sport-title" data-i18n="st_sport_title">🏅 Sport</h3>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-sport-desc" data-i18n="st_sport_desc">Choose your primary sport.</p>
+      <div class="settings-options flex flex-wrap gap-2" id="settings-sport-options"></div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-sf-title">📅 Sesongformat</div>
-      <div class="settings-desc" id="st-sf-desc">Norsk format bruker kalenderår (2025). Internasjonalt format bruker sesong (2025–2026).</div>
-      <div class="settings-options" id="settings-season-format-options"></div>
+    <!-- Season format -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-2" id="st-sf-title" data-i18n="st_sf_title">📅 Season Format</h3>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-sf-desc" data-i18n="st_sf_desc">Calendar year (2025) or season (2025–2026).</p>
+      <div class="settings-options flex flex-wrap gap-2" id="settings-season-format-options"></div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-df-title">📅 Datoformat</div>
-      <div class="settings-desc" id="st-df-desc">Velg hvordan datoer vises i appen.</div>
-      <div class="settings-options" id="settings-date-format-options"></div>
+    <!-- Date format -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-2" id="st-df-title" data-i18n="st_df_title">📅 Date Format</h3>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-df-desc" data-i18n="st_df_desc">Choose how dates are displayed.</p>
+      <div class="settings-options flex flex-wrap gap-2" id="settings-date-format-options"></div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-as-title">⭐ Aktiv sesong</div>
-      <div class="settings-desc" id="st-as-desc">Forhåndsvalgt sesong i Logg og Statistikk.</div>
-      <div class="settings-options" id="settings-active-season-options"></div>
-      <div class="settings-add-season-row">
-        <input id="settings-new-season" type="text" class="settings-add-season-input" placeholder="Legg til sesong (f.eks. 2027)">
-        <button data-action="addSeason" class="settings-add-season-btn" id="settings-add-season-btn">+ Legg til</button>
+    <!-- Active season -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container mb-2" id="st-as-title" data-i18n="st_as_title">⭐ Active Season</h3>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-as-desc" data-i18n="st_as_desc">Default season in Log and Stats.</p>
+      <div class="settings-options flex flex-wrap gap-2 mb-3" id="settings-active-season-options"></div>
+      <div class="flex gap-2">
+        <input id="settings-new-season" type="text"
+               class="settings-add-season-input flex-1 bg-surface-container-low border border-outline-variant/40 rounded-lg px-3 py-2 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+               placeholder="Add season (e.g. 2027)">
+        <button data-action="addSeason" class="settings-add-season-btn shrink-0 px-3 py-2 bg-primary-container text-on-primary font-headline font-semibold text-xs rounded-lg" id="settings-add-season-btn" data-i18n="btn_add_season">+ Add</button>
       </div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-section-title" id="st-assess-title">
-        <span id="st-assess-title-text">⭐ Selvvurdering</span>
-        <span class="export-premium-badge">⭐ Premium</span>
+    <!-- Self-assessment toggle -->
+    <div class="settings-section bg-surface-container rounded-xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="font-headline font-semibold text-xs uppercase tracking-wider text-primary-container" id="st-assess-title-text" data-i18n="st_assess_title">⭐ Self-assessment</h3>
+        <span class="export-premium-badge text-[10px] font-headline font-bold px-2 py-0.5 rounded-full bg-tertiary-fixed/10 text-tertiary-fixed border border-tertiary-fixed/30">⭐ Premium</span>
       </div>
-      <div class="settings-desc" id="st-assess-desc">Vis selvvurderingsskjema etter hver kamp.</div>
-      <div class="settings-options" id="settings-assess-options"></div>
+      <p class="text-on-surface-variant text-xs font-body mb-3" id="st-assess-desc" data-i18n="st_assess_desc">Show self-assessment form after each match.</p>
+      <div class="settings-options flex flex-wrap gap-2" id="settings-assess-options"></div>
     </div>
 
-    <div class="export-section">
-      <div class="export-premium-badge">⭐ Premium</div>
-      <div class="export-title">📤 Eksporter data</div>
-      <div class="export-desc">Last ned kamphistorikken din som CSV eller PDF-rapport. Tilgjengelig for Pro-brukere.</div>
-      <div class="export-btns">
-        <button class="export-btn" data-action="exportCSV">📊 Last ned CSV</button>
-        <button class="export-btn pdf-btn" data-action="exportPDF">📄 Last ned PDF</button>
+    <!-- Export -->
+    <div class="export-section bg-surface-container rounded-xl p-4">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="export-title font-headline font-semibold text-sm text-on-surface" data-i18n="export_title">📤 Export Data</h3>
+        <span class="text-[10px] font-headline font-bold px-2 py-0.5 rounded-full bg-tertiary-fixed/10 text-tertiary-fixed border border-tertiary-fixed/30">⭐ Premium</span>
       </div>
-    </div>
-
-    <!-- Share statistics section -->
-    <div class="export-section">
-      <div class="export-premium-badge">⭐ Premium</div>
-      <div class="export-title" id="st-share-title">🔗 Del statistikk</div>
-      <div class="export-desc" id="st-share-desc">Del statistikken din med andre</div>
-      <div class="export-btns">
-        <button class="export-btn" data-action="openSharePanel" id="share-manage-btn">
-          Administrer delingslenker
-        </button>
+      <p class="export-desc text-on-surface-variant text-xs font-body mb-3" data-i18n="export_desc">Download your match history as CSV or PDF.</p>
+      <div class="export-btns flex gap-2">
+        <button class="export-btn flex-1 py-2.5 bg-surface-container-high border border-outline-variant/40 rounded-lg text-on-surface font-headline font-semibold text-sm" data-action="exportCSV" data-i18n="export_csv">📊 CSV</button>
+        <button class="export-btn pdf-btn flex-1 py-2.5 bg-surface-container-high border border-outline-variant/40 rounded-lg text-on-surface font-headline font-semibold text-sm" data-action="exportPDF" data-i18n="export_pdf">📄 PDF</button>
       </div>
     </div>
 
-    <div class="danger-zone" id="st-danger-zone" hidden>
-      <div class="export-title" id="st-danger-title">Danger zone</div>
+    <!-- Share -->
+    <div class="export-section bg-surface-container rounded-xl p-4">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="export-title font-headline font-semibold text-sm text-on-surface" id="st-share-title" data-i18n="st_share_title">🔗 Share Stats</h3>
+        <span class="text-[10px] font-headline font-bold px-2 py-0.5 rounded-full bg-tertiary-fixed/10 text-tertiary-fixed border border-tertiary-fixed/30">⭐ Premium</span>
+      </div>
+      <p class="export-desc text-on-surface-variant text-xs font-body mb-3" id="st-share-desc" data-i18n="st_share_desc">Share your stats with others.</p>
+      <button class="export-btn w-full py-2.5 bg-surface-container-high border border-outline-variant/40 rounded-lg text-on-surface font-headline font-semibold text-sm" data-action="openSharePanel" id="share-manage-btn" data-i18n="share_manage">Manage share links</button>
+    </div>
 
-      <div class="danger-item">
-        <button type="button" class="danger-btn danger-btn--outline" data-action="toggleDangerPanel" data-type="matches" id="danger-btn-matches">
-          Delete match history
-        </button>
-        <div class="danger-panel" id="danger-panel-matches" hidden>
-          <p class="danger-warn" id="danger-warn-matches">This will permanently delete all your match data.</p>
-          <input type="text" class="danger-input" id="danger-input-matches" data-action="dangerInput" data-danger-type="matches" placeholder='type "delete matches" to confirm' autocomplete="off" aria-label="Confirmation phrase — type delete matches">
-          <div class="danger-panel-actions">
-            <button type="button" class="danger-confirm-btn" id="danger-confirm-matches" data-action="confirmDeleteMatches" disabled>Confirm</button>
-            <button type="button" class="danger-cancel-link" data-action="toggleDangerPanel" data-type="matches" id="danger-cancel-matches">Cancel</button>
+    <!-- Danger zone -->
+    <div class="danger-zone bg-surface-container rounded-xl p-4" id="st-danger-zone" hidden>
+      <h3 class="export-title font-headline font-semibold text-sm text-error mb-3" id="st-danger-title">Danger Zone</h3>
+
+      <div class="danger-item mb-3">
+        <button type="button" class="danger-btn danger-btn--outline w-full py-2.5 border border-error/40 text-error font-headline font-semibold text-sm rounded-lg" data-action="toggleDangerPanel" data-type="matches" id="danger-btn-matches">Delete match history</button>
+        <div class="danger-panel mt-3" id="danger-panel-matches" hidden>
+          <p class="danger-warn text-on-surface-variant text-xs font-body mb-3" id="danger-warn-matches">This will permanently delete all your match data.</p>
+          <input type="text" class="danger-input w-full bg-surface-container-low border border-error/40 rounded-lg px-3 py-2 text-on-surface font-body text-sm outline-none mb-3 placeholder:text-on-surface-variant/60"
+                 id="danger-input-matches" data-action="dangerInput" data-danger-type="matches" placeholder='type "delete matches" to confirm' autocomplete="off" aria-label="Confirmation phrase">
+          <div class="danger-panel-actions flex gap-2">
+            <button type="button" class="danger-confirm-btn flex-1 py-2 bg-error text-[#690005] font-headline font-bold text-sm rounded-lg disabled:opacity-40" id="danger-confirm-matches" data-action="confirmDeleteMatches" disabled>Confirm</button>
+            <button type="button" class="danger-cancel-link flex-1 py-2 text-on-surface-variant text-sm font-headline" data-action="toggleDangerPanel" data-type="matches" id="danger-cancel-matches">Cancel</button>
           </div>
         </div>
       </div>
 
       <div class="danger-item">
-        <button type="button" class="danger-btn danger-btn--solid" data-action="toggleDangerPanel" data-type="account" id="danger-btn-account">
-          Delete account
-        </button>
-        <div class="danger-panel" id="danger-panel-account" hidden>
-          <p class="danger-warn" id="danger-warn-account">This will permanently delete all your data and your account. This cannot be undone.</p>
-          <input type="text" class="danger-input" id="danger-input-account" data-action="dangerInput" data-danger-type="account" placeholder='type "delete my account" to confirm' autocomplete="off" aria-label="Confirmation phrase — type delete my account">
-          <div class="danger-panel-actions">
-            <button type="button" class="danger-confirm-btn" id="danger-confirm-account" data-action="confirmDeleteAccount" disabled>Confirm</button>
-            <button type="button" class="danger-cancel-link" data-action="toggleDangerPanel" data-type="account" id="danger-cancel-account">Cancel</button>
+        <button type="button" class="danger-btn danger-btn--solid w-full py-2.5 bg-error text-[#690005] font-headline font-bold text-sm rounded-lg" data-action="toggleDangerPanel" data-type="account" id="danger-btn-account">Delete account</button>
+        <div class="danger-panel mt-3" id="danger-panel-account" hidden>
+          <p class="danger-warn text-on-surface-variant text-xs font-body mb-3" id="danger-warn-account">This will permanently delete all your data and account.</p>
+          <input type="text" class="danger-input w-full bg-surface-container-low border border-error/40 rounded-lg px-3 py-2 text-on-surface font-body text-sm outline-none mb-3 placeholder:text-on-surface-variant/60"
+                 id="danger-input-account" data-action="dangerInput" data-danger-type="account" placeholder='type "delete my account" to confirm' autocomplete="off" aria-label="Confirmation phrase">
+          <div class="danger-panel-actions flex gap-2">
+            <button type="button" class="danger-confirm-btn flex-1 py-2 bg-error text-[#690005] font-headline font-bold text-sm rounded-lg disabled:opacity-40" id="danger-confirm-account" data-action="confirmDeleteAccount" disabled>Confirm</button>
+            <button type="button" class="danger-cancel-link flex-1 py-2 text-on-surface-variant text-sm font-headline" data-action="toggleDangerPanel" data-type="account" id="danger-cancel-account">Cancel</button>
           </div>
         </div>
       </div>
     </div>
 
-    <button class="settings-logout-btn" data-action="logout" data-i18n="auth_logout">Log out</button>
-
-    <div class="settings-spacer"></div>
-    <div class="settings-version">Athlytics Sport v0.1 · football</div>
+    <button class="settings-logout-btn w-full py-3 border border-outline-variant/40 rounded-lg text-on-surface-variant font-headline font-semibold text-sm hover:border-error hover:text-error transition-colors" data-action="logout" data-i18n="auth_logout">Log out</button>
+    <p class="text-center text-[10px] text-on-surface-variant/50 mt-2">Athlytics Sport v0.1 · football</p>
   </div>
 </section>
 </main>
 
-<nav class="tab-bar" aria-label="Main navigation">
-  <button class="tab-btn active" id="tab-log" role="tab" aria-selected="true" data-action="switchTab" data-tab="log">
-    <span class="tab-icon"><span class="tab-svg-icon tab-icon-log"></span></span>
-    <span class="tab-label">Logg</span>
-  </button>
-  <button class="tab-btn" id="tab-stats" role="tab" aria-selected="false" data-action="switchTab" data-tab="stats">
-    <span class="tab-icon"><span class="tab-svg-icon tab-icon-stats"></span></span>
-    <span class="tab-label">Statistikk</span>
-  </button>
-  <button class="tab-btn" id="tab-profil" role="tab" aria-selected="false" data-action="switchTab" data-tab="profil">
-    <span class="tab-icon"><span class="tab-svg-icon tab-icon-profile"></span><span class="tab-profile-badge" id="tab-profile-badge"></span></span>
-    <span class="tab-label">Profil</span>
-  </button>
-  <button class="tab-btn" id="tab-settings" role="tab" aria-selected="false" data-action="switchTab" data-tab="settings">
-    <span class="tab-icon"><span class="tab-svg-icon tab-icon-settings"></span></span>
-    <span class="tab-label">Innstillinger</span>
-  </button>
+<nav class="fixed bottom-0 inset-x-0 z-50 bg-surface-container-low border-t border-outline-variant/40" aria-label="Main navigation">
+  <div class="flex max-w-[480px] mx-auto">
+    <button class="tab-btn active flex-1 flex flex-col items-center gap-1 py-2 px-1" id="tab-log" role="tab" aria-selected="true" data-action="switchTab" data-tab="log">
+      <span class="tab-icon relative"><span class="tab-svg-icon tab-icon-log"></span></span>
+      <span class="tab-label text-[10px] font-headline font-semibold uppercase tracking-wider text-primary-container" data-i18n="tab_log">Log</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 px-1" id="tab-stats" role="tab" aria-selected="false" data-action="switchTab" data-tab="stats">
+      <span class="tab-icon"><span class="tab-svg-icon tab-icon-stats"></span></span>
+      <span class="tab-label text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="tab_stats">Stats</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 px-1" id="tab-profil" role="tab" aria-selected="false" data-action="switchTab" data-tab="profil">
+      <span class="tab-icon relative"><span class="tab-svg-icon tab-icon-profile"></span><span class="tab-profile-badge" id="tab-profile-badge"></span></span>
+      <span class="tab-label text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="tab_profile">Profile</span>
+    </button>
+    <button class="tab-btn flex-1 flex flex-col items-center gap-1 py-2 px-1" id="tab-settings" role="tab" aria-selected="false" data-action="switchTab" data-tab="settings">
+      <span class="tab-icon"><span class="tab-svg-icon tab-icon-settings"></span></span>
+      <span class="tab-label text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant" data-i18n="tab_settings">Settings</span>
+    </button>
+  </div>
 </nav>
 
 <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
@@ -504,153 +544,149 @@
 <!-- Delete confirm dialog -->
 <div class="delete-confirm-backdrop" id="delete-confirm-backdrop" data-action="cancelDeleteMatch"></div>
 <div class="delete-confirm-dialog" id="delete-confirm-dialog" role="alertdialog" aria-modal="true" aria-labelledby="delete-confirm-title">
-  <div class="delete-confirm-icon">🗑</div>
-  <div class="delete-confirm-title" id="delete-confirm-title">Slett kamp?</div>
-  <div class="delete-confirm-sub">Kampen mot <strong id="delete-confirm-name"></strong> slettes permanent.</div>
-  <div class="delete-confirm-actions">
-    <button class="delete-confirm-cancel" data-action="cancelDeleteMatch">Avbryt</button>
-    <button class="delete-confirm-ok" data-action="confirmDeleteMatch">Slett</button>
+  <div class="text-3xl mb-3">🗑</div>
+  <div class="font-headline font-bold text-on-surface text-lg mb-1" id="delete-confirm-title">Delete match?</div>
+  <div class="text-on-surface-variant text-sm font-body mb-5">Match against <strong id="delete-confirm-name" class="text-on-surface"></strong> will be permanently deleted.</div>
+  <div class="delete-confirm-actions flex gap-3">
+    <button class="delete-confirm-cancel flex-1 py-2.5 border border-outline-variant/40 rounded-lg text-on-surface-variant font-headline font-semibold text-sm" data-action="cancelDeleteMatch" data-i18n="btn_cancel">Cancel</button>
+    <button class="delete-confirm-ok flex-1 py-2.5 bg-error text-[#690005] rounded-lg font-headline font-bold text-sm" data-action="confirmDeleteMatch" data-i18n="btn_delete">Delete</button>
   </div>
 </div>
 
 <!-- ══════════════════════════════════ EDIT MODAL ══════════════════════════════════ -->
 <div class="modal-backdrop" id="modal-backdrop" data-action="closeModal"></div>
 <div class="modal-sheet" id="modal-sheet" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-  <div class="modal-handle"></div>
-  <div class="modal-header">
-    <div class="modal-title" id="modal-title">Rediger kamp</div>
-    <button class="modal-close-btn" data-action="closeModal" aria-label="Lukk">&times;</button>
+  <div class="modal-handle w-9 h-1 bg-outline-variant/60 rounded-full mx-auto mt-3 mb-4"></div>
+  <div class="modal-header flex items-center justify-between px-5 pb-3 border-b border-outline-variant/40">
+    <div class="modal-title font-headline font-bold text-on-surface text-lg" id="modal-title" data-i18n="modal_edit_title">Edit Match</div>
+    <button class="modal-close-btn w-8 h-8 flex items-center justify-center text-on-surface-variant rounded-full bg-surface-container-high text-xl leading-none" data-action="closeModal" aria-label="Close">&times;</button>
   </div>
-  <div class="modal-body">
+  <div class="modal-body px-5 py-4 flex flex-col gap-4">
     <div class="modal-field">
-      <label class="modal-label" for="modal-dato">Dato</label>
-      <input class="modal-input" type="date" id="modal-dato">
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" for="modal-dato" data-i18n="label_date">Date</label>
+      <input class="modal-input w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container" type="date" id="modal-dato">
     </div>
     <div class="modal-field">
-      <label class="modal-label">Hjemme / Borte</label>
-      <div class="toggle-row">
-        <button class="toggle-btn" id="modal-btn-home" data-action="setModalMatchType" data-match-type="home"><span class="match-svg-icon match-icon-home"></span> Hjemmekamp</button>
-        <button class="toggle-btn" id="modal-btn-away" data-action="setModalMatchType" data-match-type="away"><span class="match-svg-icon match-icon-away"></span> Bortekamp</button>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_match_type">Home / Away</label>
+      <div class="toggle-row grid grid-cols-2 gap-2">
+        <button class="toggle-btn flex items-center justify-center gap-2 py-2.5 border border-outline-variant/40 bg-surface-container rounded-lg text-on-surface-variant font-headline font-semibold text-sm" id="modal-btn-home" data-action="setModalMatchType" data-match-type="home"><span class="match-svg-icon match-icon-home"></span> <span data-i18n="home_match">Home</span></button>
+        <button class="toggle-btn flex items-center justify-center gap-2 py-2.5 border border-outline-variant/40 bg-surface-container rounded-lg text-on-surface-variant font-headline font-semibold text-sm" id="modal-btn-away" data-action="setModalMatchType" data-match-type="away"><span class="match-svg-icon match-icon-away"></span> <span data-i18n="away_match">Away</span></button>
       </div>
     </div>
     <div class="modal-field">
-      <label class="modal-label" for="modal-motstander">Motstanderlag</label>
-      <input class="modal-input" type="text" id="modal-motstander" autocomplete="off">
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" for="modal-motstander" data-i18n="label_opponent">Opponent</label>
+      <input class="modal-input w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container" type="text" id="modal-motstander" autocomplete="off">
     </div>
     <div class="modal-field">
-      <label class="modal-label">Eget team</label>
-      <div class="team-selector-wrap">
-        <div class="team-selected" id="modal-team-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-team-dropdown" data-action="toggleModalTeamDropdown">
-          <span class="team-selected-text placeholder" id="modal-own-team-text">Velg team...</span>
-          <span class="team-chevron" id="modal-team-chevron">▼</span>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_own_team">Own team</label>
+      <div class="team-selector-wrap relative">
+        <div class="team-selected flex items-center justify-between bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 cursor-pointer"
+             id="modal-team-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-team-dropdown" data-action="toggleModalTeamDropdown">
+          <span class="team-selected-text text-on-surface-variant font-body text-sm" id="modal-own-team-text" data-i18n="placeholder_select_team">Select team...</span>
+          <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform" id="modal-team-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="modal-team-dropdown" role="listbox">
+        <div class="team-dropdown absolute top-full left-0 right-0 mt-1 bg-surface-container-low border border-primary-container rounded-lg z-50 shadow-lg overflow-hidden" id="modal-team-dropdown" role="listbox">
           <div id="modal-team-options-list"></div>
         </div>
       </div>
       <input type="hidden" id="modal-own-team">
     </div>
     <div class="modal-field">
-      <label class="modal-label">Turnering</label>
-      <div class="team-selector-wrap">
-        <div class="team-selected" id="modal-tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-tournament-dropdown" data-action="toggleModalTournamentDropdown">
-          <span class="team-selected-text placeholder" id="modal-tournament-text">Velg turnering...</span>
-          <span class="team-chevron" id="modal-tournament-chevron">▼</span>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_tournament">Tournament</label>
+      <div class="team-selector-wrap relative">
+        <div class="team-selected flex items-center justify-between bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 cursor-pointer"
+             id="modal-tournament-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="modal-tournament-dropdown" data-action="toggleModalTournamentDropdown">
+          <span class="team-selected-text text-on-surface-variant font-body text-sm" id="modal-tournament-text" data-i18n="placeholder_select_tournament">Select tournament...</span>
+          <span class="team-chevron absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xs transition-transform" id="modal-tournament-chevron">▼</span>
         </div>
-        <div class="team-dropdown" id="modal-tournament-dropdown" role="listbox">
+        <div class="team-dropdown absolute top-full left-0 right-0 mt-1 bg-surface-container-low border border-primary-container rounded-lg z-50 shadow-lg overflow-hidden" id="modal-tournament-dropdown" role="listbox">
           <div id="modal-tournament-options-list"></div>
         </div>
       </div>
       <input type="hidden" id="modal-tournament">
     </div>
     <div class="modal-field">
-      <label class="modal-label">Score</label>
-      <div class="modal-score-row">
-        <div class="number-control">
-          <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="-1">−</button>
-          <span class="num-display" id="modal-home" aria-live="polite">0</span>
-          <button class="num-btn" data-action="modalAdjust" data-type="home" data-delta="1">+</button>
+      <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_score">Score</label>
+      <div class="modal-score-row flex items-center gap-3 justify-center">
+        <div class="number-control flex items-center bg-surface-container-high border border-outline-variant/40 rounded-lg overflow-hidden">
+          <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="home" data-delta="-1">−</button>
+          <span class="num-display w-10 text-center font-headline font-bold text-2xl text-on-surface" id="modal-home" aria-live="polite">0</span>
+          <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="home" data-delta="1">+</button>
         </div>
-        <span class="score-separator">–</span>
-        <div class="number-control">
-          <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="-1">−</button>
-          <span class="num-display" id="modal-away" aria-live="polite">0</span>
-          <button class="num-btn" data-action="modalAdjust" data-type="away" data-delta="1">+</button>
+        <span class="font-headline font-bold text-2xl text-on-surface-variant">–</span>
+        <div class="number-control flex items-center bg-surface-container-high border border-outline-variant/40 rounded-lg overflow-hidden">
+          <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="away" data-delta="-1">−</button>
+          <span class="num-display w-10 text-center font-headline font-bold text-2xl text-on-surface" id="modal-away" aria-live="polite">0</span>
+          <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="away" data-delta="1">+</button>
         </div>
       </div>
     </div>
     <div class="modal-field">
-      <div class="modal-stats-grid">
+      <div class="modal-stats-grid grid grid-cols-2 gap-3">
         <div>
-          <label class="modal-label">Mål</label>
-          <div class="number-control">
-            <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="-1">−</button>
-            <span class="num-display" id="modal-goals" aria-live="polite">0</span>
-            <button class="num-btn" data-action="modalAdjust" data-type="goals" data-delta="1">+</button>
+          <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_goals">Goals</label>
+          <div class="number-control flex items-center bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden">
+            <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="goals" data-delta="-1">−</button>
+            <span class="num-display flex-1 text-center font-headline font-bold text-xl text-on-surface" id="modal-goals" aria-live="polite">0</span>
+            <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="goals" data-delta="1">+</button>
           </div>
         </div>
         <div>
-          <label class="modal-label">Assist</label>
-          <div class="number-control">
-            <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="-1">−</button>
-            <span class="num-display" id="modal-assist" aria-live="polite">0</span>
-            <button class="num-btn" data-action="modalAdjust" data-type="assist" data-delta="1">+</button>
+          <label class="block text-[10px] font-headline font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5" data-i18n="label_assist">Assists</label>
+          <div class="number-control flex items-center bg-surface-container border border-outline-variant/40 rounded-lg overflow-hidden">
+            <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="assist" data-delta="-1">−</button>
+            <span class="num-display flex-1 text-center font-headline font-bold text-xl text-on-surface" id="modal-assist" aria-live="polite">0</span>
+            <button class="num-btn w-10 h-10 text-primary-container text-xl flex items-center justify-center" data-action="modalAdjust" data-type="assist" data-delta="1">+</button>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="modal-divider"></div>
+  <div class="modal-divider h-px bg-outline-variant/40 mx-5"></div>
   <div id="modal-assessment-body"></div>
-  <div class="modal-actions">
-    <button class="modal-del-btn" data-action="deleteMatch">🗑 Slett</button>
-    <button class="modal-save-btn" data-action="saveEditedMatch">Lagre endringer</button>
+  <div class="modal-actions flex gap-3 px-5 py-4">
+    <button class="modal-del-btn flex-1 py-2.5 border border-error/40 text-error font-headline font-semibold text-sm rounded-lg" data-action="deleteMatch" data-i18n="btn_delete_match">🗑 Delete</button>
+    <button class="modal-save-btn flex-2 py-2.5 bg-primary-container text-on-primary font-headline font-bold text-sm rounded-lg px-6" data-action="saveEditedMatch" data-i18n="btn_save_changes">Save Changes</button>
   </div>
 </div>
 
 <!-- Assessment sheet (slide-up, Log tab context) -->
 <div class="modal-backdrop" id="assessment-backdrop" data-action="closeAssessmentSheet"></div>
 <div class="modal-sheet" id="assessment-sheet" role="dialog" aria-modal="true" aria-labelledby="assess-title">
-  <div class="modal-handle"></div>
-  <div class="modal-header">
-    <div class="modal-title" id="assess-title"></div>
-    <button class="modal-close-btn" data-action="closeAssessmentSheet">&times;</button>
+  <div class="modal-handle w-9 h-1 bg-outline-variant/60 rounded-full mx-auto mt-3 mb-4"></div>
+  <div class="modal-header flex items-center justify-between px-5 pb-3 border-b border-outline-variant/40">
+    <div class="modal-title font-headline font-bold text-on-surface text-lg" id="assess-title"></div>
+    <button class="modal-close-btn w-8 h-8 flex items-center justify-center text-on-surface-variant rounded-full bg-surface-container-high text-xl leading-none" data-action="closeAssessmentSheet">&times;</button>
   </div>
-  <div class="assessment-body" id="assessment-body"></div>
-  <div class="modal-actions">
-    <button class="modal-del-btn" data-action="closeAssessmentSheet" id="assess-skip-btn"></button>
-    <button class="modal-save-btn" data-action="saveAssessment" id="assess-save-btn"></button>
+  <div class="assessment-body px-5 py-4" id="assessment-body"></div>
+  <div class="modal-actions flex gap-3 px-5 py-4">
+    <button class="modal-del-btn flex-1 py-2.5 border border-outline-variant/40 text-on-surface-variant font-headline font-semibold text-sm rounded-lg" data-action="closeAssessmentSheet" id="assess-skip-btn"></button>
+    <button class="modal-save-btn flex-1 py-2.5 bg-primary-container text-on-primary font-headline font-bold text-sm rounded-lg" data-action="saveAssessment" id="assess-save-btn"></button>
   </div>
 </div>
 
 <!-- Share panel -->
 <div id="share-panel-backdrop" class="modal-backdrop"></div>
-<div id="share-panel" class="modal-sheet" role="dialog" aria-modal="true" aria-label="Del statistikk">
-  <div class="modal-handle"></div>
-  <div class="modal-header">
-    <span class="modal-title" id="share-panel-title">Del statistikk</span>
-    <button class="modal-close-btn" data-action="closeSharePanel" aria-label="Lukk">×</button>
+<div id="share-panel" class="modal-sheet" role="dialog" aria-modal="true" aria-label="Share stats">
+  <div class="modal-handle w-9 h-1 bg-outline-variant/60 rounded-full mx-auto mt-3 mb-4"></div>
+  <div class="modal-header flex items-center justify-between px-5 pb-3 border-b border-outline-variant/40">
+    <span class="modal-title font-headline font-bold text-on-surface text-lg" id="share-panel-title" data-i18n="share_title">Share Stats</span>
+    <button class="modal-close-btn w-8 h-8 flex items-center justify-center text-on-surface-variant rounded-full bg-surface-container-high text-xl leading-none" data-action="closeSharePanel" aria-label="Close">×</button>
   </div>
-  <div style="padding: 0 20px 32px; overflow-y: auto;">
-    <!-- Create new link form -->
-    <div class="share-create-form">
-      <input
-        type="text"
-        id="share-new-label"
-        class="settings-input"
-        maxlength="40"
-        placeholder="F.eks. Trener Hansen"
-        aria-label="Etikett"
-      />
-      <select id="share-new-expiry" class="settings-select">
-        <option value="30">30 dager</option>
-        <option value="90" selected>90 dager</option>
-        <option value="season">Slutten av aktiv sesong</option>
+  <div class="px-5 pb-8 overflow-y-auto">
+    <div class="share-create-form flex flex-col gap-3 py-4">
+      <input type="text" id="share-new-label"
+             class="settings-input w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container placeholder:text-on-surface-variant"
+             maxlength="40" placeholder="e.g. Coach Hansen" aria-label="Label">
+      <select id="share-new-expiry"
+              class="settings-select w-full bg-surface-container-low border border-outline-variant/40 rounded-lg px-4 py-2.5 text-on-surface font-body text-sm outline-none focus:border-primary-container">
+        <option value="30">30 days</option>
+        <option value="90" selected>90 days</option>
+        <option value="season">End of active season</option>
         <option value="permanent">Permanent</option>
       </select>
-      <button class="modal-save-btn" data-action="createShareToken">Opprett lenke</button>
+      <button class="modal-save-btn w-full py-3 bg-primary-container text-on-primary font-headline font-bold text-sm rounded-lg" data-action="createShareToken" data-i18n="share_create">Create link</button>
     </div>
-    <!-- Token list -->
     <div id="share-panel-list"></div>
   </div>
 </div>
