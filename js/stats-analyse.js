@@ -99,7 +99,7 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   }
 
   if (!isDevPremium()) {
-    container.innerHTML = (secondary ? '' : selectorHTML) + renderFormStreak(matches) +
+    container.innerHTML = (secondary ? '' : selectorHTML) +
       '<div class="chart-locked">' +
         '<div class="chart-card" style="filter:blur(3px);pointer-events:none">' +
           '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
@@ -156,7 +156,6 @@ export function renderAnalyse(matches, activeLag, activeSeason, containerId, sec
   }
 
   container.innerHTML = (secondary ? '' : selectorHTML) +
-    renderFormStreak(matches) +
     '<div class="chart-card" id="chart-card-winpct">' +
       '<div class="chart-card-title">' + t('chart_win_pct') + '</div>' +
       '<div class="chart-canvas-wrap"><canvas id="chart-winpct" height="180"></canvas></div>' +
