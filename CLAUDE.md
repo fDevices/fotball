@@ -324,11 +324,11 @@ Begge bruker `clampStats(goals, assists, ownScore)` fra `utils.js`. Logikken er:
 ### CSS-klasser for resultat
 `.result-auto` bruker klassene **'wins'**, **'draw'**, **'loss'** – disse må matche nøyaktig med verdiene `getResult()` returnerer.
 ```css
-.result-auto.wins  { ... }  /* grønn */
-.result-auto.draw  { ... }  /* gull */
-.result-auto.loss  { ... }  /* rød */
+.wins { color: #00f2ff; border-color: #00f2ff; }  /* cyan */
+.draw { color: #ffe173; border-color: #ffe173; }  /* gold */
+.loss { color: #ffb4ab; border-color: #ffb4ab; }  /* red */
 ```
-Ikke bruk `.uavgjort`, `.tap` eller andre norske klassenavn.
+Ikke bruk `.uavgjort`, `.tap` eller andre norske klassenavn. **Ikke legg til `background` på disse klassene** — semi-transparent tint over mørk bakgrunn gir stygge oliven-farger.
 
 ### adjust()-funksjonen – logg-skjema
 Score (home/away) og spillerstatistikk (goals/assist) er **uavhengige**:
@@ -394,7 +394,7 @@ export function t(key) { ... }
 - Gold/Pro: `#ffe173` · Error/loss: `#ffb4ab`
 - Glassmorphic top nav: `#31353c` @ 60% opacity + `backdrop-filter: blur(20px)`
 - Grid texture: `body::before` radial-gradient dots, 40px spacing
-- Tailwind CDN (no build step) — tokens in `tailwind.config` block in `app.html`
+- Tailwind CDN (no build step) — tokens in `tailwind.config` block in `app.html`. **⚠️ CDN `<script>` must come BEFORE `tailwind.config = {...}`** — assigning config before the CDN loads throws a `ReferenceError` and all custom color tokens silently fail.
 - Chart.js via CDN: `https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js` (defer i `<head>`)
 
 ---

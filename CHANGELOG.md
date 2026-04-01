@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-04-01 — Kinetic Velocity post-merge fixes
+
+- **Tailwind config order** (`landing.html` + `app.html`): Moved `<script src="cdn.tailwindcss.com">` before `tailwind.config = {...}` — the assignment threw a `ReferenceError` when CDN wasn't loaded yet, causing all custom color tokens to fail and text to render black on dark backgrounds
+- **Result row** (`style.css`): Removed `background` from `.wins/.draw/.loss` — semi-transparent tint over the dark page background rendered as muddy olive; border + text color alone is sufficient
+- **Stray score separator** (`app.html`): Removed `–` span between HOME/AWAY score boxes — it was invisible before the Tailwind fix and rendered as a floating minus button after
+
+---
+
 ## 2026-03-31 — Kinetic Velocity redesign (complete, branch: redesign/kinetic-velocity)
 
 - **Spec + plan**: Full design spec and 14-task implementation plan committed to `docs/superpowers/specs/` and `docs/superpowers/plans/` on `main`
