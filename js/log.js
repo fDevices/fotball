@@ -25,14 +25,17 @@ export function setMatchType(type) {
 }
 
 export function updateResult() {
-  var el = document.getElementById('result-display');
-  if (!el) return;
   var r = matchType === 'home'
     ? (home > away ? 'wins' : home < away ? 'loss' : 'draw')
     : (away > home ? 'wins' : away < home ? 'loss' : 'draw');
-  var labels = { wins: t('res_win'), draw: t('res_uavgjort'), loss: t('res_tap') };
-  el.textContent = labels[r];
-  el.className = 'result-auto ' + r;
+  var segs = { wins: 'result-seg-wins', draw: 'result-seg-draw', loss: 'result-seg-loss' };
+  var labels = { wins: t('seg_win'), draw: t('seg_draw'), loss: t('seg_loss') };
+  Object.keys(segs).forEach(function(key) {
+    var el = document.getElementById(segs[key]);
+    if (!el) return;
+    el.textContent = labels[key];
+    el.classList.toggle('active', key === r);
+  });
 }
 
 export function adjust(type, delta) {

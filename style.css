@@ -71,6 +71,33 @@ body::before {
 .draw { color: #ffe173; border-color: #ffe173; }
 .loss { color: #ffb4ab; border-color: #ffb4ab; }
 
+/* ── RESULT SEGMENT CONTROL ── */
+.result-segment-track {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: #0d1117;
+  border-radius: 12px;
+  border: 1px solid rgba(58,73,75,0.5);
+  padding: 4px;
+  gap: 3px;
+}
+.result-segment {
+  padding: 13px 8px;
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-radius: 8px;
+  color: #6b7680;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.result-segment.active { color: #10141a; }
+#result-seg-wins.active  { background: #00f2ff; box-shadow: 0 0 14px rgba(0,242,255,0.35); }
+#result-seg-draw.active  { background: #ffe173; box-shadow: 0 0 14px rgba(255,225,115,0.35); }
+#result-seg-loss.active  { background: #ffb4ab; box-shadow: 0 0 14px rgba(255,180,171,0.35); }
+
 .match-type-mini-btn.active { background: rgba(0,242,255,0.1); border-color: #00f2ff; color: #00f2ff; }
 .match-type-mini-btn.active .match-svg-icon { background-color: #00f2ff; }
 .toggle-btn.active { background: rgba(0,242,255,0.1); border-color: #00f2ff; color: #00f2ff; }
