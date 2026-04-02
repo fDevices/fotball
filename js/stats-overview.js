@@ -107,17 +107,13 @@ function renderMonthlyBreakdown(matches) {
 
   var rows = keys.map(function(ym) {
     var s = calcWDL(monthMap[ym]);
-    var pctW = Math.round((s.w / s.n) * 100);
-    var pctD = Math.round((s.d / s.n) * 100);
-    var pctL = 100 - pctW - pctD;
-    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">' +
-      '<span style="font-size:10px;color:var(--muted);width:40px;flex-shrink:0">' + monthLabel(ym) + '</span>' +
-      '<div class="wdl-bar" style="flex:1;height:14px;margin-bottom:0">' +
-        '<div class="wdl-seg w" style="width:' + pctW + '%"></div>' +
-        '<div class="wdl-seg d" style="width:' + pctD + '%"></div>' +
-        '<div class="wdl-seg l" style="width:' + pctL + '%"></div>' +
+    return '<div class="tournament-stat-row">' +
+      '<div class="tournament-stat-name">' + monthLabel(ym) + ' <span style="color:var(--muted);font-size:12px;font-weight:400">(' + s.n + ' ' + t('matches_short') + ')</span></div>' +
+      '<div class="tournament-stat-badges">' +
+        '<span class="t-badge win">' + s.w + t('win_short') + '</span>' +
+        '<span class="t-badge draw">' + s.d + t('draw_short') + '</span>' +
+        '<span class="t-badge loss">' + s.l + t('loss_short') + '</span>' +
       '</div>' +
-      '<span style="font-size:9px;color:var(--lime);width:28px;text-align:right">\u26BD' + s.g + '</span>' +
     '</div>';
   }).join('');
 
