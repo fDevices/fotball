@@ -452,8 +452,9 @@ export function switchStatsView(view) {
   var btnAnalyse  = document.getElementById('stats-view-btn-analyse');
   if (btnOversikt) btnOversikt.classList.toggle('active', view === 'overview');
   if (btnAnalyse)  btnAnalyse.classList.toggle('active', view === 'analyse');
+  var isDesktop = window.matchMedia('(min-width: 900px)').matches;
   var filters = document.getElementById('stats-filters');
-  if (filters) filters.style.display = view === 'overview' ? '' : 'none';
+  if (filters && !isDesktop) filters.style.display = view === 'overview' ? '' : 'none';
   renderStats();
 }
 
@@ -474,6 +475,7 @@ export async function loadStats(forceRefresh) {
 
 export function renderStats() {
   destroyCharts();
+  var isDesktop = window.matchMedia('(min-width: 900px)').matches;
 
   var seasons = getAllSeasons(getAllMatches());
   if (!seasons.length) seasons = [String(new Date().getFullYear())];
@@ -485,7 +487,7 @@ export function renderStats() {
   if (statsHeadingSeason) statsHeadingSeason.textContent = ' ' + activeSeason;
 
   var filtersDiv = document.getElementById('stats-filters');
-  if (filtersDiv) filtersDiv.style.display = activeStatsView === 'overview' ? '' : 'none';
+  if (filtersDiv) filtersDiv.style.display = (isDesktop || activeStatsView === 'overview') ? '' : 'none';
 
   document.getElementById('season-selector').innerHTML = seasons.map(function(s) {
     return '<button class="season-pill ' + (s === activeSeason ? 'active' : '') + '" data-action="setSeason" data-season="' + s + '">' + s + '</button>';
@@ -527,16 +529,20 @@ export function renderStats() {
   var statsSubEl = document.getElementById('stats-sub');
   if (statsSubEl) statsSubEl.textContent = n + ' ' + t('matches_short') + ' \xb7 ' + teamText;
 
-  if (activeStatsView === 'analyse') {
+  if (activeStatsView === 'analyse' && !isDesktop) {
     renderAnalyse(matches, activeLag, activeSeason);
     return;
   }
 
   var statsContent = document.getElementById('stats-content');
-  if (!statsContent) return;
+  if (!statsContent) {
+    if (isDesktop) renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
+    return;
+  }
 
   if (n === 0) {
     statsContent.innerHTML = '<div class="loading">' + t('no_matches_season') + '</div>';
+    if (isDesktop) renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
     return;
   }
 
@@ -589,6 +595,9 @@ export function renderStats() {
     '</div>' +
     '<div class="match-list-header">' + t('match_history') + '</div>' +
     renderMatchListPaged(matches, matchPage);
+  if (isDesktop) {
+    renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
+  }
 }
 
 export function setMatchPage(page) {

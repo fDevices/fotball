@@ -397,6 +397,11 @@ canvas { max-width: 100%; }
   .share-main { padding: 16px; }
 }
 
+/* ── DESKTOP TWO-COLUMN STATS ── */
 @media (min-width: 900px) {
   .screen { max-width: 1080px; }
+  #stats-desktop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .stats-view-toggle { display: none !important; }
+  #stats-content, #stats-content-analyse { display: block !important; }
 }
+.analyse-col-header { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #b9cacb; margin-bottom: 12px; }
