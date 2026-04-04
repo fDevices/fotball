@@ -41,7 +41,11 @@ export function renderMatchListPaged(matches, page) {
   if (matchPage >= totalPages) matchPage = totalPages - 1;
   var start = matchPage * PAGE_SIZE;
   var pageMatches = matches.slice(start, start + PAGE_SIZE);
-  var html = '<div class="match-list-grid">' + renderMatchList(pageMatches) + '</div>';
+  var half = Math.ceil(pageMatches.length / 2);
+  var html = '<div class="match-list-grid">' +
+    '<div class="match-col">' + renderMatchList(pageMatches.slice(0, half)) + '</div>' +
+    '<div class="match-col">' + renderMatchList(pageMatches.slice(half)) + '</div>' +
+  '</div>';
   if (totalPages > 1) {
     var from = start + 1;
     var to = Math.min(start + PAGE_SIZE, total);

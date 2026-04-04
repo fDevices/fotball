@@ -403,7 +403,6 @@ canvas { max-width: 100%; }
   #stats-desktop-grid { display: grid; grid-template-columns: 1fr 3fr; gap: 24px; align-items: start; }
   .stats-view-toggle { display: none !important; }
   #stats-content, #stats-content-analyse { display: block !important; }
-  .match-list-grid { column-count: 2; column-gap: 6px; }
-  .match-list-grid .match-item { break-inside: avoid; }
+  .match-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 }
 .analyse-col-header { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #b9cacb; margin-bottom: 12px; }
