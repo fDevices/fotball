@@ -107,9 +107,16 @@ function renderMonthlyBreakdown(matches) {
 
   var rows = keys.map(function(ym) {
     var s = calcWDL(monthMap[ym]);
+    var pct = function(v) { return s.n ? Math.round((v / s.n) * 100) : 0; };
+    var bar = '<div class="wdl-bar" style="width:72px;height:8px;flex-shrink:0;margin-bottom:0;border-radius:4px">' +
+      '<div class="wdl-seg w" style="width:' + pct(s.w) + '%"></div>' +
+      '<div class="wdl-seg d" style="width:' + pct(s.d) + '%"></div>' +
+      '<div class="wdl-seg l" style="width:' + pct(s.l) + '%"></div>' +
+    '</div>';
     return '<div class="tournament-stat-row">' +
       '<div class="tournament-stat-name">' + monthLabel(ym) + ' <span style="color:var(--muted);font-size:12px;font-weight:400">(' + s.n + ' ' + t('matches_short') + ')</span></div>' +
-      '<div class="tournament-stat-badges">' +
+      '<div class="tournament-stat-badges" style="align-items:center">' +
+        bar +
         '<span class="t-badge win">' + s.w + t('win_short') + '</span>' +
         '<span class="t-badge draw">' + s.d + t('draw_short') + '</span>' +
         '<span class="t-badge loss">' + s.l + t('loss_short') + '</span>' +
