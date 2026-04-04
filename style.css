@@ -403,6 +403,7 @@ canvas { max-width: 100%; }
   #stats-desktop-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
   .stats-view-toggle { display: none !important; }
   #stats-content, #stats-content-analyse { display: block !important; }
+  #stats-match-history { grid-column: 1 / -1; }
   .match-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .match-list-grid > * { min-width: 0; }
 }

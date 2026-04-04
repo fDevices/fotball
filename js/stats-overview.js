@@ -547,8 +547,11 @@ export function renderStats() {
     return;
   }
 
+  var matchHistoryEl = document.getElementById('stats-match-history');
+
   if (n === 0) {
     statsContent.innerHTML = '<div class="loading">' + t('no_matches_season') + '</div>';
+    if (matchHistoryEl) matchHistoryEl.innerHTML = '';
     if (isDesktop) renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
     return;
   }
@@ -592,16 +595,19 @@ export function renderStats() {
     renderPerformanceProfile(matches) +
     renderScoringStreaks(matches) +
     renderMonthlyBreakdown(matches) +
-    renderHeadToHead(matches) +
-    '<div class="opponent-search-wrap">' +
-      '<div class="opponent-search-field-wrap">' +
-        '<span class="opponent-search-icon">\u{1F50D}</span>' +
-        '<input type="text" id="opponent-search-input" class="opponent-search-input" placeholder="' + t('opponent_search_ph') + '" value="' + esc(opponentSearch) + '" />' +
-        (opponentSearch ? '<button class="opponent-search-clear" data-action="clearOpponentSearch">\u2715</button>' : '') +
+    renderHeadToHead(matches);
+  if (matchHistoryEl) {
+    matchHistoryEl.innerHTML =
+      '<div class="opponent-search-wrap">' +
+        '<div class="opponent-search-field-wrap">' +
+          '<span class="opponent-search-icon">\u{1F50D}</span>' +
+          '<input type="text" id="opponent-search-input" class="opponent-search-input" placeholder="' + t('opponent_search_ph') + '" value="' + esc(opponentSearch) + '" />' +
+          (opponentSearch ? '<button class="opponent-search-clear" data-action="clearOpponentSearch">\u2715</button>' : '') +
+        '</div>' +
       '</div>' +
-    '</div>' +
-    '<div class="match-list-header">' + t('match_history') + '</div>' +
-    renderMatchListPaged(matches, matchPage);
+      '<div class="match-list-header">' + t('match_history') + '</div>' +
+      renderMatchListPaged(matches, matchPage);
+  }
   if (isDesktop) {
     renderAnalyse(matches, activeLag, activeSeason, 'stats-content-analyse', true);
   }
@@ -609,10 +615,10 @@ export function renderStats() {
 
 export function setMatchPage(page) {
   matchPage = page;
-  var statsContent = document.getElementById('stats-content');
-  if (!statsContent) return;
-  if (opponentSearch) { renderOpponentSearchResults(statsContent); return; }
-  var header = statsContent.querySelector('.match-list-header');
+  var container = document.getElementById('stats-match-history') || document.getElementById('stats-content');
+  if (!container) return;
+  if (opponentSearch) { renderOpponentSearchResults(container); return; }
+  var header = container.querySelector('.match-list-header');
   if (!header) { renderStats(); return; }
   var seasonMatches = getAllMatches().filter(function(k) { return matchesSeason(k, activeSeason); });
   var teamMatches = seasonMatches.filter(function(k) { return matchesTeamFilter(k, activeLag); });
@@ -623,7 +629,7 @@ export function setMatchPage(page) {
   toRemove.forEach(function(n) { n.parentNode.removeChild(n); });
   var temp = document.createElement('div');
   temp.innerHTML = renderMatchListPaged(matches, matchPage);
-  while (temp.firstChild) { statsContent.appendChild(temp.firstChild); }
+  while (temp.firstChild) { container.appendChild(temp.firstChild); }
   header.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -634,10 +640,10 @@ export function setTournamentFilter(tournament) { activeTournament = tournament;
 export function setOpponentSearch(val) {
   opponentSearch = val.trim().toLowerCase();
   matchPage = 0;
-  var statsContent = document.getElementById('stats-content');
-  if (!statsContent) return;
+  var container = document.getElementById('stats-match-history') || document.getElementById('stats-content');
+  if (!container) return;
   if (opponentSearch) {
-    renderOpponentSearchResults(statsContent);
+    renderOpponentSearchResults(container);
   } else {
     renderStats();
   }
