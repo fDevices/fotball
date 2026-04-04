@@ -108,7 +108,7 @@ function renderMonthlyBreakdown(matches) {
   var rows = keys.map(function(ym) {
     var s = calcWDL(monthMap[ym]);
     var pct = function(v) { return s.n ? Math.round((v / s.n) * 100) : 0; };
-    var bar = '<div class="wdl-bar" style="width:72px;height:8px;flex-shrink:0;margin-bottom:0;border-radius:4px">' +
+    var bar = '<div class="wdl-bar" style="flex:1;height:8px;margin-bottom:0;border-radius:4px">' +
       '<div class="wdl-seg w" style="width:' + pct(s.w) + '%"></div>' +
       '<div class="wdl-seg d" style="width:' + pct(s.d) + '%"></div>' +
       '<div class="wdl-seg l" style="width:' + pct(s.l) + '%"></div>' +
