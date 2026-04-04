@@ -148,6 +148,8 @@ body::before {
 
 .date-input-hidden { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
 .flag-svg-icon { width: 22px; height: 16px; border-radius: 2px; vertical-align: middle; }
+.lang-picker-dropdown { display: none; }
+.lang-picker-dropdown.open { display: block !important; }
 
 .tab-profile-badge { position: absolute; top: -2px; right: -4px; width: 8px; height: 8px; background: #00f2ff; border-radius: 50%; display: none; }
 .tab-profile-badge.show { display: block; }
