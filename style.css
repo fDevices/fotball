@@ -400,7 +400,7 @@ canvas { max-width: 100%; }
 /* ── DESKTOP TWO-COLUMN STATS ── */
 @media (min-width: 900px) {
   .screen { max-width: 1080px; }
-  #stats-desktop-grid { display: grid; grid-template-columns: minmax(300px, 1fr) 2fr; gap: 24px; align-items: start; }
+  #stats-desktop-grid { display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: start; }
   .stats-view-toggle { display: none !important; }
   #stats-content, #stats-content-analyse { display: block !important; }
   .match-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
