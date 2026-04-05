@@ -237,6 +237,7 @@ canvas { max-width: 100%; }
 .stat-row-value { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: #dfe2eb; }
 
 /* ── FORM STREAK BOXES ── */
+.form-streak-empty { font-size: 13px; color: #b9cacb; }
 .form-streak-boxes { display: flex; gap: 4px; flex-wrap: wrap; }
 .form-streak-box { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; }
 .form-streak-box.wins { background: rgba(0,242,255,0.2); color: #00f2ff; }
@@ -402,7 +403,7 @@ canvas { max-width: 100%; }
   .screen { max-width: 1080px; }
   #screen-log, #screen-profile, #screen-settings { max-width: 480px; }
   #stats-desktop-grid { display: grid; grid-template-columns: 380px 1fr; gap: 24px; align-items: start; }
-  .stats-view-toggle { display: none !important; }
+  #screen-stats .stats-view-toggle { display: none !important; }
   #stats-content, #stats-content-analyse { display: block !important; }
   #stats-match-history { grid-column: 1 / -1; }
   .match-list-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }

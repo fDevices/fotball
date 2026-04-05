@@ -206,9 +206,9 @@ function renderHomeAwaySection(matches) {
         '<div class="ha-mini-seg" style="width:' + pctL + '%;background:var(--danger)"></div>' +
       '</div>' +
       '<div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">' +
-        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--lime)">' + s.g + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_goals') + '</div></div>' +
-        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--gold)">' + s.a + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_assists') + '</div></div>' +
-        '<div style="text-align:center"><div style="font-family:Barlow Condensed,sans-serif;font-size:16px;font-weight:800;color:var(--white)">' + (s.g + s.a) + '</div><div style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">G+A</div></div>' +
+        '<div style="text-align:center"><div style="font-family:\'Space Grotesk\',sans-serif;font-size:16px;font-weight:800;color:var(--lime)">' + s.g + '</div><div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_goals') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-family:\'Space Grotesk\',sans-serif;font-size:16px;font-weight:800;color:var(--gold)">' + s.a + '</div><div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">' + t('stat_assists') + '</div></div>' +
+        '<div style="text-align:center"><div style="font-family:\'Space Grotesk\',sans-serif;font-size:16px;font-weight:800;color:var(--white)">' + (s.g + s.a) + '</div><div style="font-family:\'Space Grotesk\',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted)">G+A</div></div>' +
       '</div>' +
     '</div>';
   }
