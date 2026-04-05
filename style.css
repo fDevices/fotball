@@ -109,7 +109,8 @@ body::before {
 .team-chevron { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #b9cacb; font-size: 11px; transition: transform 0.15s, color 0.15s; pointer-events: none; }
 .team-chevron.open { transform: translateY(-50%) rotate(180deg); color: #00f2ff; }
 
-.stats-view-btn { border-radius: 6px; }
+.stats-view-toggle { display: flex; background: #10141a; border-radius: 10px; padding: 4px; gap: 4px; }
+.stats-view-btn { flex: 1; padding: 8px; border-radius: 6px; border: none; background: none; color: #b9cacb; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
 .stats-view-btn.active { background: #262a31; color: #00f2ff; box-shadow: 0 0 0 1px rgba(0,242,255,0.25); }
 .season-pill.active { background: #00f2ff; color: #00363a; border-color: #00f2ff; }
 
