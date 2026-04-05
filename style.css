@@ -148,6 +148,7 @@ body::before {
 
 .date-input-hidden { position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; }
 .flag-svg-icon { width: 22px; height: 16px; border-radius: 2px; vertical-align: middle; }
+.lang-flag-btn { background: none; border: none; cursor: pointer; font-size: 20px; padding: 4px; border-radius: 6px; line-height: 1; }
 .lang-picker-dropdown { display: none; }
 .lang-picker-dropdown.open { display: block !important; }
 
