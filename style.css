@@ -364,6 +364,10 @@ canvas { max-width: 100%; }
 .share-desktop-layout { display: flex; gap: 0; min-height: 100vh; max-width: 1080px; margin: 0 auto; }
 .share-sidebar { width: 260px; flex-shrink: 0; padding: 24px 20px; border-right: 1px solid rgba(58,73,75,0.4); position: sticky; top: 0; max-height: 100vh; overflow-y: auto; }
 .share-main { flex: 1; padding: 24px 20px; min-width: 0; }
+.share-page-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+.share-page-title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: #dfe2eb; }
+.share-page-cta { font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #00f2ff; text-decoration: none; white-space: nowrap; opacity: 0.85; transition: opacity 0.15s; }
+.share-page-cta:hover { opacity: 1; }
 
 .share-sidebar-profile { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
 .share-avatar { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(0,242,255,0.3); }

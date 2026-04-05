@@ -396,6 +396,10 @@ function renderStats() {
         sidebarFilters +
       '</div>' +
       '<div class="share-main">' +
+        '<div class="share-page-header">' +
+          '<div class="share-page-title">' + esc(_profileCache.name || '') + '\u2019s ' + t('stats_overview').toLowerCase() + '</div>' +
+          '<a href="/" class="share-page-cta">' + t('share_cta') + '</a>' +
+        '</div>' +
         '<div class="stats-body">' +
           toggle +
           '<div id="share-stats-content">' + statsContent + '</div>' +
