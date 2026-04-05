@@ -20,7 +20,7 @@
 | **Live URL** | https://athlyticsport.app og https://www.athlyticsport.app |
 | **GitHub** | https://github.com/fDevices/fotball (public, `main` branch) |
 | **Hosting** | Vercel – prosjekt: `fdevices-projects/fotball` |
-| **Routing** | `vercel.json`: `/` → `landing.html` (marketing/entrypoint), `/app` → `app.html` (appskall). To-entry-modell: `landing.html` er permanent markedsføringsside; `app.html` er selve appen. Begge må deployeres ved releaser. `landing.html` redirecter automatisk til `/app` hvis `athlytics_session` er gyldig (sjekkes i `<head>` før render). |
+| **Routing** | `vercel.json`: `/` → `landing.html`, `/app` → `app.html`. `landing.html` redirecter til `/app` hvis `athlytics_session` er gyldig. Begge deployeres ved releaser. |
 | **Database** | Supabase – URL og service keys settes via Vercel env vars. Anon key (`sb_publishable_`) er hardkodet i `js/config.js` — dette er design by intent; nøkkelen er offentlig og RLS beskytter data. Rotér ved mistanke om misbruk. |
 | **E-post** | Resend – ⚠️ **Husk å gjenopprette e-postkonfigurasjon etter testing er fullført** |
 | **Edge Functions** | `supabase/functions/delete-account/` — deployed via `supabase functions deploy delete-account`. Requires `SUPABASE_SERVICE_ROLE_KEY` set in Supabase project secrets. |
@@ -49,7 +49,6 @@ Access- og refresh-token lagres i `localStorage`. Standard SPA-praksis, men XSS 
 | `supabase.js` | `fetchMatches()` sender ingen `user_id`-filter — datakorrekthet avhenger av at RLS-policy er riktig. Test policies grundig ved endringer. | 🟡 Arkitekturmerknad |
 | `app.html` | Inneholder norske standardstrenger som overskrives av `updateAllText()` ved bootstrap. Skjørt hvis render-syklusen feiler. | 🟢 Lav |
 | `assessment.js` | `isDevPremium()` returnerer alltid `true` — ikke ekte entitlement. Ikke sett til `false` før Stripe-flyt er på plass. | 🟡 Medium |
-| `assessment.js` | `saveAssessment()` blander DOM-reads, API-kall, state-mutasjon, toast og knapp-state. | 🟢 Lav |
 | `navigation.js` | `updateLogBadge()` hardkoder sport-til-ikon-mapping. Flytt til `SPORT_META`-map ved Fase 3 multi-sport. | 🟢 Lav |
 
 ---
@@ -141,23 +140,6 @@ profile.js   teams.js   settings-render.js   navigation.js
                       main.js  (orkestrator)
 ```
 
-`auth.js` importeres av `supabase.js` (for session token), `profile.js`, `settings.js` og `main.js` (for `getUserId()`, `isAuthenticated()`, `restoreSession()`, `logout()`).
-
-`state.js` bryter sirkulær risiko: `stats-overview.js`, `modal.js` og `export.js` bruker alle `getAllMatches()` uten å importere hverandre.
-
----
-
-## Appens struktur
-
-### Fire tabs
-
-| Tab | Ikon | Funksjon |
-|-----|------|----------|
-| Logg | ⚽ | Registrer kampdata |
-| Statistikk | 📊 | Sesongoversikt, historikk og analyse |
-| Profil | 👤 | Spillerprofil, lag og turneringer |
-| Innstillinger | ⚙️ | Sport, sesongformat, aktiv sesong, eksport |
-
 ---
 
 ## Datakontrakter
@@ -209,8 +191,6 @@ updated_at (timestamptz)
 
 > **Merk:** JS-profilobjektet bruker feltnavn `teams` (array) internt. `saveProfileToSupabase()` mapper dette til DB-kolonnen `team`. `fetchProfileFromSupabase()` leser `row.team` og lagrer som `teams` i JS-objektet. Dette er et kjent unntak fra ellers identisk navngivning.
 
-**All kode og alle Supabase-kolonner bruker engelske navn.** Navngivningen er konsistent med ett kjent unntak: JS bruker `teams`, DB bruker `team` (se merknad over).
-
 ### localStorage-nøkler
 
 ```
@@ -223,17 +203,7 @@ sessionStorage: 'athlytics_matches'  → cache, invalidated after save/edit/dele
 
 ## Kodenavn-konvensjoner
 
-All kode bruker engelsk for variabelnavn, funksjonsnavn, ID-er, CSS-klasser og Supabase-kolonnenavn – med ett kjent unntak:
-- `teams` (JS) ↔ `team` (DB) — én kjent mapping, se profiles-kontrakten
-
-| JS-variabel | Supabase-kolonne |
-|---|---|
-| `k.date` | `date` |
-| `k.opponent` | `opponent` |
-| `k.own_team` | `own_team` |
-| `k.home_score` / `k.away_score` | `home_score` / `away_score` |
-| `k.goals` | `goals` |
-| `k.match_type` | `match_type` — ALWAYS `'home'` or `'away'` |
+All kode bruker engelsk. `match_type` bruker alltid strengene `'home'` og `'away'` — aldri andre verdier. Ett kjent unntak: JS bruker `teams`, DB-kolonnen heter `team` (se profiles-kontrakten over).
 
 ---
 
@@ -297,7 +267,7 @@ I analyse-visningen rendres sesong/lag-selectors **inline** øverst i `#stats-co
 ### Avatar upload
 Avatar-circle bruker `data-action="triggerAvatarUpload"` → ACTIONS-map kaller `#avatar-upload.click()`. Avatar-input bruker `data-action="uploadImage"` → delegert `change`-event i `main.js`. Ingen `onclick`/`onchange`-attributter og ingen `window._uploadImage` global.
 
-`uploadImage()` bruker Supabase Storage for autentiserte brukere og base64 for demo-brukere. Merget fra `feature/avatar-storage` 2026-03-21.
+`uploadImage()` bruker Supabase Storage for autentiserte brukere og base64 for demo-brukere.
 
 ---
 
@@ -349,40 +319,17 @@ Appen er portrait-only. Landscape viser en overlay: "Roter telefonen til ståend
 - Threshold `max-height: 600px` unngår at overlayden vises på desktop-browsere i smalt vindu
 
 ### Desktop (Fase 3/4)
-Stats-tab har responsivt to-kolonne layout på desktop (≥900px): Oversikt + Analyse vises side om side, tab-bar strekker seg full bredde, toggle er skjult. Implementert 2026-03-23.
-
-Gjenstående desktop-arbeid venter til Fase 3/4:
-- **Mobil** – logging av kamper, rask sjekk av enkeltstatistikk
-- **Desktop** – sidebar-nav istedet for tab-bar, coach/admin-visning
-
-Desktop kobles naturlig til **Club-planen** (Fase 4).
+Stats-tab har responsivt to-kolonne layout på desktop (≥900px). Øvrige tabs (logg/profil/innstillinger) holder 480px bredde. Sidebar-nav og coach/admin-visning venter til Fase 3/4.
 
 ---
 
 ## Multi-sport theming (implementert, aktiveres i Fase 3)
 
-`THEMES`-objekt og `applyTheme(sport)` er implementert i `settings-render.js`. `sport_icon`, `stat1_label`, `stat2_label` finnes i `TEKST`. Kalles fra `setSport()` og bootstrap.
-
-```javascript
-const THEMES = {
-  football:    { grass: '#1a3a1f', lime: '#a8e063', card: '#162b1a' },
-  orientering: { grass: '#1a2a3a', lime: '#63b8e0', card: '#162130' },
-  ski:         { grass: '#1a1a3a', lime: '#a0a8e0', card: '#161628' }
-};
-```
-
-Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat2_label` i `TEKST`, valider mot tillatt-liste i `setSport()`.
+`THEMES`-objekt og `applyTheme(sport)` er implementert i `settings-render.js`. Kalles fra `setSport()` og bootstrap. Ved ny sport: legg til rad i `THEMES`, legg til `sport_icon`/`stat1_label`/`stat2_label` i `TEKST`, valider mot tillatt-liste i `setSport()`.
 
 ---
 
 ## Roadmap
-
-### Fase 2.5 – Deling
-- [x] Share link — player generates shareable URL, third party views stats + profile (no assessments). Foundation for Fase 4 coach dashboard.
-
-### Pro stats analysis (implementert 2026-03-29)
-- [x] Performance Profile, Scoring Streaks, Head-to-Head, Monthly Breakdown (Overview tab, Pro-gated)
-- [x] Rating Trend chart (Analyse tab, Pro-gated)
 
 ### Fase 3 – Multi-sport
 - [ ] Orientering, ski
