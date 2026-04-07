@@ -97,10 +97,14 @@ export const ACTIONS = {
     var idx = parseInt(el.dataset.datasetIndex, 10);
     var chart = getChartInstance('ratingTrend');
     if (!chart) return;
-    var meta = chart.getDatasetMeta(idx);
-    meta.hidden = !meta.hidden;
+    var isVisible = chart.isDatasetVisible(idx);
+    chart.setDatasetVisibility(idx, !isVisible);
     chart.update();
-    el.classList.toggle('rating-pill-on', !meta.hidden);
+    var color = el.dataset.color;
+    var on = !isVisible;
+    el.style.background = on ? color + '22' : '';
+    el.style.borderColor = on ? color + '66' : '';
+    el.style.color = on ? color : '';
   },
   logout:              () => logout(),
   openAuthOverlay:     () => openAuthOverlay('login'),
