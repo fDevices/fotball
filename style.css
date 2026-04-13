@@ -407,6 +407,23 @@ canvas { max-width: 100%; }
   .share-main { padding: 16px; }
 }
 
+/* ── SHARE PANEL TOKEN LIST ── */
+.share-no-links { font-size: 13px; color: #b9cacb; text-align: center; padding: 20px 0; }
+.share-section-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #b9cacb; margin: 16px 0 8px; }
+.share-section-expired { color: #b9cacb; opacity: 0.6; }
+.share-token-row { background: #1c2026; border: 1px solid rgba(58,73,75,0.4); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+.share-token-row.share-token-expired { opacity: 0.5; }
+.share-token-info { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.share-token-label { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: #dfe2eb; }
+.share-token-expiry { font-size: 11px; color: #b9cacb; white-space: nowrap; }
+.share-badge-expired { color: #ffb4ab; }
+.share-token-url { font-size: 11px; color: #b9cacb; word-break: break-all; margin-bottom: 8px; opacity: 0.7; }
+.share-token-actions { display: flex; gap: 8px; }
+.share-btn-copy { flex: 1; padding: 7px 12px; background: rgba(0,242,255,0.1); border: 1px solid rgba(0,242,255,0.3); border-radius: 7px; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #00f2ff; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.share-btn-copy:hover { background: rgba(0,242,255,0.18); border-color: rgba(0,242,255,0.5); }
+.share-btn-delete { flex: 1; padding: 7px 12px; background: rgba(255,180,171,0.08); border: 1px solid rgba(255,180,171,0.2); border-radius: 7px; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #ffb4ab; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.share-btn-delete:hover { background: rgba(255,180,171,0.15); border-color: rgba(255,180,171,0.4); }
+
 /* ── DESKTOP TWO-COLUMN STATS ── */
 @media (min-width: 900px) {
   .screen { max-width: 1080px; }
