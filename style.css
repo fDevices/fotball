@@ -424,6 +424,37 @@ canvas { max-width: 100%; }
 .share-btn-delete { flex: 1; padding: 7px 12px; background: rgba(255,180,171,0.08); border: 1px solid rgba(255,180,171,0.2); border-radius: 7px; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600; color: #ffb4ab; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
 .share-btn-delete:hover { background: rgba(255,180,171,0.15); border-color: rgba(255,180,171,0.4); }
 
+/* ── EXPORT SEASON SELECTOR ── */
+.export-season-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.export-season-row span {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+#export-season-select {
+  flex: 1;
+  background: var(--elevated);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: var(--white);
+  font-size: 13px;
+  font-family: inherit;
+  padding: 7px 10px;
+  cursor: pointer;
+  outline: none;
+}
+
+#export-season-select:focus {
+  border-color: rgba(0, 242, 255, 0.5);
+}
+
 /* ── DESKTOP TWO-COLUMN STATS ── */
 @media (min-width: 900px) {
   .screen { max-width: 1080px; }
