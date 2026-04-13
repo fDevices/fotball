@@ -51,6 +51,7 @@
   }
   @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
   .fade-up { animation: fadeUp 0.6s ease forwards; }
+  @keyframes pulse-ring { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
   .hero-glow {
     background: radial-gradient(ellipse 60% 40% at 50% 60%, rgba(0,242,255,0.08) 0%, transparent 70%);
     pointer-events: none;
@@ -69,7 +70,7 @@
       <div class="flex items-center gap-3">
         <a href="#pricing" class="text-on-surface-variant text-sm hover:text-on-surface transition-colors hidden sm:block">Pricing</a>
         <a href="/app" class="text-on-surface-variant text-sm hover:text-on-surface transition-colors hidden sm:block" id="nav-login-btn">Log in</a>
-        <a href="/app" class="px-4 py-2 bg-primary-container text-on-primary font-headline font-semibold text-sm rounded-lg hover:bg-primary-fixed-dim transition-colors">Get started</a>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfqNsh_lrjrGL6yXbfr2B993eLymqG-x2Jsmjh1iUaZizTaBg/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-primary-container text-on-primary font-headline font-semibold text-sm rounded-lg hover:bg-primary-fixed-dim transition-colors">Beta testing</a>
       </div>
     </div>
   </nav>
@@ -88,10 +89,20 @@
       <p class="text-on-surface-variant text-lg sm:text-xl font-body max-w-lg mx-auto mb-8">
         Track every match. Analyse your form. Understand your performance — for free.
       </p>
-      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-12">
+      <div class="flex flex-col sm:flex-row gap-3 justify-center mb-6">
         <a href="/app" class="px-8 py-3.5 bg-primary-container text-on-primary font-headline font-bold text-base rounded-lg hover:bg-primary-fixed-dim transition-colors">Start for free →</a>
         <a href="#features" class="px-8 py-3.5 border border-outline-variant/60 text-on-surface font-headline font-semibold text-base rounded-lg hover:border-primary-container/60 transition-colors">See features</a>
       </div>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSfqNsh_lrjrGL6yXbfr2B993eLymqG-x2Jsmjh1iUaZizTaBg/viewform?usp=publish-editor"
+         target="_blank" rel="noopener noreferrer"
+         class="group flex items-center justify-between w-full px-6 py-4 rounded-xl border border-primary-container/40 bg-primary-container/5 hover:bg-primary-container/10 hover:border-primary-container/70 transition-all duration-200 mb-12">
+        <div class="flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full bg-primary-container flex-shrink-0" style="animation: pulse-ring 2s ease-in-out infinite;"></span>
+          <span class="font-headline font-semibold text-xs uppercase tracking-[0.15em] text-primary-container">Beta program</span>
+        </div>
+        <span class="font-headline font-bold text-base text-on-surface group-hover:text-primary-container transition-colors">Sign up for beta testing</span>
+        <span class="font-headline font-bold text-primary-container text-lg group-hover:translate-x-1 transition-transform inline-block">→</span>
+      </a>
       <!-- Social proof -->
       <div class="flex justify-center gap-8 text-center">
         <div>
