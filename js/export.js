@@ -75,7 +75,7 @@ export async function exportCSV() {
   var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
-  a.href = url; a.download = 'athlytics-' + result.season + '.csv';
+  a.href = url; a.download = 'athlytics-' + result.season.replace(/\u2013/g, '-') + '.csv';
   a.click(); URL.revokeObjectURL(url);
   showToast(t('export_csv_done'), 'success');
 }
@@ -116,7 +116,7 @@ export async function exportPDF() {
   }).join('');
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<title>Athlytics \u2013 ' + result.label + '</title>' +
+    '<title>Athlytics \u2013 ' + esc(result.label) + '</title>' +
     '<style>body{font-family:Arial,sans-serif;margin:32px;color:#111}' +
     'h1{font-size:28px;margin-bottom:2px}h2{font-size:14px;color:#666;font-weight:normal;margin-bottom:24px}' +
     '.summary{display:flex;gap:24px;margin-bottom:28px;flex-wrap:wrap}' +
