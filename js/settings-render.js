@@ -1,4 +1,4 @@
-import { getSettings, saveSettings, getAllSeasons } from './settings.js';
+import { getSettings, saveSettings, getAllSeasons, buildSeasonLabel } from './settings.js';
 import { initDangerZone } from './danger.js';
 import { getAllMatches } from './state.js';
 import { isDevPremium } from './utils.js';
@@ -131,6 +131,9 @@ export function renderSettings() {
   var sharePanelTitle = document.getElementById('share-panel-title');
   if (sharePanelTitle) sharePanelTitle.textContent = t('share_panel_title');
 
+  var exportSeasonLabel = document.querySelector('.export-season-row span');
+  if (exportSeasonLabel) exportSeasonLabel.textContent = t('export_season');
+
   var exportSeasonSel = document.getElementById('export-season-select');
   if (exportSeasonSel) {
     var exportSeasons = getAllSeasons(getAllMatches());
@@ -146,7 +149,8 @@ export function renderSettings() {
       exportSeasonSel.appendChild(opt);
     });
     var activeS = s.activeSeason || String(new Date().getFullYear());
-    exportSeasonSel.value = exportSeasons.includes(activeS) ? activeS : (exportSeasons[exportSeasons.length - 1] || 'all');
+    var activeLabel = buildSeasonLabel(activeS, s.seasonFormat);
+    exportSeasonSel.value = exportSeasons.includes(activeLabel) ? activeLabel : (exportSeasons[exportSeasons.length - 1] || 'all');
   }
 
   renderActiveSeasonPills();
