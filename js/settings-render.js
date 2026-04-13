@@ -131,6 +131,24 @@ export function renderSettings() {
   var sharePanelTitle = document.getElementById('share-panel-title');
   if (sharePanelTitle) sharePanelTitle.textContent = t('share_panel_title');
 
+  var exportSeasonSel = document.getElementById('export-season-select');
+  if (exportSeasonSel) {
+    var exportSeasons = getAllSeasons(getAllMatches());
+    exportSeasonSel.innerHTML = '';
+    var allOpt = document.createElement('option');
+    allOpt.value = 'all';
+    allOpt.textContent = t('export_all_seasons');
+    exportSeasonSel.appendChild(allOpt);
+    exportSeasons.forEach(function(season) {
+      var opt = document.createElement('option');
+      opt.value = season;
+      opt.textContent = season;
+      exportSeasonSel.appendChild(opt);
+    });
+    var activeS = s.activeSeason || String(new Date().getFullYear());
+    exportSeasonSel.value = exportSeasons.includes(activeS) ? activeS : (exportSeasons[exportSeasons.length - 1] || 'all');
+  }
+
   renderActiveSeasonPills();
   initDangerZone();
 }
