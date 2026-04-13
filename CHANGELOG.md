@@ -4,6 +4,16 @@
 
 ---
 
+## 2026-04-13 — Export season selector
+
+- **Season dropdown in export card** (`app.html`, `style.css`, `js/i18n.js`, `js/settings-render.js`, `js/export.js`): Added inline season picker between the export description and the CSV/PDF buttons. Users can select any season or "All seasons" before exporting. Dropdown defaults to active season on every render (ephemeral — not persisted).
+- **CSV**: filename is `athlytics-<season>.csv` or `athlytics-all.csv`; split-season en-dash sanitized to hyphen for file system safety.
+- **PDF**: subheading shows `Season 2025` for a specific season, or a year range (`2024–2026`) when all seasons are selected. Both title and h2 are escaped.
+- **Language switching**: label and "All seasons" option update correctly via the existing `athlytics:renderSettings` event chain.
+- **Split-season default**: default selection uses `buildSeasonLabel()` to correctly pre-select e.g. `2025–2026` rather than falling back to the last season.
+
+---
+
 ## 2026-04-01 — Log tab result control + stats desktop fix
 
 - **Result segment control** (`app.html`, `js/log.js`, `js/i18n.js`, `style.css`): Replaced single result display with a three-segment VICTORY / DRAW / LOSS track. Active segment fills solid with the result color (cyan/gold/red) plus a glow. Labels are i18n'd (`seg_win`/`seg_draw`/`seg_loss`). Section label updated to "Final Outcome" / "Sluttresultat".
