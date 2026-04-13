@@ -440,7 +440,7 @@ canvas { max-width: 100%; }
 
 #export-season-select {
   flex: 1;
-  background: var(--elevated);
+  background: #262a31;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   color: var(--white);
