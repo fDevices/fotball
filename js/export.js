@@ -1,6 +1,6 @@
 import { getAllMatches } from './state.js';
 import { fetchMatches } from './supabase.js';
-import { getSettings, getDateLocale } from './settings.js';
+import { getDateLocale } from './settings.js';
 import { getProfile } from './profile.js';
 import { showToast } from './toast.js';
 import { esc, getResult } from './utils.js';
@@ -21,9 +21,25 @@ function matchesSeason(k, season) {
   return (k.date || '').startsWith(season);
 }
 
-function getActiveSeasonMatches(all, s) {
-  var season = s.activeSeason || String(new Date().getFullYear());
-  return { matches: all.filter(function(k) { return matchesSeason(k, season); }), season: season };
+function buildYearRange(matches) {
+  var years = matches.map(function(k) { return parseInt((k.date || '').slice(0, 4), 10); }).filter(Boolean);
+  if (!years.length) return String(new Date().getFullYear());
+  var min = Math.min.apply(null, years);
+  var max = Math.max.apply(null, years);
+  return min === max ? String(min) : min + '\u2013' + max;
+}
+
+function resolveExportScope(all) {
+  var sel = document.getElementById('export-season-select');
+  var value = sel ? sel.value : '';
+  if (!value || value === 'all') {
+    return { matches: all, season: 'all', label: buildYearRange(all) };
+  }
+  return {
+    matches: all.filter(function(k) { return matchesSeason(k, value); }),
+    season: value,
+    label: t('export_season') + ' ' + value
+  };
 }
 
 function buildMatchResultLabel(k) {
@@ -41,8 +57,7 @@ function buildHomeAwayTeams(k) {
 export async function exportCSV() {
   showToast(t('export_fetching'), 'info');
   var all = await getMatchesForExport();
-  var s = getSettings();
-  var result = getActiveSeasonMatches(all, s);
+  var result = resolveExportScope(all);
   if (!result.matches.length) { showToast(t('export_no_matches'), 'error'); return; }
   var header = [t('date'), t('home_label'), t('away_label'), t('export_tournament'),
     t('export_h_score'), t('export_a_score'), t('stat_goals'), t('stat_assists'), t('result_label')].join(',');
@@ -68,12 +83,10 @@ export async function exportCSV() {
 export async function exportPDF() {
   showToast(t('export_fetching'), 'info');
   var all = await getMatchesForExport();
-  var s = getSettings();
-  var result = getActiveSeasonMatches(all, s);
+  var result = resolveExportScope(all);
   if (!result.matches.length) { showToast(t('export_no_matches'), 'error'); return; }
   var profil = getProfile();
   var matches = result.matches;
-  var season = result.season;
   var locale = getDateLocale();
 
   var w = 0, d = 0, l = 0, g = 0, a = 0;
@@ -103,7 +116,7 @@ export async function exportPDF() {
   }).join('');
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<title>Athlytics \u2013 ' + season + '</title>' +
+    '<title>Athlytics \u2013 ' + result.label + '</title>' +
     '<style>body{font-family:Arial,sans-serif;margin:32px;color:#111}' +
     'h1{font-size:28px;margin-bottom:2px}h2{font-size:14px;color:#666;font-weight:normal;margin-bottom:24px}' +
     '.summary{display:flex;gap:24px;margin-bottom:28px;flex-wrap:wrap}' +
@@ -117,7 +130,7 @@ export async function exportPDF() {
     '@media print{body{margin:16px}}' +
     '</style></head><body>' +
     '<h1>Athlytics Sport' + (profil.name ? ' \u2013 ' + esc(profil.name) : '') + '</h1>' +
-    '<h2>' + t('export_season') + ' ' + season + (profil.club ? ' \xb7 ' + esc(profil.club) : '') + '</h2>' +
+    '<h2>' + esc(result.label) + (profil.club ? ' \xb7 ' + esc(profil.club) : '') + '</h2>' +
     '<div class="summary">' +
       '<div class="stat"><div class="stat-n">' + n + '</div><div class="stat-l">' + t('export_matches') + '</div></div>' +
       '<div class="stat"><div class="stat-n" style="color:#4caf50">' + w + '</div><div class="stat-l">' + t('stat_wins') + '</div></div>' +
